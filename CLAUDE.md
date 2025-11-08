@@ -19,7 +19,7 @@ All project-specific content is in the level documents (01-04). This file provid
 ## Document Hierarchy
 
 - **00.SPEC_FRAMEWORK.md** - Generic hierarchical framework (reusable)
-- **01.FIRST_PRINCIPLES.md** - WHY the project exists (philosophy, mission, constraints)
+- **01.FOUNDATIONAL_PHILOSOPHY.md** - WHY the project exists & WHAT core experiences (mission, design pillars, constraints)
 - **02.STABLE_TRUTHS.md** - WHAT strategies (design commitments, behavioral science)
 - **03.INTERACTION_ARCHITECTURE.md** - HOW interactions work (Hook Model implementation)
 - **04.SYSTEMS/** - Implementation details (system specifications)
@@ -44,12 +44,13 @@ All project-specific content is in the level documents (01-04). This file provid
 When modifying specifications:
 
 1. **Maintain hierarchy**: Ensure changes in lower levels don't require changes in higher levels
-2. **Preserve philosophy**: Changes must align with First Principles
-3. **Use placeholders at Levels 1-4**: Actual numbers belong in Level 5
-4. **Keep systems isolated**: Changes to one system shouldn't break others
-5. **Document dependencies**: When systems interact, make it explicit in SYSTEMS_OVERVIEW.md
-6. **Follow reference rules**: Never violate the hierarchical reference constraints
-7. **Interaction architecture first**: Changes to behavioral/interaction patterns should update 03.INTERACTION_ARCHITECTURE.md before system docs
+2. **Preserve philosophy**: Changes must align with Foundational Philosophy (Level 1)
+3. **Design pillar alignment**: Features must support at least one design pillar from Level 1
+4. **Use placeholders at Levels 1-4**: Actual numbers belong in Level 5
+5. **Keep systems isolated**: Changes to one system shouldn't break others
+6. **Document dependencies**: When systems interact, make it explicit in SYSTEMS_OVERVIEW.md
+7. **Follow reference rules**: Never violate the hierarchical reference constraints
+8. **Interaction architecture first**: Changes to behavioral/interaction patterns should update 03.INTERACTION_ARCHITECTURE.md before system docs
 
 ### Working with Level 5 FINE_TUNING (YAML)
 
@@ -104,10 +105,38 @@ points:
 ## Reading Order
 
 1. `00.SPEC_FRAMEWORK.md` - Understand the framework
-2. `01.FIRST_PRINCIPLES.md` - WHY
+2. `01.FOUNDATIONAL_PHILOSOPHY.md` - WHY & WHAT EXPERIENCE (mission, design pillars, principles)
 3. `02.STABLE_TRUTHS.md` - WHAT strategies
 4. `03.INTERACTION_ARCHITECTURE.md` - HOW (behavioral loops)
 5. `04.SYSTEMS/SYSTEMS_OVERVIEW.md` - System interconnections
 6. Specific system docs in `04.SYSTEMS/` as needed
 7. `05.IMPLEMENTATION/USER_STORIES/` - User validation stories
 8. `05.IMPLEMENTATION/FINE_TUNING/` - Numeric parameter values (YAML)
+
+## Key Concepts
+
+### Design Pillars (Level 1)
+
+Design Pillars are 3-5 core experiences or emotions that define what the product IS. They serve as decision filters throughout development.
+
+**Characteristics of good design pillars:**
+- Focus on user FEELINGS, not features ("Empowered Action" not "Task Management")
+- Short, emotional phrases (one sentence max)
+- Specific enough to guide decisions, broad enough to inspire creativity
+- Typically 3-5 pillars (more dilutes focus, fewer lacks nuance)
+
+**Using pillars as decision filters:**
+- Every feature must support at least one pillar
+- When evaluating trade-offs, ask which option better supports the pillars
+- Pillars help teams say "no" to feature creep
+
+**Bad pillar examples:**
+- Too generic: "Make users happy" (applies to everything)
+- Too specific: "Combat system" (that's a feature, not an experience)
+- Implementation detail: "React-based" (that's technology, not experience)
+- Too many: 8+ pillars (dilutes focus)
+
+**Good pillar examples:**
+- "Empowered Action" - users feel capable and in control
+- "Sustainable Engagement" - energizing focus, not draining obligation
+- "Cascading Discovery" - one insight leads naturally to the next

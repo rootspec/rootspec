@@ -1,5 +1,7 @@
 # Hierarchical Specification Framework
 
+**Version 2.0.0** | [Changelog](CHANGELOG.md)
+
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
 ## Overview
@@ -12,17 +14,32 @@ This repository contains a complete hierarchical specification framework designe
 
 | Level | Purpose | Key Question | References |
 |-------|---------|--------------|------------|
-| **1: First Principles** | WHY the project exists | "What problem must we solve?" | External only |
+| **1: Foundational Philosophy** | WHY & WHAT EXPERIENCE | "What problem must we solve? What should users feel?" | External only |
 | **2: Stable Truths** | Design strategies & commitments | "What approach will we take?" | L1 + External |
 | **3: Interaction Architecture** | HOW users and product interact | "What's the behavioral pattern?" | L1-2 + External |
 | **4: Systems** | Implementation architecture | "How do we build this?" | L1-3 + Sibling L4 + External |
-| **5: Fine Tuning** | Validation & numeric tuning | "Does it work? What values?" | All levels + External |
+| **5: Implementation** | Validation & numeric tuning | "Does it work? What values?" | All levels + External |
 
 ## Quick Start
 
 1. **Read `00.SPEC_FRAMEWORK.md`** - Understand the complete framework structure and rules
 2. **Read `CLAUDE.md`** - Guidance for working with this repository
-3. Follow the reading order outlined in CLAUDE.md for navigating the specifications
+3. **Check `CHANGELOG.md`** - If upgrading from a previous version, review migration guides
+4. Follow the reading order outlined in CLAUDE.md for navigating the specifications
+
+## Version Information
+
+**Current Version:** 2.0.0
+
+This framework follows [Semantic Versioning](https://semver.org/):
+- **Major versions** (2.0.0) include breaking changes requiring migration
+- **Minor versions** (2.1.0) add features while maintaining compatibility
+- **Patch versions** (2.0.1) fix bugs and clarify documentation
+
+See [CHANGELOG.md](CHANGELOG.md) for:
+- Complete version history
+- Migration guides for major version upgrades
+- Detailed list of changes in each release
 
 ## Key Features
 
