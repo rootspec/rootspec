@@ -6,22 +6,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **Specification Framework Repository** - a hierarchical design document system template that can be used for any software project.
 
-This is NOT a code repository. It contains markdown documentation only.
+This is NOT a code repository. It contains the framework definition and documentation only.
 
-## Specification Framework
+## Framework Repository Contents
 
-This repository implements the hierarchical specification framework defined in `00.SPEC_FRAMEWORK.md`.
+**This repository contains:**
+- **00.SPEC_FRAMEWORK.md** - The framework definition (users copy this to their projects)
+- **README.md** - Usage guide and AI prompts
+- **CLAUDE.md** - This file (AI assistant guidance)
+- **CHANGELOG.md** - Version history and migration guides
+- **LICENSE** - MIT License
 
-**Read `00.SPEC_FRAMEWORK.md` first** to understand the 5-level hierarchy, reference rules, and architectural philosophy.
+**This repository does NOT contain:**
+- User specification files (01-05)
+- Project-specific content
+- Implementation examples
 
-All project-specific content is in the level documents (01-04). This file provides navigation guidance only.
+## How Users Work with This Framework
 
-## Document Hierarchy
+1. **Users copy `00.SPEC_FRAMEWORK.md`** to their project directory
+2. **Users (with AI assistance) create their specification files** (01-05) based on the framework
+3. **User project structure:**
+   - `00.SPEC_FRAMEWORK.md` (copied reference)
+   - `01.FOUNDATIONAL_PHILOSOPHY.md` (user's Level 1 spec)
+   - `02.STABLE_TRUTHS.md` (user's Level 2 spec)
+   - `03.INTERACTION_ARCHITECTURE.md` (user's Level 3 spec)
+   - `04.SYSTEMS/` (user's Level 4 specs)
+   - `05.IMPLEMENTATION/` (user's Level 5 specs)
 
-- **00.SPEC_FRAMEWORK.md** - Generic hierarchical framework (reusable)
+## User Specification Structure
+
+When working with a **user's specification** (not this framework repository), you'll encounter:
+
 - **01.FOUNDATIONAL_PHILOSOPHY.md** - WHY the project exists & WHAT core experiences (mission, design pillars, constraints)
 - **02.STABLE_TRUTHS.md** - WHAT strategies (design commitments, behavioral science)
-- **03.INTERACTION_ARCHITECTURE.md** - HOW interactions work (Hook Model implementation)
+- **03.INTERACTION_ARCHITECTURE.md** - HOW interactions work (behavioral patterns)
 - **04.SYSTEMS/** - Implementation details (system specifications)
 - **05.IMPLEMENTATION/** - Validation and tuning
   - **USER_STORIES/** - User perspective validation (markdown)
@@ -104,14 +123,19 @@ points:
 
 ## Reading Order
 
-1. `00.SPEC_FRAMEWORK.md` - Understand the framework
-2. `01.FOUNDATIONAL_PHILOSOPHY.md` - WHY & WHAT EXPERIENCE (mission, design pillars, principles)
-3. `02.STABLE_TRUTHS.md` - WHAT strategies
-4. `03.INTERACTION_ARCHITECTURE.md` - HOW (behavioral loops)
-5. `04.SYSTEMS/SYSTEMS_OVERVIEW.md` - System interconnections
-6. Specific system docs in `04.SYSTEMS/` as needed
-7. `05.IMPLEMENTATION/USER_STORIES/` - User validation stories
-8. `05.IMPLEMENTATION/FINE_TUNING/` - Numeric parameter values (YAML)
+**For understanding the framework itself:**
+1. This repository's `README.md` - Overview and getting started
+2. `00.SPEC_FRAMEWORK.md` - Complete framework definition
+
+**When working with a user's specification:**
+1. User's `00.SPEC_FRAMEWORK.md` - Framework reference (copied to their project)
+2. User's `01.FOUNDATIONAL_PHILOSOPHY.md` - WHY & WHAT EXPERIENCE (mission, design pillars, principles)
+3. User's `02.STABLE_TRUTHS.md` - WHAT strategies
+4. User's `03.INTERACTION_ARCHITECTURE.md` - HOW (behavioral loops)
+5. User's `04.SYSTEMS/SYSTEMS_OVERVIEW.md` - System interconnections
+6. Specific system docs in user's `04.SYSTEMS/` as needed
+7. User's `05.IMPLEMENTATION/USER_STORIES/` - User validation stories
+8. User's `05.IMPLEMENTATION/FINE_TUNING/` - Numeric parameter values (YAML)
 
 ## Key Concepts
 
