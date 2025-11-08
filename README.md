@@ -1,6 +1,6 @@
 # Hierarchical Specification Framework
 
-**Version 2.0.0** | [Changelog](CHANGELOG.md)
+**Version 2.1.0** | [Changelog](CHANGELOG.md)
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -24,16 +24,57 @@ This repository contains a complete hierarchical specification framework designe
 | **4: Systems** | Implementation architecture | "How do we build this?" | L1-3 + Sibling L4 + External |
 | **5: Implementation** | Validation & numeric tuning | "Does it work? What values?" | All levels + External |
 
-## Quick Start
+## Getting Started
 
-1. **Read `00.SPEC_FRAMEWORK.md`** - Understand the complete framework structure and rules
-2. **Read `CLAUDE.md`** - Guidance for working with this repository
-3. **Check `CHANGELOG.md`** - If upgrading from a previous version, review migration guides
-4. Follow the reading order outlined in CLAUDE.md for navigating the specifications
+### For New Projects
+
+**Step 1: Copy the framework definition to your project**
+
+```bash
+# Download the framework file
+curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+
+# Or manually download and copy 00.SPEC_FRAMEWORK.md to your project root
+```
+
+**Step 2: Use AI to generate your specification files**
+
+Copy an AI prompt from the "Working with AI Assistants" section below. The AI will:
+- Read `00.SPEC_FRAMEWORK.md` to understand the framework structure
+- Ask you questions about your product
+- Generate your specification files (01-05) based on the framework examples
+
+**Step 3: Your project structure becomes:**
+
+```
+your-project/
+├── 00.SPEC_FRAMEWORK.md           # Framework definition (reference, read-only)
+├── 01.FOUNDATIONAL_PHILOSOPHY.md  # Generated: Your WHY & WHAT EXPERIENCE
+├── 02.STABLE_TRUTHS.md            # Generated: Your design strategies
+├── 03.INTERACTION_ARCHITECTURE.md # Generated: Your interaction patterns
+├── 04.SYSTEMS/                    # Generated: Your system specs
+│   ├── SYSTEMS_OVERVIEW.md
+│   └── [YOUR_SYSTEMS].md
+└── 05.IMPLEMENTATION/             # Generated: User stories & parameters
+    ├── USER_STORIES/
+    └── FINE_TUNING/
+```
+
+**The key difference:**
+- `00.SPEC_FRAMEWORK.md` = The framework definition (same for everyone)
+- `01-05.*` = YOUR product specification (unique to your project)
+
+---
+
+### For Learning the Framework
+
+1. **Read `00.SPEC_FRAMEWORK.md`** - Complete framework structure and rules
+2. **Read `CLAUDE.md`** - AI assistant guidance
+3. **Check `CHANGELOG.md`** - Version history and migration guides
 
 ## Version Information
 
-**Current Version:** 2.0.0
+**Current Version:** 2.1.0
 
 This framework follows [Semantic Versioning](https://semver.org/):
 - **Major versions** (2.0.0) include breaking changes requiring migration
@@ -78,72 +119,89 @@ This framework is designed to be:
 
 ## Working with AI Assistants
 
-This framework is specifically designed for AI-assisted specification development. Below are example prompts for common tasks.
+This framework is specifically designed for AI-assisted specification development.
+
+**Workflow:**
+1. Copy `00.SPEC_FRAMEWORK.md` to your project directory
+2. Use the prompts below — AI reads the framework file to understand structure
+3. AI generates your specification files (01-05) based on framework examples
+
+Below are copy-paste ready prompts for common tasks.
+
+---
 
 ### 🚀 Initialize a New Specification
 
-Use this prompt to create a complete specification from scratch:
+**Prerequisites:** Copy `00.SPEC_FRAMEWORK.md` to your project directory first.
+
+**Then use this prompt:**
 
 ```
-I want to create a new product specification using the Hierarchical
-Specification Framework v2.0.0.
+I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v2.0.0)
+into my project directory.
+
+Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
 My product idea: [Brief description of your product concept]
 
-Please guide me through creating specifications for all 5 levels:
-1. Foundational Philosophy (mission, design pillars, principles)
-2. Stable Truths (design strategies and commitments)
-3. Interaction Architecture (user behavioral patterns)
-4. Systems (implementation architecture)
-5. Implementation (user stories and parameters)
+Help me create my product specification by generating specification files
+following the examples and templates in 00.SPEC_FRAMEWORK.md:
 
-Start by asking me questions to understand Level 1 (Foundational
-Philosophy). Help me identify:
+1. 01.FOUNDATIONAL_PHILOSOPHY.md - Use the Level 1 examples as a guide
+2. 02.STABLE_TRUTHS.md - Use the Level 2 examples
+3. 03.INTERACTION_ARCHITECTURE.md - Use the Level 3 examples
+4. 04.SYSTEMS/ - Use the Level 4 examples
+5. 05.IMPLEMENTATION/ - Use the Level 5 examples
+
+Start by asking me questions to understand Level 1 (Foundational Philosophy):
 - The mission and problem we're solving
 - 3-5 Design Pillars (core user experiences/emotions)
 - Inviolable principles
 - North-star experience
 
-Follow the framework rules strictly:
+Follow the framework rules in 00.SPEC_FRAMEWORK.md strictly:
 - Each level should only reference higher levels
 - Use placeholders for numbers in Levels 1-4
 - Help me avoid anti-patterns
 
-Let's proceed level by level, ensuring each is complete before
-moving to the next.
+Let's proceed level by level, ensuring each is complete before moving to the next.
 ```
 
 ### 🔄 Migrate Specification to Newer Framework Version
 
-Use this prompt to upgrade an existing specification:
+**Prerequisites:** Update `00.SPEC_FRAMEWORK.md` in your project to the new version.
+
+**Then use this prompt:**
 
 ```
-I have an existing specification that uses Hierarchical Specification
-Framework v[OLD_VERSION]. I want to migrate it to v2.0.0.
+I have an existing specification using Hierarchical Specification Framework
+v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v2.0.0.
+
+Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
+what has changed.
 
 My current specification structure:
 [Paste your current file structure or describe your spec]
 
-Please help me migrate by:
+Help me migrate my specification by:
 
-1. Reading CHANGELOG.md to identify breaking changes between
-   v[OLD_VERSION] and v2.0.0
+1. Identifying breaking changes from CHANGELOG.md between v[OLD_VERSION] and v2.0.0
 
-2. Creating a migration plan that includes:
+2. Creating a migration plan:
    - Files that need to be renamed
-   - New sections that need to be added
+   - New sections that need to be added (based on 00.SPEC_FRAMEWORK.md)
    - Structural changes required
    - Cross-references that need updating
 
-3. For v2.0.0 specifically, help me:
+3. For v2.0.0 specifically:
    - Rename 01.FIRST_PRINCIPLES.md to 01.FOUNDATIONAL_PHILOSOPHY.md
    - Extract 3-5 Design Pillars from my existing content
-   - Add Design Pillars section with proper structure
+   - Add Design Pillars section following 00.SPEC_FRAMEWORK.md examples
    - Update all cross-references throughout my spec
 
-4. Validate that the migrated spec follows v2.0.0 rules
+4. Validate the migrated spec follows v2.0.0 rules from 00.SPEC_FRAMEWORK.md
 
-Walk me through each step, showing me the changes needed for each file.
+Walk me through each step with specific changes for each file.
 ```
 
 ### ✅ Validate an Existing Specification

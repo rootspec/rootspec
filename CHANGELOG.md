@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2025-11-08
+
+### Fixed
+
+- **Removed `01.FOUNDATIONAL_PHILOSOPHY.md` from framework repository**
+  - This file was incorrectly committed as part of the framework repository in v2.0.0
+  - It should only exist in user specifications, not in the framework itself
+  - Framework repository now contains only meta-documents (framework definition + documentation)
+  - Users copy `00.SPEC_FRAMEWORK.md` as the single seed file to their projects
+  - AI assistants generate level files (01-05) based on examples in `00.SPEC_FRAMEWORK.md`
+
+### Added
+
+- **Comprehensive "Getting Started" workflow in README.md**
+  - Step-by-step guide for new projects
+  - Clear explanation of single-file seed approach
+  - Visual project structure showing what gets generated
+  - Distinction between framework definition and user specification
+
+### Changed
+
+- **Clarified single-file seed workflow throughout all documentation**
+  - Updated all AI prompts to reference `00.SPEC_FRAMEWORK.md` as the framework definition
+  - Added clear distinction between "framework repository" and "user specification"
+  - Updated CLAUDE.md to explain what files exist in framework vs user projects
+  - Updated `00.SPEC_FRAMEWORK.md` with usage instructions at the top
+  - Renamed "Directory Structure Template" to "User Project Directory Structure" for clarity
+  - All AI prompts now instruct users to copy framework file first
+
+### Documentation
+
+- **00.SPEC_FRAMEWORK.md**: Added prominent usage note at top explaining single-file seed workflow
+- **README.md**: Complete getting started section with curl command and project structure diagram
+- **CLAUDE.md**: Clear sections distinguishing framework repository contents from user specification structure
+
+### Notes
+
+This is a **non-breaking enhancement** to v2.0.0. The framework structure and Design Pillars from v2.0.0 remain unchanged. This release only clarifies the usage workflow and removes the incorrectly committed template file.
+
+---
+
 ## [2.0.0] - 2025-11-08
 
 ### Major Changes
@@ -285,6 +326,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/YOUR_USERNAME/spec-framework/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/YOUR_USERNAME/spec-framework/compare/v1.0.0...v2.0.0
-[1.0.0]: https://github.com/YOUR_USERNAME/spec-framework/releases/tag/v1.0.0
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/caudexia/spec-framework/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/caudexia/spec-framework/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/caudexia/spec-framework/releases/tag/v1.0.0
