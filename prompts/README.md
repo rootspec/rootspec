@@ -8,7 +8,8 @@ These prompts are designed for use with AI assistants (like Claude, GPT-4, etc.)
 
 | Prompt | Use Case | File |
 |--------|----------|------|
-| **Initialize Spec** | Create a new specification from scratch | [initialize-spec.md](initialize-spec.md) |
+| **Initialize Spec** | Create a new specification from scratch (greenfield) | [initialize-spec.md](initialize-spec.md) |
+| **Adopt Framework for Existing Project** | Apply framework to existing codebase (brownfield) | [adopt-framework-existing.md](adopt-framework-existing.md) |
 | **Migrate Spec** | Upgrade specification to newer framework version | [migrate-spec.md](migrate-spec.md) |
 | **Validate Spec** | Comprehensive validation of existing specification | [validate-spec.md](validate-spec.md) |
 | **Add Feature** | Add new feature to existing specification | [add-feature.md](add-feature.md) |
@@ -27,15 +28,19 @@ These prompts are designed for use with AI assistants (like Claude, GPT-4, etc.)
 
 ## Quick Start
 
-### For First-Time Users
+### For New Projects (Greenfield)
 
 Start with [initialize-spec.md](initialize-spec.md) to create your first specification from scratch.
 
-### For Existing Specifications
+### For Existing Projects (Brownfield)
+
+Use [adopt-framework-existing.md](adopt-framework-existing.md) to apply the framework to an existing codebase or product.
+
+### For Validating Specifications
 
 Use [validate-spec.md](validate-spec.md) to check if your specification follows framework rules correctly.
 
-### For Migration
+### For Framework Version Migration
 
 Use [migrate-spec.md](migrate-spec.md) when updating to a newer version of the framework.
 
