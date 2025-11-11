@@ -20,7 +20,7 @@ Use this prompt when:
 
 ## The Prompt
 
-```
+````
 I have an existing specification and want to validate that it properly
 follows the Hierarchical Specification Framework v3.0.0.
 
@@ -183,7 +183,7 @@ Please report:
 2. **Severity** (critical/warning/suggestion)
 3. **Suggested fixes** for each issue using the patterns above
 4. **Overall compliance score** (e.g., 85/100)
-```
+````
 
 ## What to Expect
 
