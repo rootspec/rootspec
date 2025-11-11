@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2025-11-11
+
+### Added
+
+#### Comprehensive Prompt Library
+
+**New `prompts/` directory** with self-contained, production-ready AI prompts for all framework workflows.
+
+- **7 detailed prompt files:**
+  - `initialize-spec.md` - Create new specifications from scratch
+  - `migrate-spec.md` - Upgrade specifications to newer framework versions
+  - `validate-spec.md` - Comprehensive specification validation
+  - `add-feature.md` - Add features while maintaining hierarchy integrity
+  - `review-feature.md` - Validate features/implementations against spec
+  - `generate-docs.md` - Generate PRDs, TDDs, backlogs from specs
+  - `tips-and-best-practices.md` - Quick commands and troubleshooting
+
+- **Self-contained prompts:** All AI decision-making logic (decision trees, examples, checklists, validation criteria) embedded directly in copyable prompt sections
+- **Human-focused guidance:** Prerequisites, usage tips, expected outcomes, and next steps outside prompt sections
+- **No duplication:** Single source of truth for each piece of guidance
+
+#### File Role Refinement
+
+- **README.md:** Now human-focused with philosophy, use cases, comparisons, and collapsible quick prompts
+- **CLAUDE.md:** Condensed to 171 lines with quick reference and redirects to detailed sources
+- **00.SPEC_FRAMEWORK.md:** Added HTML section markers for AI navigation
+- **Prompts library:** Detailed, extensible prompts for all use cases
+
+### Changed
+
+- Improved separation of concerns between human-facing and AI-facing documentation
+- Enhanced README with "Why This Framework?", "When to Use", and comparison sections
+- Streamlined CLAUDE.md from 283 to 171 lines while maintaining essential guidance
+
 ## [3.0.0] - 2025-11-09
 
 ### Major Changes
