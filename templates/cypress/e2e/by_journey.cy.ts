@@ -1,0 +1,122 @@
+/**
+ * Runtime test generator for journey-based user stories.
+ *
+ * This file dynamically loads all YAML user stories from the
+ * 05.IMPLEMENTATION/USER_STORIES/by_journey/ directory and generates
+ * Cypress tests organized by user journey (e.g., ONBOARDING, DAILY_USAGE).
+ *
+ * Test organization:
+ * - Each story becomes a describe block
+ * - Each acceptance criterion becomes a nested describe + it block
+ * - Tests display human-readable narratives in the reporter
+ */
+
+import yaml from 'js-yaml';
+import { StorySchema, type Story, type AC } from '../support/schema';
+import { runSetupSteps, runAssertionSteps } from '../support/steps';
+
+/**
+ * Load all YAML story files from the by_journey directory.
+ *
+ * This uses Vite's import.meta.glob to load files at spec-eval time.
+ * The 'as: raw' option loads file contents as strings.
+ * The 'eager: true' option loads synchronously.
+ */
+const rawFiles = import.meta.glob(
+  '../../../05.IMPLEMENTATION/USER_STORIES/by_journey/**/*.yaml',
+  { as: 'raw', eager: true }
+) as Record<string, string>;
+
+/**
+ * Parse and validate all user story YAML files.
+ *
+ * @returns Array of validated Story objects
+ * @throws Error if any story fails schema validation
+ */
+function loadStories(): Story[] {
+  const stories: Story[] = [];
+
+  for (const [path, raw] of Object.entries(rawFiles)) {
+    try {
+      // Parse YAML
+      const parsed = yaml.load(raw);
+
+      // Validate with Zod schema
+      const story = StorySchema.parse(parsed);
+
+      stories.push(story);
+    } catch (error) {
+      console.error(`Failed to load story from ${path}:`, error);
+      throw error;
+    }
+  }
+
+  return stories;
+}
+
+/**
+ * Extract a readable test title from the acceptance criterion narrative.
+ *
+ * Attempts to craft a "When → Then" title from the narrative block.
+ * Falls back to the AC title if narrative parsing fails.
+ *
+ * @param ac - Acceptance criterion object
+ * @returns Formatted test title
+ */
+function titleFromNarrative(ac: AC): string {
+  const lines = ac.narrative
+    .split(/\r?\n/)
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  const when = lines.find(l => /^when/i.test(l)) ?? ac.title;
+  const then = lines.find(l => /^then/i.test(l)) ?? '';
+
+  return `${when.replace(/^when\s+/i, '')} → ${then.replace(/^then\s+/i, '')}`.trim();
+}
+
+// Load all stories
+const stories = loadStories();
+
+/**
+ * Generate test suites for each story and acceptance criterion.
+ *
+ * Structure:
+ * describe(story) {
+ *   describe(acceptance criterion) {
+ *     before() { // Show narrative and given steps }
+ *     it(test) { // Run when and then steps }
+ *   }
+ * }
+ */
+for (const story of stories) {
+  describe(`${story.id}: ${story.title}`, () => {
+    for (const ac of story.acceptance_criteria) {
+      describe(`${ac.id}: ${ac.title}`, () => {
+        before(() => {
+          // Display human-readable narrative and setup in reporter
+          cy.log('--- Narrative ---');
+          cy.log(ac.narrative);
+
+          cy.log('--- Given (Setup) ---');
+          (ac.given ?? []).forEach(s => cy.log(JSON.stringify(s)));
+
+          // Run given steps once before the test
+          runSetupSteps(ac.given ?? []);
+        });
+
+        it(titleFromNarrative(ac), () => {
+          // Run the when step(s)
+          cy.log('--- When (Action) ---');
+          (ac.when ?? []).forEach(s => cy.log(JSON.stringify(s)));
+          runSetupSteps(ac.when ?? []);
+
+          // Run the then assertion(s)
+          cy.log('--- Then (Assertions) ---');
+          (ac.then ?? []).forEach(s => cy.log(JSON.stringify(s)));
+          runAssertionSteps(ac.then ?? []);
+        });
+      });
+    }
+  });
+}

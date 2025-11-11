@@ -7,6 +7,274 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-11-09
+
+### Major Changes
+
+#### YAML User Stories with Auto-Generated Cypress Tests
+
+**Level 5 USER_STORIES has been completely redesigned** to use YAML format with embedded test specifications that automatically generate Cypress end-to-end tests.
+
+**Breaking Changes:**
+- **File format changed:** `*.md` → `*.yaml` for all user story files
+- **Structure changed:** Markdown prose → YAML with test DSL (given/when/then)
+- **Template files added:** Framework now includes Cypress templates for test generation
+- **New directory:** `templates/` with Cypress support and example files
+
+### Added
+
+- **YAML User Story Format** in Level 5 documentation
+  - Structured format with id, title, requirement_id, acceptance_criteria
+  - Comment annotations (@priority, @journey, @systems, @spec_source)
+  - Acceptance criteria with narrative + test DSL (given/when/then)
+  - Auto-generated Cypress tests from YAML specifications
+
+- **Test DSL Documentation**
+  - Core step types (visit, click, fill, loginAs, seedItem, shouldContain, shouldExist)
+  - Extension guidance for domain-specific steps
+  - Schema validation with Zod
+  - Runtime test generation approach
+
+- **Cypress Template Files**
+  - `templates/cypress/support/schema.ts` - Zod validation schema
+  - `templates/cypress/support/steps.ts` - DSL-to-Cypress converter
+  - `templates/cypress/support/e2e.ts` - Support file entry point
+  - `templates/cypress/e2e/by_priority.cy.ts` - Priority-based test generator
+  - `templates/cypress/e2e/by_journey.cy.ts` - Journey-based test generator
+  - `templates/cypress/e2e/by_system.cy.ts` - System-based test generator
+  - `templates/cypress.config.ts` - Cypress configuration example
+
+- **Example YAML User Stories**
+  - `templates/USER_STORIES/by_priority/MVP.example.yaml`
+  - `templates/USER_STORIES/by_journey/EXAMPLE_JOURNEY.example.yaml`
+  - `templates/USER_STORIES/by_system/EXAMPLE_SYSTEM.example.yaml`
+  - `templates/USER_STORIES/USER_STORIES_OVERVIEW.md` - Updated for YAML approach
+
+- **Enhanced Documentation**
+  - Complete YAML format specification in 00.SPEC_FRAMEWORK.md
+  - Working with USER_STORIES section in CLAUDE.md
+  - Runtime test generation workflow
+  - DSL extension patterns
+
+### Changed
+
+- **User Stories are now executable** - YAML stories directly generate Cypress tests
+- **Directory structure updated** - .yaml extensions instead of .md
+- **00.SPEC_FRAMEWORK.md** - Complete rewrite of Level 5 USER_STORIES section
+- **CLAUDE.md** - Added USER_STORIES YAML guidance parallel to FINE_TUNING
+- **README.md** - Updated to mention YAML + Cypress workflow
+
+### Migration Guide: 2.x → 3.0.0
+
+If you have an existing project using version 2.x of this framework:
+
+#### 1. Copy Cypress Templates to Your Project
+
+```bash
+# Copy the entire templates directory
+cp -r templates/ your-project/
+
+# Your project now has:
+# - cypress/ (Cypress support and test files)
+# - templates/USER_STORIES/ (example YAML stories)
+```
+
+#### 2. Convert Markdown User Stories to YAML Format
+
+For each existing markdown user story, convert to YAML structure:
+
+**Before (markdown):**
+```markdown
+As a busy user, I want to add new tasks quickly so that I can capture ideas before I forget them.
+
+Acceptance criteria:
+- A new task can be created from the main screen with one tap or keystroke
+- After saving, the task appears instantly in the current list
+- Empty or whitespace-only entries are rejected
+
+System references: TASK_SYSTEM.md
+```
+
+**After (YAML):**
+```yaml
+# =============================================================================
+# USER STORY: Quick Task Creation
+# =============================================================================
+# @spec_version: 1.0.0
+# @priority: MVP
+# @journey: DAILY_USAGE
+# @systems: [TASK_SYSTEM]
+# @last_updated: 2025-11-09T00:00:00Z
+
+id: US-101
+title: Add new tasks quickly
+requirement_id: R-101
+
+acceptance_criteria:
+  - id: AC-101-1
+    title: Create task from main screen
+    narrative: |
+      Given I am a logged-in member viewing the main screen
+      When I click the add task button and enter a task name
+      Then I should see the task appear in my current list
+    given:
+      - loginAs: member
+      - visit: '/dashboard'
+    when:
+      - click: { selector: '[data-test=add-task]' }
+      - fill: { selector: '[data-test=task-input]', value: 'Buy groceries' }
+      - click: { selector: '[data-test=save-task]' }
+    then:
+      - shouldExist: { selector: '[data-test=task-list] [data-test=task-item]' }
+      - shouldContain: { selector: '[data-test=task-item]', text: 'Buy groceries' }
+
+  - id: AC-101-2
+    title: Empty tasks are rejected
+    narrative: |
+      Given I am viewing the add task screen
+      When I try to create a task with only whitespace
+      Then I should see a validation error
+    given:
+      - loginAs: member
+      - visit: '/dashboard'
+      - click: { selector: '[data-test=add-task]' }
+    when:
+      - fill: { selector: '[data-test=task-input]', value: '   ' }
+      - click: { selector: '[data-test=save-task]' }
+    then:
+      - shouldContain: { selector: '[data-test=error]', text: 'required' }
+```
+
+#### 3. Rename User Story Files
+
+```bash
+cd 05.IMPLEMENTATION/USER_STORIES/
+
+# Rename all .md files to .yaml
+mv by_priority/MVP.md by_priority/MVP.yaml
+mv by_priority/SECONDARY.md by_priority/SECONDARY.yaml
+mv by_priority/ADVANCED.md by_priority/ADVANCED.yaml
+
+# Repeat for by_journey/ and by_system/
+for file in by_journey/*.md; do mv "$file" "${file%.md}.yaml"; done
+for file in by_system/*.md; do mv "$file" "${file%.md}.yaml"; done
+```
+
+#### 4. Add Test Selectors to Your Application
+
+Update your application code to include `data-test` attributes:
+
+```tsx
+// Before
+<button onClick={handleAddTask}>Add Task</button>
+
+// After
+<button data-test="add-task" onClick={handleAddTask}>Add Task</button>
+```
+
+**Best practices for test selectors:**
+- Use `data-test` attributes (not classes or IDs that might change)
+- Use kebab-case naming (e.g., `data-test="add-task"`)
+- Be specific but stable (e.g., `task-list` not `list-1`)
+
+#### 5. Extend the DSL for Your Domain
+
+Add domain-specific test steps to `cypress/support/steps.ts`:
+
+```typescript
+// Add custom step types
+export type Step =
+  | { visit: string }
+  | { click: { selector: string } }
+  // ... core steps ...
+  | { createProject: { name: string } }  // Your custom step
+  | { inviteUser: { email: string, role: string } }  // Your custom step
+
+// Implement custom steps
+export function runSetupSteps(steps: Step[]) {
+  for (const s of steps ?? []) {
+    if ('visit' in s) cy.visit(s.visit);
+    // ... other core steps ...
+    else if ('createProject' in s) {
+      cy.task('createProject', s.createProject);
+    }
+    else if ('inviteUser' in s) {
+      cy.task('inviteUser', s.inviteUser);
+    }
+  }
+}
+```
+
+#### 6. Implement Cypress Tasks
+
+Add backend tasks in `cypress.config.ts`:
+
+```typescript
+on('task', {
+  async loginAs(role: string) {
+    // Generate session token or cookie for the role
+    return null;
+  },
+  async seedItem(payload: { slug: string, status: string }) {
+    // Seed database via API or direct DB connection
+    return null;
+  },
+  async createProject(payload: { name: string }) {
+    // Your custom task implementation
+    return null;
+  }
+});
+```
+
+#### 7. Run Your Generated Tests
+
+```bash
+# Install Cypress if not already installed
+npm install --save-dev cypress
+
+# Run tests
+npx cypress open  # Interactive mode
+npx cypress run   # Headless mode
+```
+
+#### 8. Update AI Prompts
+
+When working with AI assistants, update your prompts to request YAML format:
+
+```
+Please generate Level 5 user stories for the [SYSTEM_NAME] in YAML format
+following the structure in 00.SPEC_FRAMEWORK.md, including:
+- Story metadata (@priority, @journey, @systems)
+- Acceptance criteria with narrative
+- Test DSL (given/when/then) using appropriate selectors
+```
+
+### Why This Change?
+
+**Problem:** Markdown user stories were documentation-only. Tests and stories could drift apart, leading to stale documentation and untested features.
+
+**Solution:** YAML user stories with embedded test specifications create a single source of truth. User stories ARE the test specification, ensuring living documentation.
+
+**Benefits:**
+- **Single source of truth** - Stories and tests can't drift apart
+- **Living documentation** - Tests always match documented behavior
+- **Traceability** - Clear path from L4 systems → L5 stories → Cypress tests
+- **AI-friendly** - Structured format for automated story/test generation
+- **Multi-view testing** - Same stories generate priority, journey, and system test suites
+- **Version control** - YAML with comments tracks full context of changes
+
+**Backward compatibility:** The philosophical intent of Level 5 hasn't changed—it still validates that systems deliver user value. The format changed from documentation-only markdown to executable YAML specifications.
+
+### Notes
+
+- **Breaking change rationale:** File format and structure change require migration effort, hence 3.0.0
+- **Philosophy unchanged:** Core framework principles (hierarchy, reference rules, separation of concerns) remain the same
+- **Template addition:** Framework now includes working templates to accelerate adoption
+- **No impact on Levels 1-4:** Structure and content of other levels unchanged
+- **FINE_TUNING unchanged:** Level 5 FINE_TUNING YAML format remains the same
+
+---
+
 ## [2.1.0] - 2025-11-08
 
 ### Fixed
@@ -326,7 +594,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/caudexia/spec-framework/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/caudexia/spec-framework/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/caudexia/spec-framework/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/caudexia/spec-framework/releases/tag/v1.0.0
