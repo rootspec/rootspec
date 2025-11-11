@@ -24,7 +24,8 @@ Use this prompt when:
 I have an existing specification and want to validate that it properly
 follows the Hierarchical Specification Framework v3.0.0.
 
-Please perform a comprehensive validation by checking:
+Please read 00.SPEC_FRAMEWORK.md to understand the complete framework
+rules, then perform a comprehensive validation by checking:
 
 **Reference Hierarchy Compliance:**
 - Level 1 only references external resources
