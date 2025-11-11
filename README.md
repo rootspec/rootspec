@@ -1,6 +1,6 @@
 # Hierarchical Specification Framework
 
-**Version 3.0.0** | [Changelog](CHANGELOG.md)
+**Version 3.1.0** | [Changelog](CHANGELOG.md)
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -16,13 +16,128 @@ This repository contains a complete hierarchical specification framework designe
 
 ## The Five Levels
 
-| Level | Purpose | Key Question | References |
-|-------|---------|--------------|------------|
-| **1: Foundational Philosophy** | WHY & WHAT EXPERIENCE | "What problem must we solve? What should users feel?" | External only |
-| **2: Stable Truths** | Design strategies & commitments | "What approach will we take?" | L1 + External |
-| **3: Interaction Architecture** | HOW users and product interact | "What's the behavioral pattern?" | L1-2 + External |
-| **4: Systems** | Implementation architecture | "How do we build this?" | L1-3 + Sibling L4 + External |
-| **5: Implementation** | Validation (YAML + Cypress) & tuning | "Does it work? What values?" | All levels + External |
+| Level                           | Purpose                              | Key Question                                          | References                   |
+| ------------------------------- | ------------------------------------ | ----------------------------------------------------- | ---------------------------- |
+| **1: Foundational Philosophy**  | WHY & WHAT EXPERIENCE                | "What problem must we solve? What should users feel?" | External only                |
+| **2: Stable Truths**            | Design strategies & commitments      | "What approach will we take?"                         | L1 + External                |
+| **3: Interaction Architecture** | HOW users and product interact       | "What's the behavioral pattern?"                      | L1-2 + External              |
+| **4: Systems**                  | Implementation architecture          | "How do we build this?"                               | L1-3 + Sibling L4 + External |
+| **5: Implementation**           | Validation (YAML + Cypress) & tuning | "Does it work? What values?"                          | All levels + External        |
+
+## Why This Framework?
+
+### Philosophy & Motivation
+
+Traditional specification approaches often suffer from **circular dependencies** and **implementation-driven design**:
+
+- **Bottom-up specifications** start with features, leading to incoherent user experiences
+- **Implementation-first thinking** couples architecture to implementation details
+- **Spec drift** occurs when documentation doesn't match actual product philosophy
+- **Feature creep** happens without clear decision filters
+
+**This framework solves these problems through dependency inversion:**
+
+```
+Philosophy (Level 1)
+    ↓ guides
+Strategy (Level 2)
+    ↓ guides
+Interaction Patterns (Level 3)
+    ↓ guide
+System Architecture (Level 4)
+    ↓ guides
+Implementation & Tests (Level 5)
+```
+
+**Key benefits:**
+
+1. **Stable foundations** - Philosophy doesn't change when you adjust implementation
+2. **Clear decision-making** - Design Pillars filter feature requests
+3. **Architectural integrity** - High-level policy guides low-level details
+4. **Living documentation** - YAML user stories auto-generate tests
+5. **Team alignment** - Shared understanding from "why" to "how much"
+
+**Trade-offs:**
+
+- **More upfront structure** vs. "just start coding"
+- **Disciplined hierarchy** vs. flexible documentation
+- **Best for:** Complex products, long-lived systems, team collaboration
+- **Not ideal for:** Throwaway prototypes, single-developer experiments
+
+### When to Use This Framework
+
+**Use this framework when:**
+
+- Building complex products with multiple interconnected systems
+- Working with teams that need aligned understanding
+- Creating long-lived systems that will evolve over years
+- You need to maintain coherent user experience across features
+- Specifications need to guide both human and AI implementation
+
+**Example domains:**
+
+- SaaS platforms (project management, CRM, analytics)
+- Games (RPGs, strategy games, simulation)
+- Education tools (learning platforms, course management)
+- Healthcare applications (patient portals, clinical systems)
+- Financial services (trading platforms, banking apps)
+
+**Don't use this framework when:**
+
+- Building a quick MVP to test market fit (use lighter docs)
+- Throwaway prototype or proof-of-concept
+- Project has no clear philosophical foundation yet
+- Team prefers pure agile/emergent design
+
+### How This Compares to Other Approaches
+
+#### vs. Traditional PRDs (Product Requirements Documents)
+
+**Traditional PRD:**
+
+- Lists features and requirements
+- Often implementation-first
+- Philosophy emerges from features (if at all)
+- Updates lag behind implementation
+
+**This Framework:**
+
+- Starts with philosophy and experience
+- Features must support Design Pillars
+- Implementation guided by stable truths
+- Specifications drive implementation
+
+#### vs. User Stories Only
+
+**User Stories Only:**
+
+- Good for capturing user needs
+- Lacks architectural coherence
+- No philosophical foundation
+- Features can contradict each other
+
+**This Framework:**
+
+- User stories validate system implementations (Level 5)
+- Backed by system architecture (Level 4)
+- Guided by interaction patterns (Level 3)
+- Aligned with philosophical foundations (Levels 1-2)
+
+#### vs. Code-as-Specification
+
+**Code-as-Spec:**
+
+- Implementation IS the specification
+- No separation of concerns
+- Philosophy implicit in code
+- Hard to validate alignment
+
+**This Framework:**
+
+- Specification guides code
+- Clear separation: why/what/how/how-much
+- Philosophy explicit and stable
+- Easy to validate implementation against spec
 
 ## Getting Started
 
@@ -40,6 +155,7 @@ curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_F
 **Step 2: Use AI to generate your specification files**
 
 Copy an AI prompt from the "Working with AI Assistants" section below. The AI will:
+
 - Read `00.SPEC_FRAMEWORK.md` to understand the framework structure
 - Ask you questions about your product
 - Generate your specification files (01-05) based on the framework examples
@@ -61,6 +177,7 @@ your-project/
 ```
 
 **The key difference:**
+
 - `00.SPEC_FRAMEWORK.md` = The framework definition (same for everyone)
 - `01-05.*` = YOUR product specification (unique to your project)
 
@@ -74,14 +191,16 @@ your-project/
 
 ## Version Information
 
-**Current Version:** 3.0.0
+**Current Version:** 3.1.0
 
 This framework follows [Semantic Versioning](https://semver.org/):
+
 - **Major versions** (2.0.0) include breaking changes requiring migration
 - **Minor versions** (2.1.0) add features while maintaining compatibility
 - **Patch versions** (2.0.1) fix bugs and clarify documentation
 
 See [CHANGELOG.md](CHANGELOG.md) for:
+
 - Complete version history
 - Migration guides for major version upgrades
 - Detailed list of changes in each release
@@ -120,306 +239,195 @@ This framework is designed to be:
 
 ## Working with AI Assistants
 
-This framework is specifically designed for AI-assisted specification development.
+This framework is specifically designed for AI-assisted specification development. Use the prompts below with AI assistants (Claude, GPT-4, etc.) to create and maintain your specifications.
 
-**Workflow:**
-1. Copy `00.SPEC_FRAMEWORK.md` to your project directory
-2. Use the prompts below — AI reads the framework file to understand structure
-3. AI generates your specification files (01-05) based on framework examples
+**Quick workflow:**
 
-Below are copy-paste ready prompts for common tasks.
+1. Copy `00.SPEC_FRAMEWORK.md` to your project
+2. Use a prompt from the sections below (or from [prompts/](prompts/) for detailed versions)
+3. AI reads framework and generates your spec files (01-05)
+
+**📚 Full prompt library:** See [prompts/](prompts/) directory for detailed, comprehensive prompts for every use case.
 
 ---
 
-### 🚀 Initialize a New Specification
+<details>
+<summary>🚀 <strong>Initialize a New Specification</strong></summary>
 
-**Prerequisites:** Copy `00.SPEC_FRAMEWORK.md` to your project directory first.
+<br/>
 
-**Then use this prompt:**
-
-```
-I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v3.0.0)
-into my project directory.
-
-Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
-
-My product idea: [Brief description of your product concept]
-
-Help me create my product specification by generating specification files
-following the examples and templates in 00.SPEC_FRAMEWORK.md:
-
-1. 01.FOUNDATIONAL_PHILOSOPHY.md - Use the Level 1 examples as a guide
-2. 02.STABLE_TRUTHS.md - Use the Level 2 examples
-3. 03.INTERACTION_ARCHITECTURE.md - Use the Level 3 examples
-4. 04.SYSTEMS/ - Use the Level 4 examples
-5. 05.IMPLEMENTATION/ - Use the Level 5 examples
-
-Start by asking me questions to understand Level 1 (Foundational Philosophy):
-- The mission and problem we're solving
-- 3-5 Design Pillars (core user experiences/emotions)
-- Inviolable principles
-- North-star experience
-
-Follow the framework rules in 00.SPEC_FRAMEWORK.md strictly:
-- Each level should only reference higher levels
-- Use placeholders for numbers in Levels 1-4
-- Help me avoid anti-patterns
-
-Let's proceed level by level, ensuring each is complete before moving to the next.
-```
-
-### 🔄 Migrate Specification to Newer Framework Version
-
-**Prerequisites:** Update `00.SPEC_FRAMEWORK.md` in your project to the new version.
-
-**Then use this prompt:**
+**Quick prompt:**
 
 ```
-I have an existing specification using Hierarchical Specification Framework
-v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.0.0.
+I have copied 00.SPEC_FRAMEWORK.md to my project.
 
-Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
-what has changed.
+My product idea: [Brief description]
 
-My current specification structure:
-[Paste your current file structure or describe your spec]
+Help me create my specification by asking questions about:
+1. Level 1: Mission, 3-5 Design Pillars, inviolable principles
+2. Level 2: Design strategies and commitments
+3. Level 3: Interaction patterns
+4. Level 4: System architecture
+5. Level 5: User stories (YAML) and parameters
 
-Help me migrate my specification by:
-
-1. Identifying breaking changes from CHANGELOG.md between v[OLD_VERSION] and v3.0.0
-
-2. Creating a migration plan:
-   - Files that need to be renamed
-   - New sections that need to be added (based on 00.SPEC_FRAMEWORK.md)
-   - Structural changes required
-   - Cross-references that need updating
-
-3. For v3.0.0 specifically (if migrating from v2.x):
-   - Convert user story .md files to .yaml format
-   - Add test DSL (given/when/then) to acceptance criteria
-   - Copy Cypress templates from framework
-   - Add data-test attributes to application
-   - Implement Cypress tasks for test setup
-
-4. Validate the migrated spec follows v3.0.0 rules from 00.SPEC_FRAMEWORK.md
-
-Walk me through each step with specific changes for each file.
+Follow framework rules: hierarchy, placeholders in L1-4, no upward references.
 ```
 
-### ✅ Validate an Existing Specification
+**📖 Detailed prompt:** [prompts/initialize-spec.md](prompts/initialize-spec.md)
 
-Use this prompt to check if your spec follows the framework correctly:
+</details>
 
-```
-I have an existing specification and want to validate that it properly
-follows the Hierarchical Specification Framework v3.0.0.
+<details>
+<summary>🔄 <strong>Migrate Specification to Newer Version</strong></summary>
 
-Please perform a comprehensive validation by checking:
+<br/>
 
-**Reference Hierarchy Compliance:**
-- Level 1 only references external resources
-- Level 2 only references L1 + external
-- Level 3 only references L1-2 + external
-- Level 4 only references L1-3 + sibling L4 + external
-- Level 5 can reference all levels
-- NO lower-level references from higher levels
-
-**Level 1 (Foundational Philosophy) Validation:**
-- Has Mission statement
-- Has 3-5 Design Pillars with proper structure
-- Each pillar includes: name, emotional statement, explanation,
-  user perspective, examples
-- Has Inviolable Principles
-- Has North-Star Experience
-- No numeric values (only placeholders)
-- No implementation details
-- Pillars focus on FEELINGS not FEATURES
-
-**Level 2 (Stable Truths) Validation:**
-- Contains design philosophies and strategies
-- No references to L3-5 systems or implementation
-- Uses placeholders for numeric values
-- Aligns with L1 mission and pillars
-
-**Level 3 (Interaction Architecture) Validation:**
-- Describes behavioral patterns, not UI implementation
-- No references to L4-5 specifics
-- Uses placeholders for numeric values
-- Includes failure modes and edge cases
-
-**Level 4 (Systems) Validation:**
-- Clear system boundaries and responsibilities
-- Conceptual rules, not code
-- Uses placeholders for numeric values (e.g., [base_points])
-- No references to L5 user stories or tuning values
-
-**Level 5 (Implementation) Validation:**
-- User stories follow "As a [user], I want [action], so that [outcome]"
-- User stories have observable acceptance criteria
-- User stories reference relevant L4 systems
-- Fine-tuning YAML has @rationale and @spec_source annotations
-- Actual numeric values only appear here
-
-**Anti-Pattern Detection:**
-- Features in L1 instead of purpose
-- Vague emotional goals ("feel good" vs specific emotions)
-- Too many design pillars (>8)
-- Generic pillars that apply to everything
-- Implementation constraints in L1-3
-- Numeric values in L1-4
-
-Please report:
-1. All violations found (with file:line references)
-2. Severity (critical/warning/suggestion)
-3. Suggested fixes for each issue
-4. Overall compliance score
-```
-
-### 🔍 Add Feature to Existing Specification
-
-Use this prompt when extending your specification:
+**Quick prompt:**
 
 ```
-I want to add a new feature to my existing specification.
+I have a spec using framework v[OLD_VERSION]. I've updated to v3.0.0.
 
-Feature description: [Describe the feature]
-
-My specification follows Hierarchical Specification Framework v3.0.0.
-
-Please help me:
-
-1. **Design Pillar Check (Level 1):**
-   - Which of my existing Design Pillars does this feature support?
-   - If it doesn't support any pillar, should I reconsider the feature
-     or add a new pillar?
-
-2. **Determine Appropriate Levels:**
-   - Does this require changes at Level 2 (new design strategy)?
-   - Does this require changes at Level 3 (new interaction pattern)?
-   - Which Level 4 systems are affected?
-   - What Level 5 user stories and parameters are needed?
-
-3. **Maintain Hierarchy:**
-   - Ensure changes flow downward (L1→L2→L3→L4→L5)
-   - Verify no upward references are introduced
-   - Check that higher levels don't need changes for this feature
-
-4. **Draft Specifications:**
-   - Show me what to add/modify at each affected level
-   - Use placeholders for numbers in L1-4
-   - Actual values only in L5
-
-Guide me through this systematically, starting with pillar alignment.
+Read CHANGELOG.md and help me migrate:
+1. Identify breaking changes
+2. Rename files if needed
+3. Convert user stories to YAML (if from v2.x)
+4. Update all cross-references
+5. Validate against new framework rules
 ```
 
-### 📊 Generate Documentation from Specification
+**📖 Detailed prompt:** [prompts/migrate-spec.md](prompts/migrate-spec.md)
 
-Use this prompt to create documentation artifacts:
+</details>
 
-```
-I have a complete specification following Hierarchical Specification
-Framework v3.0.0.
+<details>
+<summary>✅ <strong>Validate an Existing Specification</strong></summary>
 
-Please help me generate:
+<br/>
 
-1. **Product Requirements Document (PRD)**
-   - Extract mission from L1
-   - Summarize design pillars as product principles
-   - Include L3 interaction flows
-   - Map L5 user stories by priority
-
-2. **Technical Design Document (TDD)**
-   - Extract L2 architectural commitments
-   - Detail L4 system designs
-   - Include system interaction diagrams
-   - Reference L5 parameter values
-
-3. **User Story Backlog**
-   - Export all L5 user stories
-   - Organize by priority (MVP/Secondary/Advanced)
-   - Include acceptance criteria
-   - Link to relevant L4 systems
-
-4. **Design Pillar Validation Matrix**
-   - List all L4 systems
-   - Map which pillar(s) each system supports
-   - Identify gaps (systems not supporting pillars, pillars
-     without systems)
-
-Please maintain traceability back to the spec levels.
-```
-
-### 🎯 Review Feature Against Specification
-
-Use this prompt to validate a proposed feature or implementation:
+**Quick prompt:**
 
 ```
-I have a feature proposal/implementation and want to validate it
-against my specification.
+Validate my specification against framework v3.0.0:
 
-Feature/Implementation: [Describe or paste code/design]
+Check:
+- Reference hierarchy (no upward references)
+- No numeric values in L1-4 (placeholders only)
+- Design Pillars are emotional, not features
+- User stories have test DSL
+- All required sections present
 
-My specification follows Hierarchical Specification Framework v3.0.0.
-
-Please review and answer:
-
-1. **Pillar Alignment (L1):**
-   - Which Design Pillar(s) does this support?
-   - Does this violate any Inviolable Principles?
-   - Does this align with the Mission and North-Star?
-
-2. **Strategy Compliance (L2):**
-   - Does this follow the design philosophies?
-   - Are there trade-offs that conflict with L2 commitments?
-
-3. **Interaction Pattern (L3):**
-   - Does the interaction match L3 architecture?
-   - Are behavioral loops properly implemented?
-
-4. **System Design (L4):**
-   - Does this follow the system boundaries and rules?
-   - Are there unintended system interactions?
-
-5. **Parameter Validation (L5):**
-   - Do numeric values match L5 fine-tuning specs?
-   - Are there values that should be configurable in L5?
-
-**Verdict:**
-- ✅ Approved / ⚠️ Needs Changes / ❌ Violates Spec
-- List specific issues and suggested fixes
+Report violations with file:line and suggested fixes.
 ```
+
+**📖 Detailed prompt:** [prompts/validate-spec.md](prompts/validate-spec.md)
+
+</details>
+
+<details>
+<summary>🔍 <strong>Add Feature to Existing Specification</strong></summary>
+
+<br/>
+
+**Quick prompt:**
+
+```
+I want to add a new feature: [Description]
+
+Help me:
+1. Check which Design Pillar(s) it supports
+2. Determine which levels need updates
+3. Draft changes for each affected level
+4. Ensure changes flow downward only
+5. Create user stories and tests (L5)
+```
+
+**📖 Detailed prompt:** [prompts/add-feature.md](prompts/add-feature.md)
+
+</details>
+
+<details>
+<summary>📊 <strong>Generate Documentation from Spec</strong></summary>
+
+<br/>
+
+**Quick prompt:**
+
+```
+Generate from my specification:
+- PRD (Product Requirements Document)
+- TDD (Technical Design Document)
+- User Story Backlog
+- Design Pillar Validation Matrix
+
+Maintain traceability to spec levels.
+```
+
+**📖 Detailed prompt:** [prompts/generate-docs.md](prompts/generate-docs.md)
+
+</details>
+
+<details>
+<summary>🎯 <strong>Review Feature Against Specification</strong></summary>
+
+<br/>
+
+**Quick prompt:**
+
+```
+Review this feature/implementation: [Description or code]
+
+Check alignment with:
+1. L1: Design Pillars and principles
+2. L2: Design strategies
+3. L3: Interaction patterns
+4. L4: System boundaries
+5. L5: Parameters
+
+Verdict: ✅ Approved / ⚠️ Needs Changes / ❌ Violates Spec
+```
+
+**📖 Detailed prompt:** [prompts/review-feature.md](prompts/review-feature.md)
+
+</details>
 
 ---
 
-## Tips for AI-Assisted Specification
+### Tips for Best Results
 
-**Best Practices:**
+**When working with AI assistants:**
 
-1. **Start at Level 1**: Always begin with Foundational Philosophy before diving into implementation
-2. **One level at a time**: Complete each level before moving to the next
-3. **Use the validation prompt regularly**: Catch hierarchy violations early
-4. **Let AI ask questions**: AI assistants following this framework will ask clarifying questions—answer them thoroughly
-5. **Reference the framework docs**: Point your AI to `00.SPEC_FRAMEWORK.md` and `CLAUDE.md` for detailed guidance
-6. **Iterate on Design Pillars**: Spend time getting your 3-5 pillars right—they guide everything else
+1. **Be specific** - Provide context about your domain and constraints
+2. **Answer thoroughly** - AI uses your answers to generate better specs
+3. **Iterate** - Refine AI-generated content based on your expertise
+4. **Validate frequently** - Use the validation prompt regularly
+5. **Question suggestions** - If something feels wrong, speak up
 
-**Common AI Commands:**
+**Common commands:**
 
-- "Validate my Level 1 against Design Pillar best practices"
-- "Check if this feature supports at least one Design Pillar"
-- "Help me extract Design Pillars from my existing mission statement"
-- "Show me all references from Level 3 to other levels and verify hierarchy compliance"
-- "Generate Level 5 user stories for the [SYSTEM_NAME] from Level 4"
+- `"Check if this violates any hierarchy rules"`
+- `"Generate 3 user stories for [SYSTEM] in YAML format"`
+- `"Does this feature support at least one Design Pillar?"`
+- `"Rewrite this without referencing Level 4 systems"`
 
-**Framework-Aware AI Assistants:**
+**For more tips:** See [prompts/tips-and-best-practices.md](prompts/tips-and-best-practices.md)
 
-This framework includes `CLAUDE.md` with comprehensive guidance for Claude Code and other AI assistants. When working in a directory containing these files, AI assistants will automatically:
+---
 
-- Understand the 5-level hierarchy
+### Framework-Aware AI Assistants
+
+This framework includes guidance files that AI assistants automatically read:
+
+- **CLAUDE.md** - Brief quick reference for Claude Code
+- **00.SPEC_FRAMEWORK.md** - Complete framework specification
+- **prompts/** - Detailed prompts for all use cases
+
+When working in a directory containing these files, AI assistants will:
+
+- Understand the five-level hierarchy
 - Enforce reference rules
 - Guide you through level-by-level specification
 - Validate against anti-patterns
-- Suggest Design Pillars based on your mission
-- Help extract specs from existing documentation
+- Help create YAML user stories with test DSL
 
 ---
 
