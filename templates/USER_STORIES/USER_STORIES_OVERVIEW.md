@@ -6,6 +6,29 @@ This directory contains Level 5 user stories in YAML format with embedded Cypres
 
 **Key principle:** User stories ARE the test specification. There is a single source of truth—stories and tests cannot drift apart.
 
+## Getting Started
+
+**First time using Cypress with this framework?**
+
+This framework automatically generates Cypress end-to-end tests from your YAML user stories. To use this feature:
+
+1. **Install dependencies** - See **[../../docs/CYPRESS_SETUP.md](../../docs/CYPRESS_SETUP.md)** for complete setup guide
+2. **Copy template files** - Follow the setup guide to copy Cypress configuration and test generators
+3. **Implement Cypress tasks** - Edit `cypress.config.ts` to add `loginAs` and `seedItem` tasks
+4. **Create your first story** - Copy from the examples in this directory
+5. **Run tests** - Execute `npx cypress open` to see your stories become tests
+
+**Quick setup checklist:**
+- [ ] Installed: `cypress`, `cypress-vite`, `js-yaml`, `zod`, `typescript`
+- [ ] Copied: `cypress.config.ts` and `cypress/` directory to your project
+- [ ] Implemented: Required Cypress tasks (`loginAs`, `seedItem`)
+- [ ] Created: At least one YAML user story file
+- [ ] Validated: Tests run successfully with `npx cypress open`
+
+**For detailed installation and troubleshooting:** **[../../docs/CYPRESS_SETUP.md](../../docs/CYPRESS_SETUP.md)**
+
+---
+
 ## Directory Organization
 
 User stories are organized in three complementary views:

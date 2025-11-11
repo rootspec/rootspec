@@ -18,6 +18,31 @@ Brief guidance for Claude Code when working in this repository.
 
 ---
 
+## User's Project Scenario
+
+**Is this a NEW project (greenfield)?**
+- Starting from scratch with new product concept
+- No existing codebase or minimal implementation
+- Use `prompts/initialize-spec.md`
+- Generate specs level-by-level: L1 → L2 → L3 → L4 → L5
+- Work top-down from philosophy to implementation
+
+**Is this an EXISTING project (brownfield)?**
+- Has existing codebase or partially-built product
+- Applying framework retroactively
+- Use `prompts/adopt-framework-existing.md`
+- **Choose approach:**
+  - **Specification-First (recommended):** Define ideal state, create gap analysis, refactor toward spec
+  - **Reverse-Engineering:** Document current state, infer philosophy from implementation
+- Handle technical debt and migration planning
+
+**Key differences in approach:**
+- Greenfield: Philosophy guides implementation (design first)
+- Brownfield Spec-First: Define ideal, plan migration, refactor incrementally
+- Brownfield Reverse-Eng: Extract philosophy from code, document as-is
+
+---
+
 ## Repository Purpose
 
 This is a **Specification Framework Repository** - a hierarchical design document system template for software projects.

@@ -141,7 +141,11 @@ Implementation & Tests (Level 5)
 
 ## Getting Started
 
-### For New Projects
+Choose your path based on your project stage:
+
+### Path 1: New Project (Greenfield)
+
+**Starting from scratch with a new product concept**
 
 **Step 1: Copy the framework definition to your project**
 
@@ -152,13 +156,16 @@ curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_F
 # Or manually download and copy 00.SPEC_FRAMEWORK.md to your project root
 ```
 
-**Step 2: Use AI to generate your specification files**
+**Step 2: Generate your specification with AI**
 
-Copy an AI prompt from the "Working with AI Assistants" section below. The AI will:
+Use the detailed prompt: **[prompts/initialize-spec.md](prompts/initialize-spec.md)**
 
+The AI will:
 - Read `00.SPEC_FRAMEWORK.md` to understand the framework structure
-- Ask you questions about your product
-- Generate your specification files (01-05) based on the framework examples
+- Ask you questions level-by-level (WHY → WHAT → HOW → HOW MUCH)
+- Generate your complete specification files (01-05)
+
+**Time estimate:** 2-4 hours for initial draft
 
 **Step 3: Your project structure becomes:**
 
@@ -176,18 +183,73 @@ your-project/
     └── FINE_TUNING/               # Numeric parameter YAML files
 ```
 
-**The key difference:**
+**Step 4: (Optional) Set up automated testing**
 
-- `00.SPEC_FRAMEWORK.md` = The framework definition (same for everyone)
-- `01-05.*` = YOUR product specification (unique to your project)
+See **[docs/CYPRESS_SETUP.md](docs/CYPRESS_SETUP.md)** for complete Cypress integration guide.
+
+Your YAML user stories will automatically generate end-to-end tests.
 
 ---
 
-### For Learning the Framework
+### Path 2: Existing Project (Brownfield)
 
-1. **Read `00.SPEC_FRAMEWORK.md`** - Complete framework structure and rules
-2. **Read `CLAUDE.md`** - AI assistant guidance
-3. **Check `CHANGELOG.md`** - Version history and migration guides
+**Applying the framework to an existing codebase or product**
+
+**Step 1: Copy the framework definition**
+
+```bash
+cd your-existing-project/
+curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+```
+
+**Step 2: Choose your approach**
+
+**Specification-First (Recommended):**
+- Define ideal philosophy and architecture
+- Document what SHOULD exist
+- Create gap analysis vs. current state
+- Refactor incrementally toward spec
+
+**Reverse-Engineering (Pragmatic):**
+- Document current architecture as-is
+- Infer implicit design decisions
+- Extract retrospective philosophy
+- Validate spec matches reality
+
+**Step 3: Generate specification with AI**
+
+Use the detailed prompt: **[prompts/adopt-framework-existing.md](prompts/adopt-framework-existing.md)**
+
+The AI will help you:
+- Map existing code to framework levels
+- Define Design Pillars that match your decisions
+- Create gap analysis (if Specification-First)
+- Document current state accurately (if Reverse-Engineering)
+
+**Time estimate:** 4-8 hours depending on codebase size
+
+**Step 4: Establish as single source of truth**
+
+- Use Design Pillars to filter roadmap
+- Reference spec in PRs and planning
+- Gradual migration over 3-6 months (if Specification-First)
+- Ongoing maintenance (if Reverse-Engineering)
+
+**See [docs/QUICK_START.md](docs/QUICK_START.md) for detailed workflows.**
+
+---
+
+### Path 3: Learning the Framework
+
+**Understanding the framework before committing**
+
+1. **Read [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md)** - Complete framework structure and rules
+2. **Read [CLAUDE.md](CLAUDE.md)** - AI assistant quick reference
+3. **Review [templates/USER_STORIES/](templates/USER_STORIES/)** - See YAML examples
+4. **Check [CHANGELOG.md](CHANGELOG.md)** - Version history and evolution
+5. **Try [docs/QUICK_START.md](docs/QUICK_START.md)** - Fast-track guides for both scenarios
+
+**Time investment:** 1-2 hours to understand, 2-8 hours to create your first spec
 
 ## Version Information
 
