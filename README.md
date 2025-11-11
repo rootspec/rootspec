@@ -1,6 +1,6 @@
 # Hierarchical Specification Framework
 
-**Version 2.1.0** | [Changelog](CHANGELOG.md)
+**Version 3.0.0** | [Changelog](CHANGELOG.md)
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -22,7 +22,7 @@ This repository contains a complete hierarchical specification framework designe
 | **2: Stable Truths** | Design strategies & commitments | "What approach will we take?" | L1 + External |
 | **3: Interaction Architecture** | HOW users and product interact | "What's the behavioral pattern?" | L1-2 + External |
 | **4: Systems** | Implementation architecture | "How do we build this?" | L1-3 + Sibling L4 + External |
-| **5: Implementation** | Validation & numeric tuning | "Does it work? What values?" | All levels + External |
+| **5: Implementation** | Validation (YAML + Cypress) & tuning | "Does it work? What values?" | All levels + External |
 
 ## Getting Started
 
@@ -55,9 +55,9 @@ your-project/
 ├── 04.SYSTEMS/                    # Generated: Your system specs
 │   ├── SYSTEMS_OVERVIEW.md
 │   └── [YOUR_SYSTEMS].md
-└── 05.IMPLEMENTATION/             # Generated: User stories & parameters
-    ├── USER_STORIES/
-    └── FINE_TUNING/
+└── 05.IMPLEMENTATION/             # Generated: User stories (YAML→Cypress) & parameters
+    ├── USER_STORIES/              # YAML files with auto-generated Cypress tests
+    └── FINE_TUNING/               # Numeric parameter YAML files
 ```
 
 **The key difference:**
@@ -74,7 +74,7 @@ your-project/
 
 ## Version Information
 
-**Current Version:** 2.1.0
+**Current Version:** 3.0.0
 
 This framework follows [Semantic Versioning](https://semver.org/):
 - **Major versions** (2.0.0) include breaking changes requiring migration
@@ -93,6 +93,7 @@ See [CHANGELOG.md](CHANGELOG.md) for:
 - **Dependency Inversion**: Philosophy drives implementation, not the reverse
 - **Scalable Architecture**: Systems remain loosely coupled while maintaining clear interaction patterns
 - **Future-Proof Design**: Stable upper levels protect against constant churn in implementation details
+- **Automated Testing**: User stories in YAML format automatically generate Cypress end-to-end tests
 
 ## Reference Rules
 
@@ -137,7 +138,7 @@ Below are copy-paste ready prompts for common tasks.
 **Then use this prompt:**
 
 ```
-I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v2.0.0)
+I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v3.0.0)
 into my project directory.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
@@ -175,7 +176,7 @@ Let's proceed level by level, ensuring each is complete before moving to the nex
 
 ```
 I have an existing specification using Hierarchical Specification Framework
-v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v2.0.0.
+v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.0.0.
 
 Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
 what has changed.
@@ -185,7 +186,7 @@ My current specification structure:
 
 Help me migrate my specification by:
 
-1. Identifying breaking changes from CHANGELOG.md between v[OLD_VERSION] and v2.0.0
+1. Identifying breaking changes from CHANGELOG.md between v[OLD_VERSION] and v3.0.0
 
 2. Creating a migration plan:
    - Files that need to be renamed
@@ -193,13 +194,14 @@ Help me migrate my specification by:
    - Structural changes required
    - Cross-references that need updating
 
-3. For v2.0.0 specifically:
-   - Rename 01.FIRST_PRINCIPLES.md to 01.FOUNDATIONAL_PHILOSOPHY.md
-   - Extract 3-5 Design Pillars from my existing content
-   - Add Design Pillars section following 00.SPEC_FRAMEWORK.md examples
-   - Update all cross-references throughout my spec
+3. For v3.0.0 specifically (if migrating from v2.x):
+   - Convert user story .md files to .yaml format
+   - Add test DSL (given/when/then) to acceptance criteria
+   - Copy Cypress templates from framework
+   - Add data-test attributes to application
+   - Implement Cypress tasks for test setup
 
-4. Validate the migrated spec follows v2.0.0 rules from 00.SPEC_FRAMEWORK.md
+4. Validate the migrated spec follows v3.0.0 rules from 00.SPEC_FRAMEWORK.md
 
 Walk me through each step with specific changes for each file.
 ```
@@ -210,7 +212,7 @@ Use this prompt to check if your spec follows the framework correctly:
 
 ```
 I have an existing specification and want to validate that it properly
-follows the Hierarchical Specification Framework v2.0.0.
+follows the Hierarchical Specification Framework v3.0.0.
 
 Please perform a comprehensive validation by checking:
 
@@ -282,7 +284,7 @@ I want to add a new feature to my existing specification.
 
 Feature description: [Describe the feature]
 
-My specification follows Hierarchical Specification Framework v2.0.0.
+My specification follows Hierarchical Specification Framework v3.0.0.
 
 Please help me:
 
@@ -316,7 +318,7 @@ Use this prompt to create documentation artifacts:
 
 ```
 I have a complete specification following Hierarchical Specification
-Framework v2.0.0.
+Framework v3.0.0.
 
 Please help me generate:
 
@@ -357,7 +359,7 @@ against my specification.
 
 Feature/Implementation: [Describe or paste code/design]
 
-My specification follows Hierarchical Specification Framework v2.0.0.
+My specification follows Hierarchical Specification Framework v3.0.0.
 
 Please review and answer:
 

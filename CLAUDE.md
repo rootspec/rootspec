@@ -43,7 +43,7 @@ When working with a **user's specification** (not this framework repository), yo
 - **03.INTERACTION_ARCHITECTURE.md** - HOW interactions work (behavioral patterns)
 - **04.SYSTEMS/** - Implementation details (system specifications)
 - **05.IMPLEMENTATION/** - Validation and tuning
-  - **USER_STORIES/** - User perspective validation (markdown)
+  - **USER_STORIES/** - User perspective validation (YAML with Cypress tests)
   - **FINE_TUNING/** - Numeric parameters (comment-annotated YAML)
 
 ## Reference Hierarchy Rules
@@ -71,9 +71,125 @@ When modifying specifications:
 7. **Follow reference rules**: Never violate the hierarchical reference constraints
 8. **Interaction architecture first**: Changes to behavioral/interaction patterns should update 03.INTERACTION_ARCHITECTURE.md before system docs
 
+### Working with Level 5 USER_STORIES (YAML)
+
+Level 5 USER_STORIES files use **comment-annotated YAML** format with test specifications that automatically generate Cypress tests:
+
+**Format Rules:**
+- YAML structure contains story metadata and acceptance criteria with test DSL
+- All metadata, rationale, and context goes in comments
+- Use `# @annotation: value` syntax for structured metadata
+- Each story should have `@priority`, `@journey`, and `@systems` annotations
+- Acceptance criteria use given/when/then structure with Cypress test steps
+
+**Standard Annotations:**
+- `@spec_version` - Version of spec this implements
+- `@priority` - Development priority (MVP | SECONDARY | ADVANCED)
+- `@journey` - User journey this story belongs to
+- `@systems` - Which L4 systems this story validates (array)
+- `@last_updated` - ISO 8601 timestamp
+- `@spec_source` - Reference to spec docs (e.g., `04.SYSTEMS/TASK_SYSTEM.md:45`)
+
+**Test DSL Structure:**
+- **given** - Setup steps (array of step objects)
+- **when** - Action steps (typically 1 step, array for complex flows)
+- **then** - Assertion steps (array of expected outcomes)
+
+**Core DSL Steps:**
+```yaml
+# Setup/Action Steps (given/when):
+- visit: '/path'
+- click: { selector: '[data-test=button]' }
+- fill: { selector: '[data-test=input]', value: 'text' }
+- loginAs: 'user_role'
+- seedItem: { slug: 'item-id', status: 'available' }
+
+# Assertion Steps (then):
+- shouldContain: { selector: '[data-test=element]', text: 'expected' }
+- shouldExist: { selector: '[data-test=element]' }
+```
+
+**Example:**
+```yaml
+# =============================================================================
+# USER STORY: Quick Task Creation
+# =============================================================================
+# @spec_version: 1.0.0
+# @priority: MVP
+# @journey: DAILY_USAGE
+# @systems: [TASK_SYSTEM]
+# @last_updated: 2025-11-09T00:00:00Z
+
+id: US-101
+title: Add new tasks quickly
+requirement_id: R-101
+
+acceptance_criteria:
+  - id: AC-101-1
+    title: Member can create task from main screen
+    narrative: |
+      Given I am a logged-in member viewing the main screen
+      When I click the add task button and enter a task name
+      Then I should see the task appear in my current list
+    given:
+      - loginAs: member
+      - visit: '/dashboard'
+    when:
+      - click: { selector: '[data-test=add-task]' }
+      - fill: { selector: '[data-test=task-input]', value: 'Buy groceries' }
+      - click: { selector: '[data-test=save-task]' }
+    then:
+      - shouldExist: { selector: '[data-test=task-list] [data-test=task-item]' }
+      - shouldContain: { selector: '[data-test=task-item]', text: 'Buy groceries' }
+```
+
+**When editing USER_STORIES YAML:**
+1. Always update `@last_updated` timestamp in file header
+2. Ensure test DSL steps match the narrative description
+3. Use data-test attributes in selectors for stability
+4. Keep given/when/then structure clear and focused
+5. Maintain traceability via `@systems` and `@spec_source` references
+6. Test steps should validate observable user behaviors, not implementation details
+
+**Extending the DSL:**
+
+Projects should extend the core DSL with domain-specific steps. Add custom step types to `templates/cypress/support/steps.ts`:
+
+```typescript
+// Add to the Step union type
+export type Step =
+  | { visit: string }
+  | { click: { selector: string } }
+  // ... core steps ...
+  | { createProject: { name: string } }  // Custom
+  | { inviteUser: { email: string, role: string } }  // Custom
+
+// Implement in runSetupSteps
+export function runSetupSteps(steps: Step[]) {
+  for (const s of steps ?? []) {
+    if ('visit' in s) cy.visit(s.visit);
+    // ... other steps ...
+    else if ('createProject' in s) {
+      cy.task('createProject', s.createProject);
+    }
+  }
+}
+```
+
+**Runtime Test Generation:**
+
+User story YAML files automatically generate Cypress tests:
+- `by_priority/*.yaml` → `cypress/e2e/by_priority.cy.ts` (all MVP/SECONDARY/ADVANCED tests)
+- `by_journey/*.yaml` → `cypress/e2e/by_journey.cy.ts` (journey-specific test suites)
+- `by_system/*.yaml` → `cypress/e2e/by_system.cy.ts` (system-specific test suites)
+
+The runtime script (`templates/cypress/e2e/*.cy.ts`) loads all YAML files, validates them with Zod schema, and dynamically generates describe/it blocks for each story and acceptance criterion.
+
+---
+
 ### Working with Level 5 FINE_TUNING (YAML)
 
-Level 5 FINE_TUNING files use **comment-annotated YAML** format:
+Level 5 FINE_TUNING files use **comment-annotated YAML** format for numeric parameters:
 
 **Format Rules:**
 - YAML structure contains ONLY actual configuration values
@@ -134,7 +250,7 @@ points:
 4. User's `03.INTERACTION_ARCHITECTURE.md` - HOW (behavioral loops)
 5. User's `04.SYSTEMS/SYSTEMS_OVERVIEW.md` - System interconnections
 6. Specific system docs in user's `04.SYSTEMS/` as needed
-7. User's `05.IMPLEMENTATION/USER_STORIES/` - User validation stories
+7. User's `05.IMPLEMENTATION/USER_STORIES/` - User validation stories (YAML with Cypress tests)
 8. User's `05.IMPLEMENTATION/FINE_TUNING/` - Numeric parameter values (YAML)
 
 ## Key Concepts
