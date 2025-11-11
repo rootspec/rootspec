@@ -85,12 +85,14 @@ Watch for these specific violations and apply the fixes shown:
 ### 1. Reference Hierarchy Violations
 
 **Problem:** Level 2 references Level 4 system
+
 ```markdown
 <!-- 02.STABLE_TRUTHS.md -->
 We use the REWARD_SYSTEM.md to motivate users...
 ```
 
 **Fix:** Reference concept, not specific system
+
 ```markdown
 <!-- 02.STABLE_TRUTHS.md -->
 We use variable reward schedules to motivate users...
@@ -101,12 +103,14 @@ We use variable reward schedules to motivate users...
 ### 2. Numeric Values in Levels 1-4
 
 **Problem:** Actual numbers in Level 3
+
 ```markdown
 <!-- 03.INTERACTION_ARCHITECTURE.md -->
 Points appear within 100ms of completion
 ```
 
 **Fix:** Use placeholders
+
 ```markdown
 <!-- 03.INTERACTION_ARCHITECTURE.md -->
 Points appear within [brief duration] of completion
@@ -117,12 +121,14 @@ Points appear within [brief duration] of completion
 ### 3. Vague Design Pillars
 
 **Problem:** Generic pillar that applies to everything
+
 ```markdown
 ### Make Users Happy
 Users should enjoy the app
 ```
 
 **Fix:** Specific emotion with context
+
 ```markdown
 ### Empowered Action
 Users feel capable and in control, never overwhelmed or helpless.
@@ -135,12 +141,14 @@ Users feel capable and in control, never overwhelmed or helpless.
 ### 4. Implementation Details in Philosophy
 
 **Problem:** Technical details in Level 1
+
 ```markdown
 ## Mission
 Build a React-based app using microservices...
 ```
 
 **Fix:** Focus on why and what experience
+
 ```markdown
 ## Mission
 Transform how people manage tasks by prioritizing sustainable
@@ -152,12 +160,14 @@ productivity over guilt-driven completion metrics.
 ### 5. Feature Lists Masquerading as Pillars
 
 **Problem:** Features instead of emotions
+
 ```markdown
 ### Task Management
 Users can create, edit, and complete tasks
 ```
 
 **Fix:** Emotional experience
+
 ```markdown
 ### Flow State Achievement
 Users experience frictionless task engagement, minimizing
