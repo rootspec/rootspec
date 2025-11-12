@@ -1,6 +1,6 @@
 # Hierarchical Specification Framework
 
-**Version 3.1.0** | [Changelog](CHANGELOG.md)
+**Version 3.2.0** | [Changelog](CHANGELOG.md)
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -253,7 +253,7 @@ The AI will help you:
 
 ## Version Information
 
-**Current Version:** 3.1.0
+**Current Version:** 3.2.0
 
 This framework follows [Semantic Versioning](https://semver.org/):
 

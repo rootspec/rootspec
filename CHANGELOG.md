@@ -7,6 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2025-11-11
+
+### Added
+
+#### Comprehensive Setup Documentation
+
+**New `docs/` directory** with detailed setup and quick-start guides.
+
+- **docs/CYPRESS_SETUP.md** - Complete Cypress installation and configuration guide
+  - 8-step setup workflow with validation
+  - Dependencies list (cypress, cypress-vite, js-yaml, zod, typescript)
+  - npm scripts examples
+  - Task implementation guide (loginAs, seedItem)
+  - Test DSL extension guidance
+  - Troubleshooting section with 8 common issues
+  - CI/CD integration examples
+
+- **docs/QUICK_START.md** - Fast-track reference cards
+  - "New Project in 5 Minutes" workflow
+  - "Existing Project in 10 Minutes" workflow
+  - Learning path for framework newcomers
+  - Common commands cheat sheet
+  - Decision trees for approach selection
+  - Prompt library reference table
+
+#### Existing Project Adoption Workflow
+
+**New prompt for brownfield projects** - Complete guidance for applying the framework to existing codebases.
+
+- **prompts/adopt-framework-existing.md** - Dedicated brownfield adoption prompt
+  - Two approaches: Specification-First (recommended) vs Reverse-Engineering
+  - Specification-First: Define ideal state, create gap analysis, refactor incrementally
+  - Reverse-Engineering: Document current state, infer philosophy from implementation
+  - Level-by-level discovery questions tailored for each approach
+  - Gap analysis and migration planning workflow
+  - Anti-patterns specific to existing projects
+  - Complete guidance for 4-8 hour adoption process
+
+### Changed
+
+#### Documentation Improvements
+
+- **README.md:** Restructured "Getting Started" with three clear paths
+  - Path 1: New Project (Greenfield) - enhanced with time estimates and Cypress link
+  - Path 2: Existing Project (Brownfield) - NEW complete workflow
+  - Path 3: Learning - expanded resources list
+  - Clear scenario-based navigation for all project types
+
+- **templates/USER_STORIES/USER_STORIES_OVERVIEW.md:**
+  - Added "Getting Started" section with 5-step quick setup guide
+  - Setup checklist for validation
+  - Links to CYPRESS_SETUP.md for detailed instructions
+
+- **prompts/README.md:**
+  - Added new brownfield adoption prompt to table
+  - Clarified greenfield vs brownfield scenarios in Quick Start section
+  - Updated descriptions for better discoverability
+
+- **CLAUDE.md:**
+  - Added "User's Project Scenario" section
+  - Helps distinguish greenfield vs brownfield contexts
+  - Explains approach differences (Specification-First vs Reverse-Engineering)
+  - Directs to appropriate prompts for each scenario
+
+### Impact
+
+This release dramatically improves developer experience for both new and existing projects:
+
+- **Cypress setup:** Reduced time-to-first-test from hours of trial/error to 30-45 minutes with clear guidance
+- **Existing projects:** Framework now explicitly welcomes brownfield adoption with dedicated 4-8 hour workflow
+- **Documentation:** Multiple entry points with cross-linked guides for all scenarios
+- **Developer clarity:** Three clear paths (new/existing/learning) with realistic time estimates
+
 ## [3.1.0] - 2025-11-11
 
 ### Added
@@ -628,7 +701,9 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.2.0...HEAD
+[3.2.0]: https://github.com/caudexia/spec-framework/compare/v3.1.0...v3.2.0
+[3.1.0]: https://github.com/caudexia/spec-framework/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/caudexia/spec-framework/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/caudexia/spec-framework/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/caudexia/spec-framework/compare/v1.0.0...v2.0.0
