@@ -5,6 +5,7 @@ Prompt for creating various documentation artifacts from your specification.
 ## Prerequisites
 
 - [ ] Complete specification (all levels 1-5)
+- [ ] 00.SPEC_FRAMEWORK.md in your project directory (optional)
 - [ ] Clear understanding of which document type you need
 
 ## When to Use This Prompt
@@ -22,6 +23,9 @@ Use this prompt when:
 ```
 I have a complete specification following Hierarchical Specification
 Framework v3.0.0.
+
+You may reference 00.SPEC_FRAMEWORK.md to understand the level structure
+if needed for context.
 
 ## DOCUMENT TYPE SPECIFICATIONS
 

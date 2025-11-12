@@ -5,6 +5,7 @@ Complete prompt for adding a new feature to your existing specification while ma
 ## Prerequisites
 
 - [ ] Existing specification (01-05 files)
+- [ ] 00.SPEC_FRAMEWORK.md in your project directory
 - [ ] Clear understanding of the new feature
 - [ ] Knowledge of which Design Pillars the feature supports
 
@@ -25,6 +26,9 @@ I want to add a new feature to my existing specification.
 Feature description: [Describe the feature]
 
 My specification follows Hierarchical Specification Framework v3.0.0.
+
+Please read 00.SPEC_FRAMEWORK.md to understand the framework structure,
+hierarchy rules, and formatting requirements for each level.
 
 ## DECISION TREE: WHERE DOES THIS FEATURE BELONG?
 

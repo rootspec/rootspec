@@ -5,6 +5,7 @@ Prompt for validating a proposed feature or implementation against your specific
 ## Prerequisites
 
 - [ ] Complete specification (01-05 files)
+- [ ] 00.SPEC_FRAMEWORK.md in your project directory
 - [ ] Feature proposal or implementation to review
 
 ## When to Use This Prompt
@@ -26,6 +27,9 @@ against my specification.
 Feature/Implementation: [Describe or paste code/design]
 
 My specification follows Hierarchical Specification Framework v3.0.0.
+
+Please read 00.SPEC_FRAMEWORK.md to understand the framework validation
+rules and compliance criteria.
 
 ## REVIEW CRITERIA BY LEVEL
 
