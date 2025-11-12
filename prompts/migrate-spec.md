@@ -19,7 +19,7 @@ Use this prompt when:
 
 ## The Prompt
 
-```
+````
 I have an existing specification using Hierarchical Specification Framework
 v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.0.0.
 
@@ -138,7 +138,7 @@ Help me migrate my specification by:
    - Confirm no content was lost
 
 Walk me through each step with specific changes for each file.
-```
+````
 
 ## Tips for Working with AI on Migration
 
