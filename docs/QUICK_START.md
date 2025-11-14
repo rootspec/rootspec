@@ -52,9 +52,21 @@ npx cypress open
 
 ### Step 4: Start Building ✨
 
-Use Design Pillars from Level 1 as your decision filter:
+**Implement iteratively using YAML tests as your guide:**
+
+**Quick Start:**
+1. Run MVP tests: `npm test -- --spec cypress/e2e/by_priority.cy.ts --grep "MVP"`
+2. Pick first failing test
+3. Implement minimal code to pass it
+4. Commit and move to next test
+
+**Design Filter:**
 - Every feature must support at least one Design Pillar
 - If it doesn't → don't build it
+
+**Detailed workflow:** See [`docs/IMPLEMENTATION_WORKFLOW.md`](IMPLEMENTATION_WORKFLOW.md)
+
+**AI assistance:** Use [`prompts/implement-from-tests.md`](../prompts/implement-from-tests.md) for guided implementation
 
 ---
 
@@ -285,6 +297,7 @@ npm run test:e2e       # All E2E tests
 |--------|----------|------|
 | [`initialize-spec.md`](../prompts/initialize-spec.md) | Create new specification from scratch | 2-4 hours |
 | [`adopt-framework-existing.md`](../prompts/adopt-framework-existing.md) | Apply framework to existing project | 4-8 hours |
+| [`implement-from-tests.md`](../prompts/implement-from-tests.md) | Implement app iteratively from YAML tests | 2-6 weeks |
 | [`validate-spec.md`](../prompts/validate-spec.md) | Check specification compliance | 15-30 min |
 | [`add-feature.md`](../prompts/add-feature.md) | Add new feature to spec | 30-60 min |
 | [`review-feature.md`](../prompts/review-feature.md) | Validate implementation vs. spec | 15-30 min |
@@ -315,7 +328,8 @@ npm run test:e2e       # All E2E tests
 **For new projects:**
 1. Generate specification → `prompts/initialize-spec.md`
 2. Set up testing → `docs/CYPRESS_SETUP.md`
-3. Start building with Design Pillars as filter
+3. Implement iteratively → `docs/IMPLEMENTATION_WORKFLOW.md` or `prompts/implement-from-tests.md`
+4. Use Design Pillars as decision filter
 
 **For existing projects:**
 1. Choose approach (Specification-First vs. Reverse-Engineering)

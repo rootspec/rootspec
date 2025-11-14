@@ -5,6 +5,36 @@ All notable changes to the Hierarchical Specification Framework will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2025-11-14
+
+### Added
+
+#### Implementation Workflow for Test-Driven Development
+
+**New AI prompt and developer documentation** - Complete workflow for implementing applications iteratively from YAML user story tests (spec-first development).
+
+- **New prompt:** `prompts/implement-from-tests.md` - AI assistant workflow for iterative implementation
+  - 3-phase approach: Analyze → Global Setup → Iterate
+  - Prescriptive patterns for auth, database reset, and seed data
+  - Decision tree for extending DSL vs implementing features
+  - Troubleshooting guide and success criteria
+
+- **New documentation:** `docs/IMPLEMENTATION_WORKFLOW.md` - Human-readable developer guide
+  - Detailed code examples for all patterns
+  - Common scenarios and troubleshooting
+  - Best practices and validation checklist
+  - Timeline estimates (2-6 weeks for MVP)
+
+- **Template improvements:**
+  - `templates/cypress/support/e2e.ts` - Prescriptive global setup pattern with database reset
+  - `templates/cypress.config.ts` - Added `resetDatabase` task with multiple implementation examples
+
+- **Documentation updates:**
+  - `docs/QUICK_START.md` - Expanded "Step 4: Start Building" with concrete workflow steps
+  - `CLAUDE.md` - Added "Implementing from Tests" scenario with key patterns reference
+
+**Impact:** Provides clear, step-by-step guidance for both AI assistants and human developers to implement applications using the YAML test suite as a development roadmap. Establishes prescriptive patterns for global test setup (auth, database reset, fixtures) to prevent common pitfalls like test pollution.
+
 ## [3.3.0] - 2025-11-14
 
 ### Added

@@ -106,13 +106,56 @@ export default defineConfig({
         },
 
         /**
+         * PRESCRIPTIVE PATTERN: Reset database to clean state.
+         *
+         * Called by the global beforeEach hook in cypress/support/e2e.ts
+         * to ensure each test starts with a clean database state.
+         *
+         * This prevents test pollution where one test's data affects another.
+         *
+         * @returns null (required by Cypress)
+         */
+        async resetDatabase() {
+          console.log('[Task] Resetting database to clean state');
+
+          // TODO: Implement your database reset logic here
+          // Example approaches:
+          //
+          // 1. Truncate all tables (Prisma example):
+          //    const tables = await prisma.$queryRaw`
+          //      SELECT tablename FROM pg_tables WHERE schemaname='public'
+          //    `;
+          //    for (const { tablename } of tables) {
+          //      if (tablename !== '_prisma_migrations') {
+          //        await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${tablename}" CASCADE;`);
+          //      }
+          //    }
+          //    // Re-seed baseline data (admin user, etc.)
+          //    await prisma.user.create({ data: { role: 'admin', email: 'admin@test.com' } });
+          //
+          // 2. Drop and recreate schema:
+          //    await db.dropSchema();
+          //    await db.migrate();
+          //    await db.seedBaseline();
+          //
+          // 3. Test database with migrations:
+          //    await exec('npm run db:reset:test');
+          //
+          // 4. In-memory database:
+          //    database.clear();
+          //    database.init();
+
+          return null;
+        },
+
+        /**
          * Add custom tasks here to support domain-specific test steps.
          *
          * Examples:
          * - createProject({ name, owner })
          * - inviteUser({ email, role })
-         * - resetDatabase()
-         * - seedFixtures({ fixture })
+         * - sendNotification({ userId, message })
+         * - processQueue({ queueName })
          */
 
         // async createProject(payload: { name: string; owner: string }) {

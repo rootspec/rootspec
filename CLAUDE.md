@@ -128,6 +128,28 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 4. Verify no new reference violations
 5. See `prompts/add-feature.md` for detailed guidance
 
+### Implementing from Tests
+
+**Use when:** Implementing application iteratively from YAML user stories (spec-first development)
+
+**For AI assistance:**
+1. Use prompt from `prompts/implement-from-tests.md`
+2. **Phase 1:** Analyze all YAML tests, identify global setup needs
+3. **Phase 2:** Implement global setup (auth, DB reset, seed data)
+4. **Phase 3:** Iterate through MVP tests, implement one at a time
+
+**For human developers:**
+- See `docs/IMPLEMENTATION_WORKFLOW.md` for detailed guide
+- Decision tree: Extend DSL → Modify app → Create fixtures
+- Commit after each passing test
+- Work MVP first, then POST_MVP
+
+**Key patterns:**
+- Global setup: `beforeEach` with database reset in `cypress/support/e2e.ts`
+- Auth: `loginAs` task in `cypress.config.ts` + localStorage/cookies
+- Seed data: `seedItem` task for on-demand test data
+- DSL extension: Add steps to `cypress/support/steps.ts` + schema
+
 ### Migrating Spec Versions
 
 1. Read `CHANGELOG.md` for breaking changes
@@ -191,5 +213,7 @@ Both USER_STORIES and FINE_TUNING use comment-annotated YAML:
 
 For detailed prompts and guidance, see:
 - `prompts/` directory for all use cases
+- `prompts/implement-from-tests.md` for iterative implementation workflow (AI)
+- `docs/IMPLEMENTATION_WORKFLOW.md` for implementation guide (humans)
 - `00.SPEC_FRAMEWORK.md` for complete framework specification
 - `README.md` for human-focused introduction and philosophy
