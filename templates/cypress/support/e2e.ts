@@ -15,20 +15,48 @@
 // import { runSetupSteps, runAssertionSteps } from './steps';
 
 /**
- * Global configuration or hooks can go here.
+ * Global configuration and hooks.
  *
- * Examples:
- * - beforeEach hooks that run before every test
- * - Custom Cypress commands using Cypress.Commands.add()
- * - Event listeners for Cypress events
+ * This file sets up test isolation patterns that ensure each test
+ * runs independently with a clean state.
  */
 
-// Example: Log test names before each test
+/**
+ * PRESCRIPTIVE PATTERN: Test Isolation
+ *
+ * Run before each test to ensure a clean starting state.
+ * This prevents test pollution where one test's data affects another.
+ */
+beforeEach(() => {
+  // 1. Reset database to clean state
+  // IMPORTANT: Implement the 'resetDatabase' task in cypress.config.ts
+  cy.task('resetDatabase');
+
+  // 2. Clear browser state
+  cy.clearLocalStorage();
+  cy.clearCookies();
+});
+
+/**
+ * OPTIONAL: Global test logging
+ *
+ * Uncomment to log test names for debugging.
+ */
 // beforeEach(() => {
 //   cy.log('Running test:', Cypress.currentTest.title);
 // });
 
-// Example: Clear local storage before each test
-// beforeEach(() => {
-//   cy.clearLocalStorage();
-// });
+/**
+ * OPTIONAL: Custom Cypress commands
+ *
+ * Add reusable commands here.
+ *
+ * Example:
+ * Cypress.Commands.add('loginAsMember', () => {
+ *   cy.task('loginAs', 'member').then((creds: any) => {
+ *     cy.window().then((win) => {
+ *       win.localStorage.setItem('authToken', creds.token);
+ *     });
+ *   });
+ * });
+ */
