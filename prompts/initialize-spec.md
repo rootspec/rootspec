@@ -1,6 +1,6 @@
 # Initialize New Specification
 
-Complete prompt for creating a new specification using the Hierarchical Specification Framework v3.0.0.
+Complete prompt for creating a new specification using the Hierarchical Specification Framework v3.4.0.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Use this prompt when:
 Copy and paste the text below, replacing `[Brief description of your product concept]` with your actual product idea:
 
 ```
-I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v3.0.0)
+I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v3.4.0)
 into my project directory.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
