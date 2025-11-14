@@ -21,9 +21,18 @@ import { runSetupSteps, runAssertionSteps } from '../support/steps';
  * This uses Vite's import.meta.glob to load files at spec-eval time.
  * The 'as: raw' option loads file contents as strings.
  * The 'eager: true' option loads synchronously.
+ *
+ * To customize for your project structure, edit the glob pattern below.
+ * Path is relative to this file (cypress/e2e/).
+ *
+ * Examples for different structures:
+ * - Standard:  '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**​/*.yaml'
+ * - Content:   '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/**​/*.yaml'
+ * - Monorepo:  '../../../packages/spec/USER_STORIES/by_priority/**​/*.yaml'
+ * - Flat:      '../../../stories/priority/**​/*.yaml'
  */
 const rawFiles = import.meta.glob(
-  '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml',
+  '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml',
   { as: 'raw', eager: true }
 ) as Record<string, string>;
 
@@ -38,13 +47,59 @@ function loadStories(): Story[] {
 
   for (const [path, raw] of Object.entries(rawFiles)) {
     try {
-      // Parse YAML
-      const parsed = yaml.load(raw);
+      // Parse YAML - loadAll handles multiple documents separated by ---
+      const documents = yaml.loadAll(raw);
 
-      // Validate with Zod schema
-      const story = StorySchema.parse(parsed);
+      // Process each document in the file
+      for (const parsed of documents) {
+        // Skip empty documents
+        if (!parsed) continue;
 
-      stories.push(story);
+        // Support both document-level stories array and direct story format
+        let storiesToProcess: any[] = [];
+        if (parsed.stories || parsed.user_stories) {
+          // Document has a stories array - extract it
+          storiesToProcess = parsed.stories || parsed.user_stories;
+        } else if (parsed.acceptance_criteria) {
+          // Document is a single story - wrap in array for uniform processing
+          storiesToProcess = [parsed];
+        } else {
+          // Document doesn't contain stories - skip it (e.g., metadata documents)
+          continue;
+        }
+
+        // Process each story
+        for (const storyData of storiesToProcess) {
+          // Pre-validate step structure to provide better error messages
+          if (storyData.acceptance_criteria) {
+            storyData.acceptance_criteria.forEach((ac: any, acIdx: number) => {
+              ['given', 'when', 'then'].forEach(phase => {
+                if (ac[phase]) {
+                  ac[phase].forEach((step: any, stepIdx: number) => {
+                    if (step === null || step === undefined) {
+                      throw new Error(
+                        `Empty step at acceptance_criteria[${acIdx}].${phase}[${stepIdx}] in ${path}\n` +
+                        `Check YAML for extra dashes (-) or blank array elements`
+                      );
+                    }
+                    if (typeof step !== 'object' || Array.isArray(step)) {
+                      throw new Error(
+                        `Invalid step at acceptance_criteria[${acIdx}].${phase}[${stepIdx}] in ${path}\n` +
+                        `Expected object, got ${Array.isArray(step) ? 'array' : typeof step}`
+                      );
+                    }
+                  });
+                }
+              });
+            });
+          }
+
+          // Validate with Zod schema
+          const story = StorySchema.parse(storyData);
+
+          stories.push(story);
+        }
+      }
     } catch (error) {
       console.error(`Failed to load story from ${path}:`, error);
       throw error;

@@ -79,6 +79,59 @@ your-project/
 
 ---
 
+## Step 2b: Customize Story Paths (If Needed)
+
+By default, the test loaders look for user stories in:
+- `05.IMPLEMENTATION/USER_STORIES/by_priority/`
+- `05.IMPLEMENTATION/USER_STORIES/by_journey/`
+- `05.IMPLEMENTATION/USER_STORIES/by_system/`
+
+**If your project uses a different directory structure**, you must edit the glob pattern in each test file:
+
+1. Open `cypress/e2e/by_priority.cy.ts` (around line 34)
+2. Open `cypress/e2e/by_journey.cy.ts` (around line 34)
+3. Open `cypress/e2e/by_system.cy.ts` (around line 34)
+
+Find and edit the `import.meta.glob()` pattern:
+
+```typescript
+const rawFiles = import.meta.glob(
+  '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml',  // ← Edit this line
+  { as: 'raw', eager: true }
+) as Record<string, string>;
+```
+
+**Path format:**
+- Relative to the test file location (`cypress/e2e/`)
+- Use `../../../` to navigate to project root
+- Must be a literal string (Vite requirement - cannot use variables)
+
+**Examples for common structures:**
+
+Standard framework:
+```typescript
+'../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'
+```
+
+Content subdirectory:
+```typescript
+'../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'
+```
+
+Monorepo:
+```typescript
+'../../../packages/app-spec/USER_STORIES/by_priority/**/*.yaml'
+```
+
+Flat structure:
+```typescript
+'../../../stories/priority/**/*.yaml'
+```
+
+> **Note:** Each test file has inline comments with these examples. Look for the `import.meta.glob()` call and follow the instructions in the JSDoc comment above it.
+
+---
+
 ## Step 3: Add npm Scripts
 
 Add these scripts to your `package.json`:

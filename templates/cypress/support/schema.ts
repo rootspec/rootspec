@@ -10,26 +10,19 @@ import { z } from 'zod';
 /**
  * Step represents a single action or assertion in the test DSL.
  *
- * Core steps provided by the framework:
- * - visit: Navigate to a path
- * - click: Click an element
- * - fill: Fill an input field
- * - loginAs: Authenticate as a user role
- * - seedItem: Seed test data
- * - shouldContain: Assert text content
- * - shouldExist: Assert element exists
+ * Steps can be any object with key-value pairs where:
+ * - The key is the step name (e.g., 'visit', 'click', 'enrollStudent')
+ * - The value can be a string, number, boolean, object, or array
  *
- * Extend this union with domain-specific steps for your project.
+ * This flexible schema allows the DSL to be extended without modifying the schema.
+ *
+ * Examples:
+ * - { visit: '/dashboard' }
+ * - { click: { selector: '[data-test=button]' } }
+ * - { enrollStudent: { studentId: 123, classId: 456 } }
+ * - { shouldShow: { text: 'Welcome', timeout: 2000 } }
  */
-export const Step = z.union([
-  z.object({ visit: z.string() }),
-  z.object({ click: z.object({ selector: z.string() }) }),
-  z.object({ fill: z.object({ selector: z.string(), value: z.string() }) }),
-  z.object({ loginAs: z.string() }),
-  z.object({ seedItem: z.object({ slug: z.string(), status: z.string() }) }),
-  z.object({ shouldContain: z.object({ selector: z.string(), text: z.string() }) }),
-  z.object({ shouldExist: z.object({ selector: z.string() }) })
-]);
+export const Step = z.object({}).passthrough();
 
 /**
  * Acceptance represents a single acceptance criterion with test specification.
@@ -39,16 +32,18 @@ export const Step = z.union([
  * - title: Short description
  * - narrative: Human-readable given/when/then narrative
  * - given: Setup steps (optional, array of Step objects)
- * - when: Action step (exactly 1 step, array for type consistency)
- * - then: Assertion steps (1-5 steps)
+ * - when: Action steps (optional, array of Step objects)
+ * - then: Assertion steps (optional, array of Step objects)
+ *
+ * All step arrays are optional to support narrative-only acceptance criteria.
  */
 export const Acceptance = z.object({
   id: z.string(),
   title: z.string(),
   narrative: z.string().min(10),
   given: z.array(Step).optional(),
-  when: z.array(Step).length(1),
-  then: z.array(Step).min(1).max(5)
+  when: z.array(Step).optional(),
+  then: z.array(Step).optional()
 });
 
 /**

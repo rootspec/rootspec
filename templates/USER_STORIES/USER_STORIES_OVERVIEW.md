@@ -57,6 +57,20 @@ USER_STORIES/
 
 Stories can appear in multiple organizational views to enable different testing perspectives.
 
+### Customizing Story Paths
+
+The default directory structure can be customized by editing the glob patterns in the test loader files. This allows you to adapt the framework to:
+- Monorepo structures
+- Legacy codebases with existing story locations
+- Custom organization preferences
+
+To customize paths, edit the `import.meta.glob()` pattern in each test file (see inline comments for examples):
+- `cypress/e2e/by_priority.cy.ts`
+- `cypress/e2e/by_journey.cy.ts`
+- `cypress/e2e/by_system.cy.ts`
+
+See [../../docs/CYPRESS_SETUP.md](../../docs/CYPRESS_SETUP.md) Step 2b for detailed instructions.
+
 ## YAML Format
 
 Each user story file uses comment-annotated YAML format:
