@@ -5,7 +5,166 @@ All notable changes to the Hierarchical Specification Framework will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.3.0] - 2025-11-14
+
+### Added
+
+#### YAML Syntax Guidance
+
+**New "YAML Syntax Requirements" section in 00.SPEC_FRAMEWORK.md** - Comprehensive YAML formatting guidance to prevent parsing errors in generated user story files.
+
+- Added after the YAML format example (line 419)
+- **Block scalars:** Explains pipe operator (`|`) for multi-line text and text containing colons
+- **Quote escaping:** Documents proper handling of apostrophes and quotes in strings
+  - Use double quotes for strings with apostrophes: `message: "hasn't"` (recommended)
+  - Or escape single quotes by doubling: `message: 'hasn''t'`
+  - Invalid: Cannot use `\'` inside single quotes (common error)
+- Includes before/after examples showing correct and incorrect YAML syntax
+- Documents common YAML pitfalls (unquoted strings with colons, invalid quote escaping, improper indentation, special characters)
+- Provides quick reference for YAML best practices
+- Directly addresses reported issues:
+  - Generated ADVANCED.yaml files with invalid syntax due to unquoted text with colons
+  - Invalid quote escaping using `\'` inside single-quoted strings
+
+**Impact:** Prevents YAML parsing errors when AI assistants generate user story files, especially for placeholder files, notes sections containing colons, and test assertions with apostrophes.
+
+#### Improved Validation Error Messages
+
+**Added pre-validation checks to Cypress test generators** - Provides clear, actionable error messages before Zod schema validation to help users quickly identify and fix YAML syntax issues.
+
+- **Pre-validation in all three test generators:**
+  - `templates/cypress/e2e/by_priority.cy.ts` (lines 49-71)
+  - `templates/cypress/e2e/by_journey.cy.ts` (lines 49-71)
+  - `templates/cypress/e2e/by_system.cy.ts` (lines 49-71)
+  - Checks for null/undefined steps (empty array elements)
+  - Checks for invalid data types (arrays, strings instead of objects)
+  - Reports exact error location with file path and index
+
+- **New "Troubleshooting YAML Validation Errors" section in 00.SPEC_FRAMEWORK.md** (lines 493-545)
+  - How to locate errors from paths like `acceptance_criteria[2].then[1]`
+  - Common "invalid_union" error causes with before/after examples
+  - Validation checklist for quick debugging
+
+- **Expanded "Common YAML Pitfalls"** (line 481)
+  - Added pitfall #6: Empty array elements
+  - Added "Array elements" to Quick Reference
+
+**Before:** Cryptic Zod union errors showing all union members failed
+**After:** Clear error messages like "Empty step at acceptance_criteria[2].then[1] - Check YAML for extra dashes"
+
+**Impact:** Dramatically improves developer experience when debugging YAML validation errors. Users can quickly identify the exact line causing issues and understand what to fix, rather than deciphering cryptic Zod union validation failures.
+
+### Fixed
+
+#### Cypress Test Generators Support Multiple YAML Documents
+
+**Updated all three test generators to use `yaml.loadAll()` instead of `yaml.load()`** - Properly handles YAML files containing multiple documents separated by `---`.
+
+- **templates/cypress/e2e/by_priority.cy.ts** - Updated `loadStories()` function
+- **templates/cypress/e2e/by_journey.cy.ts** - Updated `loadStories()` function
+- **templates/cypress/e2e/by_system.cy.ts** - Updated `loadStories()` function
+- Now iterates through all documents returned by `yaml.loadAll()`
+- Skips empty documents automatically
+- Each document is validated with Zod schema independently
+
+**Before:** Used `yaml.load()` which only parses the first YAML document in a file
+**After:** Uses `yaml.loadAll()` which handles multiple YAML documents in a single file
+
+**Impact:** Allows user story YAML files to contain multiple story documents in a single file, separated by the standard YAML document separator (`---`). This provides more flexible file organization options for user stories.
+
+#### Zod Schema Validation Fixes
+
+**Fixed "invalid union" validation errors in Zod schema** - Resolved schema-YAML mismatches that caused validation failures for acceptance criteria.
+
+- **templates/cypress/support/schema.ts:50** - Changed `when` array constraint from `.length(1)` to `.min(1)`
+  - **Before:** Required exactly 1 step in the `when` array
+  - **After:** Allows 1 or more steps in the `when` array
+  - **Rationale:** User actions often involve multi-step sequences (click → fill → submit). Framework's own YAML examples contain 2-3 steps in `when` arrays.
+
+- **templates/cypress/support/schema.ts:29** - Added `.passthrough()` to `seedItem` schema
+  - **Before:** Only allowed `slug` and `status` fields in seedItem
+  - **After:** Allows additional domain-specific fields while still validating required fields
+  - **Rationale:** YAML examples include custom fields like `points: 10`. Passthrough enables domain-specific test data customization.
+
+- Updated JSDoc comment to reflect "Action steps" (plural) instead of "Action step" (singular)
+
+**Impact:** Fixes "invalid union on acceptance criteria" validation errors. Allows realistic multi-step user actions and custom test data fields, aligning schema with actual usage patterns.
+
+### Changed
+
+#### Cypress Test Loaders Support Document-Level Stories Array
+
+**Enhanced YAML structure support in test generators** - Test loaders now support YAML files with a `stories:` or `user_stories:` array at the document level, in addition to the single-story-per-document format.
+
+- **Updated all three test loaders:**
+  - `templates/cypress/e2e/by_priority.cy.ts` (lines 49-89)
+  - `templates/cypress/e2e/by_journey.cy.ts` (lines 49-89)
+  - `templates/cypress/e2e/by_system.cy.ts` (lines 49-89)
+  - Checks for `parsed.stories` or `parsed.user_stories` array
+  - If array exists, iterates through and validates each story individually
+  - If array doesn't exist, validates document as single story (backward compatible)
+
+**Supported YAML structures:**
+
+1. **Document-level stories array** (new):
+```yaml
+---
+stories:
+  - id: US-001
+    title: Story One
+    acceptance_criteria: [...]
+  - id: US-002
+    title: Story Two
+    acceptance_criteria: [...]
+```
+
+2. **Single story per document** (still supported):
+```yaml
+---
+id: US-001
+title: Story One
+acceptance_criteria: [...]
+```
+
+**Impact:** Allows multiple user stories in a single YAML file while maintaining backward compatibility. Provides more flexible file organization options for teams managing many user stories.
+
+#### User Story Path Customization Documentation
+
+**Added inline documentation for customizing story paths** - User story file paths can be customized by editing glob patterns directly in test loader files. Comprehensive inline examples support different project structures.
+
+- **Test loader files with inline documentation:**
+  - `templates/cypress/e2e/by_priority.cy.ts` - JSDoc with examples for standard, content, monorepo, and flat structures
+  - `templates/cypress/e2e/by_journey.cy.ts` - JSDoc with examples for different directory layouts
+  - `templates/cypress/e2e/by_system.cy.ts` - JSDoc with examples for various project types
+  - Each file includes 4 common path pattern examples in comments
+
+- **Documentation:**
+  - `docs/CYPRESS_SETUP.md` - New Step 2b with path customization instructions
+    - Step-by-step guide to editing test files
+    - Exact line numbers where to make changes
+    - Examples for standard, content subdirectory, monorepo, and flat structures
+  - `templates/USER_STORIES/USER_STORIES_OVERVIEW.md` - Updated with path customization info
+  - File structure diagram updated (no separate config file needed)
+
+**Default paths (content subdirectory pattern):**
+```typescript
+'../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'
+'../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_journey/**/*.yaml'
+'../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_system/**/*.yaml'
+```
+
+**Example patterns provided in inline docs:**
+
+Standard: `'../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'`
+Content: `'../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'`
+Monorepo: `'../../../packages/spec/USER_STORIES/by_priority/**/*.yaml'`
+Flat: `'../../../stories/priority/**/*.yaml'`
+
+**Technical constraint:** Vite's `import.meta.glob()` requires string literals for static analysis at build time - variables and imports cannot be used. This is a Vite limitation that necessitates editing glob patterns directly in test files.
+
+**To customize paths:** Edit the `import.meta.glob()` pattern in each test file (lines ~34). Inline comments provide examples for common project structures.
+
+**Impact:** Projects with non-standard directory structures (monorepos, legacy codebases, custom organization) can easily customize paths by editing three clearly-documented locations. No separate configuration file needed.
 
 ## [3.2.0] - 2025-11-11
 
