@@ -5,6 +5,53 @@ All notable changes to the Hierarchical Specification Framework will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2025-11-15
+
+### Added
+
+#### Test Control Modifiers (skip/only)
+
+**New optional `skip` and `only` fields for user stories and acceptance criteria** - Control which tests run during development, matching Cypress's `.skip()` and `.only()` behavior.
+
+- **Schema changes:**
+  - `templates/cypress/support/schema.ts` - Added optional `skip?: boolean` and `only?: boolean` to both `StorySchema` and `Acceptance` schema
+  - Story-level modifiers take precedence over acceptance criterion-level modifiers
+  - Multiple `only` flags behave additively (all marked tests run)
+
+- **Test generator updates:**
+  - `templates/cypress/e2e/by_priority.cy.ts` - Implements skip/only logic
+  - `templates/cypress/e2e/by_journey.cy.ts` - Implements skip/only logic
+  - `templates/cypress/e2e/by_system.cy.ts` - Implements skip/only logic
+  - Uses `describe.skip()` and `describe.only()` to control test execution
+
+- **Documentation:**
+  - `00.SPEC_FRAMEWORK.md` (lines 678-742) - New "Test Control Modifiers (skip/only)" section
+  - Explains modifier behavior and precedence rules
+  - Provides best practices (never commit `only`, document skip reasons)
+  - Includes complete examples with both story-level and AC-level modifiers
+
+- **Template examples:**
+  - All three example files updated with commented modifier examples
+  - `templates/USER_STORIES/by_priority/MVP.example.yaml`
+  - `templates/USER_STORIES/by_journey/ONBOARDING.example.yaml`
+  - `templates/USER_STORIES/by_system/TASK_SYSTEM.example.yaml`
+
+**Usage:**
+```yaml
+id: US-101
+title: Add new tasks quickly
+skip: true  # Skip this entire story
+# only: true  # Or run ONLY this story
+
+acceptance_criteria:
+  - id: AC-101-1
+    title: Member can create task
+    # skip: true  # Skip just this AC
+    # only: true  # Or run ONLY this AC
+```
+
+**Impact:** Enables developers to focus on specific tests during development without commenting out YAML or modifying test code. Supports iterative development by allowing selective test execution while maintaining full test suite in version control.
+
 ## [3.4.0] - 2025-11-14
 
 ### Added
@@ -890,7 +937,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/caudexia/spec-framework/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/caudexia/spec-framework/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/caudexia/spec-framework/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/caudexia/spec-framework/compare/v3.1.0...v3.2.0
