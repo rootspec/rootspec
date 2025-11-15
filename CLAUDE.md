@@ -156,6 +156,59 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 2. Use prompt from `prompts/migrate-spec.md`
 3. Follow migration guide for specific version (e.g., v2.x → v3.0)
 
+### Releasing a New Framework Version
+
+**When making framework changes,** follow this process to commit and tag a new version.
+
+**Version numbering:** Patch (3.4.1) = bug fixes | Minor (3.5.0) = new features | Major (4.0.0) = breaking changes
+
+**Steps:**
+
+```bash
+# 1. Update CHANGELOG.md with new version section at top (manually edit)
+
+# 2. Find and update all version references in docs
+grep -r "v3\.[0-3]\.0" --include="*.md" . | grep -v ".git" | grep -v "CHANGELOG.md"
+# Update: 00.SPEC_FRAMEWORK.md, README.md (2 places), CHANGELOG.md links, all prompts/*
+
+# 3. Commit feature changes
+git add CHANGELOG.md 00.SPEC_FRAMEWORK.md README.md prompts/ docs/ templates/
+git commit -m "Add [feature name] (vX.Y.0)
+
+[Description]
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# 4. Commit version number updates
+git add .
+git commit -m "Update all version references to X.Y.0 throughout documentation
+
+- 00.SPEC_FRAMEWORK.md: [old] → X.Y.0
+- README.md: [old] → X.Y.0
+- CHANGELOG.md: Add version comparison links
+- All prompts updated to vX.Y.0"
+
+# 5. Create tag
+git tag -a vX.Y.0 -m "Version X.Y.0: [Brief description]
+
+New features:
+- [List]
+
+See CHANGELOG.md for details."
+
+# 6. Verify
+git log --oneline -5
+git tag -l "v3.*" | tail -3
+git status
+
+# 7. Push
+git push && git push --tags
+```
+
+**If you need to retag:** `git tag -d vX.Y.0` then recreate and `git push --tags --force`
+
 ---
 
 ## Reading Order
