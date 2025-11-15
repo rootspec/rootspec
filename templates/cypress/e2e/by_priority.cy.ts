@@ -139,7 +139,7 @@ const stories = loadStories();
  * Structure:
  * describe(story) {
  *   describe(acceptance criterion) {
- *     before() { // Show narrative and given steps }
+ *     beforeEach() { // Show narrative and given steps after global state reset }
  *     it(test) { // Run when and then steps }
  *   }
  * }
@@ -172,7 +172,7 @@ for (const story of stories) {
       }
 
       acDescribe(`${ac.id}: ${ac.title}`, () => {
-        before(() => {
+        beforeEach(() => {
           // Display human-readable narrative and setup in reporter
           cy.log('--- Narrative ---');
           cy.log(ac.narrative);
@@ -180,7 +180,7 @@ for (const story of stories) {
           cy.log('--- Given (Setup) ---');
           (ac.given ?? []).forEach(s => cy.log(JSON.stringify(s)));
 
-          // Run given steps once before the test
+          // Run given steps before each test (after global beforeEach resets state)
           runSetupSteps(ac.given ?? []);
         });
 
