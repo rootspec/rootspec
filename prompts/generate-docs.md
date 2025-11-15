@@ -22,7 +22,7 @@ Use this prompt when:
 
 ```
 I have a complete specification following Hierarchical Specification
-Framework v3.4.0.
+Framework v3.5.0.
 
 You may reference 00.SPEC_FRAMEWORK.md to understand the level structure
 if needed for context.

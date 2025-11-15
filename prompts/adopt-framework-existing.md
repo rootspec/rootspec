@@ -1,6 +1,6 @@
 # Adopt Framework for Existing Project
 
-Complete prompt for applying the Hierarchical Specification Framework v3.4.0 to an existing codebase or partially-built product.
+Complete prompt for applying the Hierarchical Specification Framework v3.5.0 to an existing codebase or partially-built product.
 
 ## Prerequisites
 
@@ -78,7 +78,7 @@ Use this prompt when:
 Copy and paste the text below, replacing placeholders with your project details:
 
 ```
-I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v3.4.0)
+I have copied 00.SPEC_FRAMEWORK.md (Hierarchical Specification Framework v3.5.0)
 into my EXISTING project directory.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
