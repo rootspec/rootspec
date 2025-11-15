@@ -11,10 +11,14 @@
 id: US-301
 title: Edit existing task details
 requirement_id: R-301
+# skip: true  # Uncomment to skip this entire story
+# only: true  # Uncomment to run ONLY this story (for local development)
 
 acceptance_criteria:
   - id: AC-301-1
     title: Member can update task name
+    # skip: true  # Uncomment to skip just this acceptance criterion
+    # only: true  # Uncomment to run ONLY this acceptance criterion
     narrative: |
       Given I have an existing task
       When I edit the task name and save
@@ -43,6 +47,8 @@ acceptance_criteria:
 id: US-302
 title: Delete task with confirmation
 requirement_id: R-302
+# skip: true  # Uncomment to skip this entire story
+# only: true  # Uncomment to run ONLY this story (for local development)
 
 acceptance_criteria:
   - id: AC-302-1

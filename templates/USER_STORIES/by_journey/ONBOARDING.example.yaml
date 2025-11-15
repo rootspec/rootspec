@@ -11,10 +11,14 @@
 id: US-201
 title: Complete initial onboarding flow
 requirement_id: R-201
+# skip: true  # Uncomment to skip this entire story
+# only: true  # Uncomment to run ONLY this story (for local development)
 
 acceptance_criteria:
   - id: AC-201-1
     title: New user can create account
+    # skip: true  # Uncomment to skip just this acceptance criterion
+    # only: true  # Uncomment to run ONLY this acceptance criterion
     narrative: |
       Given I am a new user on the landing page
       When I complete the signup form with valid information
