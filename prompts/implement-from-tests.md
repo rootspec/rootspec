@@ -26,7 +26,7 @@ Use this prompt when:
 Copy and paste the text below:
 
 ```
-I have a complete specification following Hierarchical Specification Framework v3.5.1,
+I have a complete specification following Hierarchical Specification Framework v3.5.2,
 with YAML user stories in 05.IMPLEMENTATION/USER_STORIES/.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure and test DSL.
