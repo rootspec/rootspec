@@ -5,6 +5,26 @@ All notable changes to the Hierarchical Specification Framework will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.2] - 2025-11-15
+
+### Fixed
+
+- **Critical Cypress test hook timing bug** - Changed test setup hooks from `before()` to `beforeEach()` to fix execution order issue where setup steps were being cleared before tests ran.
+
+  **Problem:** Test generators used `before()` hooks for setup steps (from YAML `given` sections), which ran BEFORE the global `beforeEach()` hook that clears page/cookies/localStorage. This caused setup steps like `cy.visit()` to be cleared before tests executed, resulting in "default blank page" errors.
+
+  **Solution:** Changed all three test generators to use `beforeEach()` hooks, ensuring correct execution order:
+  1. Global `beforeEach()`: Clear state (from e2e.ts)
+  2. AC-level `beforeEach()`: Run setup steps (from test generators)
+  3. Test `it()`: Run test with proper setup intact
+
+  **Files fixed:**
+  - `templates/cypress/e2e/by_priority.cy.ts` (lines 142, 175, 183)
+  - `templates/cypress/e2e/by_journey.cy.ts` (lines 142, 175, 183)
+  - `templates/cypress/e2e/by_system.cy.ts` (lines 142, 175, 183)
+
+  This ensures setup steps (page visits, logins, etc.) execute after state is cleared and persist through test execution.
+
 ## [3.5.1] - 2025-11-15
 
 ### Fixed
@@ -947,7 +967,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.5.1...HEAD
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.5.2...HEAD
+[3.5.2]: https://github.com/caudexia/spec-framework/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/caudexia/spec-framework/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/caudexia/spec-framework/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/caudexia/spec-framework/compare/v3.3.0...v3.4.0
