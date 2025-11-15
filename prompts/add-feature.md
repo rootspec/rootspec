@@ -25,7 +25,7 @@ I want to add a new feature to my existing specification.
 
 Feature description: [Describe the feature]
 
-My specification follows Hierarchical Specification Framework v3.4.0.
+My specification follows Hierarchical Specification Framework v3.5.0.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure,
 hierarchy rules, and formatting requirements for each level.
