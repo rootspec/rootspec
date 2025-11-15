@@ -159,11 +159,11 @@ for (const story of stories) {
   storyDescribe(`${story.id}: ${story.title}`, () => {
     for (const ac of story.acceptance_criteria) {
       // Determine which describe function to use for the AC
-      // Story-level modifiers take precedence
+      // Story-level skip suppresses AC-level modifiers
+      // Story-level only allows AC-level modifiers to work within the focused story
       let acDescribe = describe;
-      if (story.only || story.skip) {
-        // Story-level modifier exists - use normal describe for ACs
-        // (the story-level modifier already handles skip/only behavior)
+      if (story.skip) {
+        // Story is skipped - ignore AC-level modifiers
         acDescribe = describe;
       } else if (ac.only) {
         acDescribe = describe.only;
