@@ -204,7 +204,7 @@ git tag -l "v3.*" | tail -3
 git status
 
 # 7. Push
-git push && git push --tags
+git push && git push origin vX.Y.0
 ```
 
 **If you need to retag:** `git tag -d vX.Y.0` then recreate and `git push --tags --force`
