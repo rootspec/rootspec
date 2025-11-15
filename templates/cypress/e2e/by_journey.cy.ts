@@ -143,11 +143,35 @@ const stories = loadStories();
  *     it(test) { // Run when and then steps }
  *   }
  * }
+ *
+ * Supports skip/only modifiers at both story and acceptance criterion levels.
+ * Story-level modifiers take precedence over AC-level modifiers.
  */
 for (const story of stories) {
-  describe(`${story.id}: ${story.title}`, () => {
+  // Determine which describe function to use for the story
+  let storyDescribe = describe;
+  if (story.only) {
+    storyDescribe = describe.only;
+  } else if (story.skip) {
+    storyDescribe = describe.skip;
+  }
+
+  storyDescribe(`${story.id}: ${story.title}`, () => {
     for (const ac of story.acceptance_criteria) {
-      describe(`${ac.id}: ${ac.title}`, () => {
+      // Determine which describe function to use for the AC
+      // Story-level modifiers take precedence
+      let acDescribe = describe;
+      if (story.only || story.skip) {
+        // Story-level modifier exists - use normal describe for ACs
+        // (the story-level modifier already handles skip/only behavior)
+        acDescribe = describe;
+      } else if (ac.only) {
+        acDescribe = describe.only;
+      } else if (ac.skip) {
+        acDescribe = describe.skip;
+      }
+
+      acDescribe(`${ac.id}: ${ac.title}`, () => {
         before(() => {
           // Display human-readable narrative and setup in reporter
           cy.log('--- Narrative ---');

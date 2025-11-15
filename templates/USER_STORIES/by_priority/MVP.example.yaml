@@ -11,10 +11,14 @@
 id: US-101
 title: Add new tasks quickly
 requirement_id: R-101
+# skip: true  # Uncomment to skip this entire story
+# only: true  # Uncomment to run ONLY this story (for local development)
 
 acceptance_criteria:
   - id: AC-101-1
     title: Member can create task from main screen
+    # skip: true  # Uncomment to skip just this acceptance criterion
+    # only: true  # Uncomment to run ONLY this acceptance criterion
     narrative: |
       Given I am a logged-in member viewing the main screen
       When I click the add task button and enter a task name
@@ -60,6 +64,8 @@ acceptance_criteria:
 id: US-102
 title: See points awarded immediately on task completion
 requirement_id: R-102
+# skip: true  # Uncomment to skip this entire story
+# only: true  # Uncomment to run ONLY this story (for local development)
 
 acceptance_criteria:
   - id: AC-102-1

@@ -34,6 +34,8 @@ export const Step = z.object({}).passthrough();
  * - given: Setup steps (optional, array of Step objects)
  * - when: Action steps (optional, array of Step objects)
  * - then: Assertion steps (optional, array of Step objects)
+ * - skip: Skip this acceptance criterion (optional, boolean)
+ * - only: Run only this acceptance criterion (optional, boolean)
  *
  * All step arrays are optional to support narrative-only acceptance criteria.
  */
@@ -43,7 +45,9 @@ export const Acceptance = z.object({
   narrative: z.string().min(10),
   given: z.array(Step).optional(),
   when: z.array(Step).optional(),
-  then: z.array(Step).optional()
+  then: z.array(Step).optional(),
+  skip: z.boolean().optional(),
+  only: z.boolean().optional()
 });
 
 /**
@@ -54,12 +58,18 @@ export const Acceptance = z.object({
  * - title: Story title
  * - requirement_id: Optional reference to requirements (e.g., R-101)
  * - acceptance_criteria: Array of acceptance criteria (at least 1)
+ * - skip: Skip this entire story (optional, boolean)
+ * - only: Run only this story (optional, boolean)
+ *
+ * Note: Story-level skip/only takes precedence over acceptance criteria-level flags.
  */
 export const StorySchema = z.object({
   id: z.string(),
   title: z.string(),
   requirement_id: z.string().optional(),
-  acceptance_criteria: z.array(Acceptance).nonempty()
+  acceptance_criteria: z.array(Acceptance).nonempty(),
+  skip: z.boolean().optional(),
+  only: z.boolean().optional()
 });
 
 // Export TypeScript types inferred from Zod schemas
