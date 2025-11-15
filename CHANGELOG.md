@@ -5,6 +5,16 @@ All notable changes to the Hierarchical Specification Framework will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.1] - 2025-11-15
+
+### Fixed
+
+- **AC-level `only` modifier now works within focused stories** - Previously, when a story had `only: true`, all of its acceptance criteria would run, even if only one AC had `only: true`. Now AC-level `only` modifiers correctly focus tests within a focused story.
+  - Fixed: `templates/cypress/e2e/by_priority.cy.ts` (line 164)
+  - Fixed: `templates/cypress/e2e/by_journey.cy.ts` (line 164)
+  - Fixed: `templates/cypress/e2e/by_system.cy.ts` (line 164)
+  - Changed condition from `if (story.only || story.skip)` to `if (story.skip)` to allow AC-level modifiers to work within `story.only`
+
 ## [3.5.0] - 2025-11-15
 
 ### Added
@@ -937,7 +947,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.5.0...HEAD
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.5.1...HEAD
+[3.5.1]: https://github.com/caudexia/spec-framework/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/caudexia/spec-framework/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/caudexia/spec-framework/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/caudexia/spec-framework/compare/v3.2.0...v3.3.0
