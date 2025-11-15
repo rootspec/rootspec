@@ -21,7 +21,7 @@ Use this prompt when:
 
 ````
 I have an existing specification using Hierarchical Specification Framework
-v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.0.0.
+v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.4.0.
 
 Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
 what has changed.
@@ -115,7 +115,7 @@ test:
 Help me migrate my specification by:
 
 1. **Identify Breaking Changes**
-   - Read CHANGELOG.md between v[OLD_VERSION] and v3.0.0
+   - Read CHANGELOG.md between v[OLD_VERSION] and v3.4.0
    - List all breaking changes that affect my spec
    - Highlight critical changes that require immediate attention
 
@@ -132,7 +132,7 @@ Help me migrate my specification by:
    - Update all cross-references
 
 4. **Validate Migrated Spec**
-   - Ensure it follows v3.0.0 rules from 00.SPEC_FRAMEWORK.md
+   - Ensure it follows v3.4.0 rules from 00.SPEC_FRAMEWORK.md
    - Check reference hierarchy compliance
    - Verify all cross-references work
    - Confirm no content was lost

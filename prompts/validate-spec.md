@@ -22,7 +22,7 @@ Use this prompt when:
 
 ````
 I have an existing specification and want to validate that it properly
-follows the Hierarchical Specification Framework v3.0.0.
+follows the Hierarchical Specification Framework v3.4.0.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the complete framework
 rules, then perform a comprehensive validation by checking:

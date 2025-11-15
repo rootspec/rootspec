@@ -1,6 +1,6 @@
 # Hierarchical Specification Framework
 
-**Version 3.2.0** | [Changelog](CHANGELOG.md)
+**Version 3.4.0** | [Changelog](CHANGELOG.md)
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -253,7 +253,7 @@ The AI will help you:
 
 ## Version Information
 
-**Current Version:** 3.2.0
+**Current Version:** 3.4.0
 
 This framework follows [Semantic Versioning](https://semver.org/):
 
@@ -347,7 +347,7 @@ Follow framework rules: hierarchy, placeholders in L1-4, no upward references.
 **Quick prompt:**
 
 ```
-I have a spec using framework v[OLD_VERSION]. I've updated to v3.0.0.
+I have a spec using framework v[OLD_VERSION]. I've updated to v3.4.0.
 
 Read CHANGELOG.md and help me migrate:
 1. Identify breaking changes
@@ -369,7 +369,7 @@ Read CHANGELOG.md and help me migrate:
 **Quick prompt:**
 
 ```
-Validate my specification against framework v3.0.0:
+Validate my specification against framework v3.4.0:
 
 Check:
 - Reference hierarchy (no upward references)
