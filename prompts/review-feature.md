@@ -26,7 +26,7 @@ against my specification.
 
 Feature/Implementation: [Describe or paste code/design]
 
-My specification follows Hierarchical Specification Framework v3.5.0.
+My specification follows Hierarchical Specification Framework v3.5.1.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework validation
 rules and compliance criteria.
