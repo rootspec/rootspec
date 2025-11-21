@@ -5,6 +5,86 @@ All notable changes to **RootSpec** (Hierarchical Specification Framework) will 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2025-11-21
+
+### Added
+
+#### RootSpec CLI
+
+**New official CLI for framework installation, prompt generation, and project setup** - Replaces manual `curl` downloads and manual prompt editing with automated commands.
+
+**Commands:**
+- `rootspec init [--path] [--full] [--yes]` - Initialize framework with optional Cypress templates
+- `rootspec cypress` - Add Cypress testing templates to existing project
+- `rootspec prompts [name] [-o]` - List or view AI workflow prompts (auto-filled with project context)
+- `rootspec validate` - Validate specification compliance
+
+**Installation:**
+```bash
+# Global installation
+npm install -g rootspec
+
+# Or use directly with npx
+npx rootspec init
+```
+
+**Key Features:**
+- **Auto-detection:** Scans project for framework (Next.js, Nuxt, React, Vue, Angular, etc.), source directories (`src/`, `lib/`, `app/`, etc.), and configuration files
+- **Template engine:** Custom syntax with `{{VARIABLE}}`, `{{#IF condition}}`, and `{{#EACH array}}` for dynamic prompt generation
+- **Context-aware prompts:** Automatically fills prompts with your actual project details
+- **Interactive mode:** User-friendly prompts for all configuration options
+- **Non-interactive mode:** `--yes` flag for CI/CD and scripting
+
+**Template System:**
+All AI prompt files now use template format with placeholders that the CLI automatically fills:
+- `{{FRAMEWORK}}` - Auto-detected framework (e.g., "Next.js", "React")
+- `{{SOURCE_DIRS}}` - Discovered source directories
+- `{{CONFIG_FILES}}` - Found configuration files
+- `{{SPEC_DIR}}` - Specification directory location
+
+**Example workflow:**
+```bash
+$ rootspec init
+$ rootspec prompts adopt
+
+🌳 Adopt RootSpec Framework
+
+Analyzing your existing codebase...
+  ✓ Detected framework: Next.js
+  ✓ Found src/, components/
+
+✅ Prompt ready! [copy and paste into AI assistant]
+```
+
+**Technical implementation:**
+- TypeScript with ESM modules
+- Commander.js for CLI framework
+- Inquirer for interactive prompts
+- fs-extra for file operations
+- Custom template engine
+- npm package: `rootspec`
+- Node requirement: >=18.0.0
+
+**Documentation updates:**
+All major documentation files updated to reflect CLI-based workflow:
+- `README.md` - New Installation section, updated Getting Started paths
+- `prompts/README.md` - Complete rewrite explaining template system
+- `docs/QUICK_START.md` - CLI Commands Reference section
+- `CLAUDE.md` - CLI-Aware Workflows section
+- `docs/CYPRESS_SETUP.md` - `rootspec cypress` as primary method
+- `00.SPEC_FRAMEWORK.md` - Installation options with CLI recommended
+
+**Migration notes:**
+- Manual workflow still supported (download framework files directly from GitHub)
+- Existing projects: No breaking changes to specification format or structure
+- Users can continue using manual `curl` downloads if preferred
+
+### Changed
+
+- **Prompt files converted to template format** - All prompts in `prompts/` directory now use placeholder syntax instead of hardcoded examples
+- **CLI is now the recommended installation method** - Manual workflow documented as alternative for offline/advanced usage
+- **Documentation restructured** - CLI workflow presented first, manual approach in collapsible sections
+
 ## [3.6.0] - 2025-11-21
 
 ### Added
@@ -1000,7 +1080,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/rootspec/rootspec/compare/v3.6.0...HEAD
+[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/rootspec/rootspec/compare/v3.6.0...v4.0.0
 [3.6.0]: https://github.com/rootspec/rootspec/compare/v3.5.2...v3.6.0
 [3.5.2]: https://github.com/rootspec/rootspec/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/rootspec/rootspec/compare/v3.5.0...v3.5.1
