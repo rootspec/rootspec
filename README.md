@@ -1,10 +1,27 @@
-# Hierarchical Specification Framework
+<p align="center">
+  <img src="assets/rootspec-banner.png" alt="RootSpec" width="600">
+</p>
 
-**Version 3.6.0** | [Changelog](CHANGELOG.md)
+<h1 align="center">RootSpec</h1>
+
+<p align="center">
+  <strong>Hierarchical Specification Framework</strong><br>
+  Philosophy guides implementation, never vice versa.
+</p>
+
+<p align="center">
+  <a href="CHANGELOG.md">Changelog</a> •
+  <a href="docs/QUICK_START.md">Quick Start</a> •
+  <a href="prompts/">Prompts</a>
+</p>
+
+---
+
+**Version 3.6.0**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
-**🤖 AI-First Design:** While this framework can be used manually, it is specifically designed for AI assistants and agents to help you create, maintain, and validate comprehensive product specifications.
+**AI-First Design:** Built for AI assistants to help you create, maintain, and validate comprehensive product specifications.
 
 ## Overview
 
@@ -194,7 +211,7 @@ Choose your path based on your project stage:
 
 ```bash
 # Download the framework file
-curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 
 # Or manually download and copy 00.SPEC_FRAMEWORK.md to your project root
 ```
@@ -242,7 +259,7 @@ Your YAML user stories will automatically generate end-to-end tests.
 
 ```bash
 cd your-existing-project/
-curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 ```
 
 **Step 2: Choose your approach**
