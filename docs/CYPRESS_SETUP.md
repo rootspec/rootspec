@@ -50,20 +50,58 @@ npm install --save-dev typescript @types/node
 
 ---
 
-## Step 2: Copy Template Files
+## Step 2: Install Cypress Templates
 
-From the rootspec repository, copy the Cypress configuration and test generation scripts to your project:
+### Using CLI (Recommended)
 
 ```bash
-# Copy Cypress configuration
-cp path/to/rootspec/templates/cypress.config.ts ./
-
-# Copy Cypress support files and test generators
-cp -r path/to/rootspec/templates/cypress ./
+rootspec cypress
 ```
 
-**Or manually create this structure:**
+The CLI will:
+- Copy `cypress.config.ts` with RootSpec tasks (loginAs, seedItem, resetDatabase, log)
+- Copy all Cypress support files and test generators
+- Detect your spec directory from `.rootspecrc.json`
+- Set up proper paths automatically
+- Provide next steps and installation instructions
 
+**Output:**
+```
+🧪 RootSpec - Cypress Testing Setup
+
+📁 Copying Cypress configuration...
+   ✓ cypress.config.ts
+   ✓ cypress/
+
+✅ Cypress templates installed!
+
+Next steps:
+1. Install dependencies:
+   npm install --save-dev cypress cypress-vite js-yaml zod typescript
+2. Implement Cypress tasks in cypress.config.ts:
+   - loginAs: Authentication logic
+   - seedItem: Test data seeding
+   - resetDatabase: Database cleanup
+3. Create user stories in ./spec/05.IMPLEMENTATION/USER_STORIES/
+4. Run tests: npx cypress open
+```
+
+### Manual Alternative
+
+If you need to customize the setup or don't have the CLI:
+
+```bash
+# Clone or download the rootspec repository first
+git clone https://github.com/rootspec/rootspec.git
+
+# Copy Cypress configuration
+cp rootspec/templates/cypress.config.ts ./
+
+# Copy Cypress support files and test generators
+cp -r rootspec/templates/cypress ./
+```
+
+**Resulting structure:**
 ```
 your-project/
 ├── cypress.config.ts              # Cypress configuration

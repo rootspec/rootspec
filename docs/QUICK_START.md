@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Fast-track guides for getting started with the Hierarchical Specification Framework.
+Fast-track guides for getting started with RootSpec v4.0.0.
 
 ---
 
@@ -8,19 +8,35 @@ Fast-track guides for getting started with the Hierarchical Specification Framew
 
 **Scenario:** Starting from scratch with a greenfield project
 
-### Step 1: Download Framework (30 seconds)
+### Step 1: Initialize RootSpec (30 seconds)
 
 ```bash
-cd your-project/
-curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+# Install and initialize with one command
+npx rootspec init
+
+# Or install globally first
+npm install -g rootspec
+rootspec init
 ```
+
+This creates:
+- `spec/00.SPEC_FRAMEWORK.md` - Framework reference
+- `.rootspecrc.json` - Configuration file
 
 ### Step 2: Generate Specification with AI (2-4 hours)
 
-1. Open [`prompts/initialize-spec.md`](../prompts/initialize-spec.md)
-2. Copy the complete prompt
-3. Replace `[Brief description]` with your product idea
-4. Paste into Claude Code or GPT-4
+```bash
+# Generate AI prompt with auto-detected project context
+rootspec prompts init
+```
+
+The CLI will:
+1. Scan your project structure
+2. Detect your framework (if any)
+3. Generate a ready-to-use prompt
+
+Then:
+4. Copy the output and paste into Claude Code, ChatGPT, or your preferred AI
 5. Answer AI's questions level-by-level
 
 **What you'll create:**
@@ -34,19 +50,23 @@ your-project/
 └── 05.IMPLEMENTATION/             # User stories & parameters
 ```
 
-### Step 3: Set Up Cypress Testing (Optional, 30 minutes)
+### Step 3: Set Up Cypress Testing (Optional, 15 minutes)
 
 ```bash
+# Install Cypress templates with CLI
+rootspec cypress
+
 # Install dependencies
 npm install --save-dev cypress cypress-vite js-yaml zod typescript
-
-# Copy templates (from cloned framework repo)
-cp -r rootspec/templates/cypress/ ./
-cp rootspec/templates/cypress.config.ts ./
 
 # Run tests
 npx cypress open
 ```
+
+The CLI automatically:
+- Copies Cypress configuration and templates
+- Sets up test generators (by priority, journey, system)
+- Configures paths based on your spec directory
 
 **For detailed setup:** See [`docs/CYPRESS_SETUP.md`](CYPRESS_SETUP.md)
 
@@ -74,14 +94,43 @@ npx cypress open
 
 **Scenario:** Applying the framework to an existing codebase
 
-### Step 1: Download Framework (30 seconds)
+### Step 1: Initialize RootSpec (30 seconds)
 
 ```bash
 cd your-existing-project/
-curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+npx rootspec init
 ```
 
-### Step 2: Choose Your Approach (1 minute)
+### Step 2: Generate Adoption Prompt with Auto-Detection (30 seconds)
+
+```bash
+# CLI scans your codebase and generates contextualized prompt
+rootspec prompts adopt
+```
+
+**What the CLI detects:**
+- Framework (Next.js, Nuxt, React, Vue, Angular, Express, etc.)
+- Source directories (src/, lib/, app/, components/, etc.)
+- Configuration files (tsconfig.json, package.json, etc.)
+- Existing specification files (if any)
+
+**Example output:**
+```
+🌳 Adopt RootSpec Framework
+
+Analyzing your existing codebase...
+
+  ✓ Found src/
+  ✓ Found components/
+  ✓ Detected framework: Next.js
+  ✓ Found config files: tsconfig.json, package.json
+
+✅ Prompt ready! [contextualized prompt with your actual project details]
+```
+
+### Step 3: Choose Your Approach (via AI prompt)
+
+The generated prompt will ask you to choose:
 
 **Specification-First (Recommended):**
 - Define ideal philosophy and architecture
@@ -95,17 +144,10 @@ curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWO
 - Extract retrospective philosophy
 - Validate spec matches reality
 
-### Step 3: Generate Specification with AI (4-8 hours)
+### Step 4: Generate Specification with AI (4-8 hours)
 
-1. Open [`prompts/adopt-framework-existing.md`](../prompts/adopt-framework-existing.md)
-2. Copy the complete prompt
-3. Fill in your project details:
-   - Current domain/type
-   - Development stage
-   - Existing systems
-   - Chosen approach
-4. Paste into Claude Code or GPT-4
-5. Answer AI's discovery questions
+1. Paste the generated prompt (from Step 2) into your AI assistant
+2. Answer AI's discovery questions about your project
 
 **AI will help you:**
 - Map existing code to framework levels
@@ -185,61 +227,95 @@ curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWO
 
 ---
 
-## 🛠️ Common Commands
+## 🛠️ CLI Commands Reference
 
-**Generate new specification:**
+### Setup Commands
+
+**Initialize RootSpec:**
 ```bash
-# Copy framework
+rootspec init                    # Initialize in ./spec
+rootspec init --path ./docs      # Custom directory
+rootspec init --full             # Include Cypress templates
+rootspec init --yes              # Skip prompts, use defaults
+```
+
+**Install Cypress testing:**
+```bash
+rootspec cypress                 # Add Cypress templates
+```
+
+### Prompt Generation Commands
+
+**Generate AI prompts** (auto-fills with your project context):
+
+```bash
+rootspec prompts                 # List all available prompts
+
+rootspec prompts init            # New project specification
+rootspec prompts adopt           # Existing project adoption
+rootspec prompts validate        # Validate specification
+rootspec prompts add-feature     # Add feature to spec
+rootspec prompts review          # Review implementation
+rootspec prompts migrate         # Migrate to newer version
+rootspec prompts generate-docs   # Generate documentation
+rootspec prompts cypress-merge   # Merge Cypress configs
+```
+
+**Example workflow:**
+```bash
+# 1. Initialize
+$ rootspec init
+
+# 2. Generate adoption prompt
+$ rootspec prompts adopt
+
+🌳 Adopt RootSpec Framework
+Analyzing your existing codebase...
+  ✓ Detected framework: Next.js
+  ✓ Found src/, components/
+✅ Prompt ready! [copy and paste output into AI]
+
+# 3. Copy output, paste into AI assistant
+# 4. AI generates your specification
+```
+
+### Validation Commands
+
+**Validate specification:**
+```bash
+rootspec validate                # Check spec compliance
+rootspec prompts validate        # Generate detailed validation prompt for AI
+```
+
+### Testing Commands
+
+**Run Cypress tests** (after setup):
+```bash
+npx cypress open                 # Interactive mode
+npx cypress run                  # Headless mode
+npx cypress run --spec "**/*MVP*"  # MVP tests only
+```
+
+### Help Commands
+
+**Get help:**
+```bash
+rootspec --help                  # Show all commands
+rootspec init --help             # Command-specific help
+rootspec prompts --help          # Prompts command help
+```
+
+### Manual Alternative (No CLI)
+
+If you prefer not to use the CLI:
+
+```bash
+# Download framework manually
 curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 
-# Use initialize-spec.md prompt with AI
-```
-
-**Validate existing specification:**
-```bash
-# Use prompts/validate-spec.md with AI
-# AI will check:
-# - Reference hierarchy compliance
-# - Placeholder usage (no numbers in L1-4)
-# - Design Pillar alignment
-```
-
-**Add a new feature:**
-```bash
-# Use prompts/add-feature.md with AI
-# AI will:
-# - Determine correct level
-# - Check Design Pillar support
-# - Verify reference rules
-# - Update appropriate files
-```
-
-**Review implementation:**
-```bash
-# Use prompts/review-feature.md with AI
-# AI will validate implementation against spec
-```
-
-**Generate documentation:**
-```bash
-# Use prompts/generate-docs.md with AI
-# AI can create:
-# - PRDs from spec
-# - Technical design docs
-# - API documentation
-```
-
-**Run Cypress tests:**
-```bash
-npm run cypress:open   # Interactive mode
-npm run cypress:run    # Headless mode
-npm run test:e2e       # All E2E tests
-```
-
-**Migrate framework version:**
-```bash
-# Use prompts/migrate-spec.md with AI
-# Follow migration guide in CHANGELOG.md
+# Read prompt templates from prompts/ directory
+# Manually fill in placeholders like {{FRAMEWORK}}, {{SOURCE_DIRS}}
+# Paste into AI assistant
 ```
 
 ---
