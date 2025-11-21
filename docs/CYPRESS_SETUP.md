@@ -11,6 +11,7 @@ This framework includes a runtime test generation system that converts YAML user
 - Runtime test generation (no code generation step)
 - Extensible test DSL for domain-specific steps
 - Tests organized by priority, journey, or system
+- Browser console log capture for headless debugging
 
 **Time estimate:** 30-45 minutes for initial setup
 
@@ -400,6 +401,56 @@ npm run cypress:run
 
 ---
 
+## Browser Console Logs
+
+The Cypress templates include built-in browser console log capturing. This feature captures `console.log`, `console.warn`, `console.error`, and `console.info` from your application and outputs them to the Cypress terminal—especially useful for debugging in headless mode and CI environments.
+
+### How It Works
+
+**Interactive Mode (Cypress UI):**
+- Console logs appear in your browser's DevTools (normal behavior)
+- Console errors also appear in the Cypress Command Log with a red indicator
+
+**Headless Mode (Terminal/CI):**
+- All browser console output appears in your terminal alongside test results
+- Formatted with timestamps and log levels
+
+**Example terminal output:**
+```
+[14:32:15.123] [Browser LOG] User clicked submit button
+[14:32:15.456] [Browser WARN] Deprecated API usage detected
+[14:32:15.789] [Browser ERROR] Failed to load resource: 404
+```
+
+### Implementation Details
+
+This feature is implemented in two files:
+
+1. **`cypress/support/e2e.ts`** - Hooks into `window:before:load` to capture console methods
+2. **`cypress.config.ts`** - Provides a `log` task that outputs to Node.js console
+
+### Customizing Log Levels
+
+To capture only warnings and errors (reduce noise), edit `cypress/support/e2e.ts` and comment out the `console.log` and `console.info` overrides:
+
+```typescript
+// In Cypress.on('window:before:load', (win) => { ... })
+
+// Comment out to disable:
+// win.console.log = function (...args: any[]) { ... };
+// win.console.info = function (...args: any[]) { ... };
+
+// Keep these for errors and warnings:
+win.console.warn = function (...args: any[]) { ... };
+win.console.error = function (...args: any[]) { ... };
+```
+
+### Disabling Console Capture
+
+To disable console log capturing entirely, remove or comment out the entire `Cypress.on('window:before:load', ...)` block in `cypress/support/e2e.ts`.
+
+---
+
 ## Troubleshooting
 
 ### "Cannot find module 'js-yaml'"
@@ -553,6 +604,7 @@ jobs:
 - ✅ YAML-to-test runtime generation
 - ✅ Extensible test DSL
 - ✅ Test organization (priority/journey/system)
+- ✅ Browser console log capture (for headless debugging)
 - ✅ Single source of truth (stories ARE tests)
 
 **Your workflow:**

@@ -38,6 +38,56 @@ beforeEach(() => {
 });
 
 /**
+ * PRESCRIPTIVE PATTERN: Capture browser console logs
+ *
+ * Captures console.log, console.warn, console.error, console.info from the
+ * application under test and outputs them to Cypress terminal (headless mode)
+ * and Cypress UI (interactive mode).
+ *
+ * This is especially useful for:
+ * - Detecting JavaScript errors in headless CI environments
+ * - Debugging application behavior during test runs
+ * - Catching warnings that might indicate issues
+ */
+Cypress.on('window:before:load', (win) => {
+  // Store original console methods
+  const originalLog = win.console.log;
+  const originalWarn = win.console.warn;
+  const originalError = win.console.error;
+  const originalInfo = win.console.info;
+
+  // Override console.log
+  win.console.log = function (...args: any[]) {
+    // Call original to preserve normal console behavior
+    originalLog.apply(win.console, args);
+
+    // Send to Cypress terminal (visible in headless mode)
+    cy.task('log', { level: 'LOG', message: args.join(' ') }, { log: false });
+  };
+
+  // Override console.warn
+  win.console.warn = function (...args: any[]) {
+    originalWarn.apply(win.console, args);
+    cy.task('log', { level: 'WARN', message: args.join(' ') }, { log: false });
+  };
+
+  // Override console.error
+  win.console.error = function (...args: any[]) {
+    originalError.apply(win.console, args);
+    cy.task('log', { level: 'ERROR', message: args.join(' ') }, { log: false });
+
+    // Also show errors in Cypress Command Log for visibility
+    cy.log(`🔴 Console Error: ${args.join(' ')}`);
+  };
+
+  // Override console.info
+  win.console.info = function (...args: any[]) {
+    originalInfo.apply(win.console, args);
+    cy.task('log', { level: 'INFO', message: args.join(' ') }, { log: false });
+  };
+});
+
+/**
  * OPTIONAL: Global test logging
  *
  * Uncomment to log test names for debugging.
