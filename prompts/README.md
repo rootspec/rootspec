@@ -1,6 +1,6 @@
 # AI Assistant Prompt Library
 
-Complete, detailed prompts for working with the Hierarchical Specification Framework v3.5.2.
+Complete, detailed prompts for working with the Hierarchical Specification Framework v3.6.0.
 
 These prompts are designed for use with AI assistants (like Claude, GPT-4, etc.) to help you create, maintain, and evolve your product specifications.
 
@@ -67,6 +67,6 @@ If you create custom prompts or improvements to existing ones, consider contribu
 
 ## Version Compatibility
 
-These prompts are designed for **Hierarchical Specification Framework v3.5.2**.
+These prompts are designed for **Hierarchical Specification Framework v3.6.0**.
 
 For earlier versions, see the framework's [CHANGELOG.md](../CHANGELOG.md) for migration guidance.

@@ -21,7 +21,7 @@ Use this prompt when:
 
 ````
 I have an existing specification using Hierarchical Specification Framework
-v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.5.2.
+v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.6.0.
 
 Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
 what has changed.
@@ -132,7 +132,7 @@ Help me migrate my specification by:
    - Update all cross-references
 
 4. **Validate Migrated Spec**
-   - Ensure it follows v3.5.2 rules from 00.SPEC_FRAMEWORK.md
+   - Ensure it follows v3.6.0 rules from 00.SPEC_FRAMEWORK.md
    - Check reference hierarchy compliance
    - Verify all cross-references work
    - Confirm no content was lost

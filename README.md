@@ -1,6 +1,6 @@
 # Hierarchical Specification Framework
 
-**Version 3.5.2** | [Changelog](CHANGELOG.md)
+**Version 3.6.0** | [Changelog](CHANGELOG.md)
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -342,7 +342,7 @@ Follow framework rules: hierarchy, placeholders in L1-4, no upward references.
 **Quick prompt:**
 
 ```
-I have a spec using framework v[OLD_VERSION]. I've updated to v3.5.2.
+I have a spec using framework v[OLD_VERSION]. I've updated to v3.6.0.
 
 Read CHANGELOG.md and help me migrate:
 1. Identify breaking changes
@@ -364,7 +364,7 @@ Read CHANGELOG.md and help me migrate:
 **Quick prompt:**
 
 ```
-Validate my specification against framework v3.5.2:
+Validate my specification against framework v3.6.0:
 
 Check:
 - Reference hierarchy (no upward references)
@@ -490,7 +490,7 @@ When working in a directory containing these files, AI assistants will:
 
 ## Version Information
 
-**Current Version:** 3.5.2
+**Current Version:** 3.6.0
 
 This framework follows [Semantic Versioning](https://semver.org/):
 

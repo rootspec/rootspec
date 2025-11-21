@@ -5,6 +5,39 @@ All notable changes to the Hierarchical Specification Framework will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0] - 2025-11-21
+
+### Added
+
+#### Browser Console Log Capture
+
+**New built-in console log capturing for Cypress tests** - Captures `console.log`, `console.warn`, `console.error`, and `console.info` from your application and outputs them to the Cypress terminal, making them visible in headless mode and CI environments.
+
+- **Implementation in `templates/cypress/support/e2e.ts`:**
+  - Added `Cypress.on('window:before:load')` hook
+  - Overrides browser console methods to capture output
+  - Preserves original console functionality
+  - Console errors also displayed in Cypress Command Log with red indicator
+
+- **Implementation in `templates/cypress.config.ts`:**
+  - Added `log` task that outputs to Node.js console
+  - Formatted with timestamps: `[HH:MM:SS.mmm] [Browser LEVEL] message`
+
+- **Documentation in `docs/CYPRESS_SETUP.md`:**
+  - New "Browser Console Logs" section explaining the feature
+  - Instructions for customizing log levels (errors/warnings only)
+  - Instructions for disabling the feature if needed
+  - Updated "What you get" and Summary sections
+
+**Example terminal output:**
+```
+[14:32:15.123] [Browser LOG] User clicked submit button
+[14:32:15.456] [Browser WARN] Deprecated API usage detected
+[14:32:15.789] [Browser ERROR] Failed to load resource: 404
+```
+
+**Impact:** Enables debugging JavaScript errors and application behavior in headless CI environments where browser DevTools are not available. Especially useful for catching runtime errors, deprecation warnings, and failed network requests during automated test runs.
+
 ## [3.5.2] - 2025-11-15
 
 ### Fixed
@@ -967,7 +1000,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.5.2...HEAD
+[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/caudexia/spec-framework/compare/v3.5.2...v3.6.0
 [3.5.2]: https://github.com/caudexia/spec-framework/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/caudexia/spec-framework/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/caudexia/spec-framework/compare/v3.4.0...v3.5.0
