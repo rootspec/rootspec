@@ -52,14 +52,14 @@ npm install --save-dev typescript @types/node
 
 ## Step 2: Copy Template Files
 
-From the spec-framework repository, copy the Cypress configuration and test generation scripts to your project:
+From the rootspec repository, copy the Cypress configuration and test generation scripts to your project:
 
 ```bash
 # Copy Cypress configuration
-cp path/to/spec-framework/templates/cypress.config.ts ./
+cp path/to/rootspec/templates/cypress.config.ts ./
 
 # Copy Cypress support files and test generators
-cp -r path/to/spec-framework/templates/cypress ./
+cp -r path/to/rootspec/templates/cypress ./
 ```
 
 **Or manually create this structure:**
@@ -290,7 +290,7 @@ Copy an example YAML file and customize it:
 
 ```bash
 # Copy example
-cp path/to/spec-framework/templates/USER_STORIES/by_priority/MVP.example.yaml \
+cp path/to/rootspec/templates/USER_STORIES/by_priority/MVP.example.yaml \
    05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
 
 # Or create from scratch

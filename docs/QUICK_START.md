@@ -12,7 +12,7 @@ Fast-track guides for getting started with the Hierarchical Specification Framew
 
 ```bash
 cd your-project/
-curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 ```
 
 ### Step 2: Generate Specification with AI (2-4 hours)
@@ -41,8 +41,8 @@ your-project/
 npm install --save-dev cypress cypress-vite js-yaml zod typescript
 
 # Copy templates (from cloned framework repo)
-cp -r spec-framework/templates/cypress/ ./
-cp spec-framework/templates/cypress.config.ts ./
+cp -r rootspec/templates/cypress/ ./
+cp rootspec/templates/cypress.config.ts ./
 
 # Run tests
 npx cypress open
@@ -78,7 +78,7 @@ npx cypress open
 
 ```bash
 cd your-existing-project/
-curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 ```
 
 ### Step 2: Choose Your Approach (1 minute)
@@ -190,7 +190,7 @@ curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_F
 **Generate new specification:**
 ```bash
 # Copy framework
-curl -O https://raw.githubusercontent.com/caudexia/spec-framework/main/00.SPEC_FRAMEWORK.md
+curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 
 # Use initialize-spec.md prompt with AI
 ```

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Hierarchical Specification Framework will be documented in this file.
+All notable changes to **RootSpec** (Hierarchical Specification Framework) will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -1000,16 +1000,16 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/caudexia/spec-framework/compare/v3.6.0...HEAD
-[3.6.0]: https://github.com/caudexia/spec-framework/compare/v3.5.2...v3.6.0
-[3.5.2]: https://github.com/caudexia/spec-framework/compare/v3.5.1...v3.5.2
-[3.5.1]: https://github.com/caudexia/spec-framework/compare/v3.5.0...v3.5.1
-[3.5.0]: https://github.com/caudexia/spec-framework/compare/v3.4.0...v3.5.0
-[3.4.0]: https://github.com/caudexia/spec-framework/compare/v3.3.0...v3.4.0
-[3.3.0]: https://github.com/caudexia/spec-framework/compare/v3.2.0...v3.3.0
-[3.2.0]: https://github.com/caudexia/spec-framework/compare/v3.1.0...v3.2.0
-[3.1.0]: https://github.com/caudexia/spec-framework/compare/v3.0.0...v3.1.0
-[3.0.0]: https://github.com/caudexia/spec-framework/compare/v2.1.0...v3.0.0
-[2.1.0]: https://github.com/caudexia/spec-framework/compare/v2.0.0...v2.1.0
-[2.0.0]: https://github.com/caudexia/spec-framework/compare/v1.0.0...v2.0.0
-[1.0.0]: https://github.com/caudexia/spec-framework/releases/tag/v1.0.0
+[Unreleased]: https://github.com/rootspec/rootspec/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/rootspec/rootspec/compare/v3.5.2...v3.6.0
+[3.5.2]: https://github.com/rootspec/rootspec/compare/v3.5.1...v3.5.2
+[3.5.1]: https://github.com/rootspec/rootspec/compare/v3.5.0...v3.5.1
+[3.5.0]: https://github.com/rootspec/rootspec/compare/v3.4.0...v3.5.0
+[3.4.0]: https://github.com/rootspec/rootspec/compare/v3.3.0...v3.4.0
+[3.3.0]: https://github.com/rootspec/rootspec/compare/v3.2.0...v3.3.0
+[3.2.0]: https://github.com/rootspec/rootspec/compare/v3.1.0...v3.2.0
+[3.1.0]: https://github.com/rootspec/rootspec/compare/v3.0.0...v3.1.0
+[3.0.0]: https://github.com/rootspec/rootspec/compare/v2.1.0...v3.0.0
+[2.1.0]: https://github.com/rootspec/rootspec/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/rootspec/rootspec/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/rootspec/rootspec/releases/tag/v1.0.0
