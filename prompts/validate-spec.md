@@ -1,31 +1,30 @@
-# Validate Existing Specification
-
-Comprehensive prompt for validating that your specification follows the Hierarchical Specification Framework correctly.
-
-## Prerequisites
-
-- [ ] Existing specification files (01-05)
-- [ ] 00.SPEC_FRAMEWORK.md in your project directory
-- [ ] Understanding of framework hierarchy rules
-
-## When to Use This Prompt
-
-Use this prompt when:
-
-- After creating or modifying a specification
-- Before sharing spec with stakeholders
-- After adding new features
-- Periodically to catch drift from framework rules
-- After team members make changes
-
-## The Prompt
-
-````
 I have an existing specification and want to validate that it properly
-follows the Hierarchical Specification Framework v3.6.0.
+follows RootSpec v3.6.0.
 
-Please read 00.SPEC_FRAMEWORK.md to understand the complete framework
-rules, then perform a comprehensive validation by checking:
+## My Specification Files
+
+**Location:** {{SPEC_DIR}}/
+
+**Found files:**
+{{#EACH FOUND_FILES}}
+- {{ITEM}}
+{{/EACH}}
+
+{{#IF MISSING_FILES}}
+**Missing required files:**
+{{#EACH MISSING_FILES}}
+- {{ITEM}}
+{{/EACH}}
+
+{{/IF}}
+## RootSpec Framework
+
+Please fetch the framework definition:
+https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+
+## Validation Checklist
+
+Please read my specification files and check:
 
 **Reference Hierarchy Compliance:**
 - Level 1 only references external resources
@@ -184,49 +183,3 @@ Please report:
 2. **Severity** (critical/warning/suggestion)
 3. **Suggested fixes** for each issue using the patterns above
 4. **Overall compliance score** (e.g., 85/100)
-````
-
-## What to Expect
-
-The AI will analyze your specification and provide:
-
-### Validation Report Structure
-
-1. **Executive Summary**
-   - Overall compliance score (e.g., 85/100)
-   - Number of critical/warning/suggestion items
-   - Quick assessment of specification health
-
-2. **Critical Violations** (must fix)
-   - Reference hierarchy violations
-   - Missing required sections
-   - Anti-patterns that break framework
-
-3. **Warnings** (should fix)
-   - Suboptimal structure
-   - Unclear descriptions
-   - Potential reference violations
-
-4. **Suggestions** (nice to have)
-   - Improvements to clarity
-   - Additional examples
-   - Better organization
-
-5. **Specific Fixes**
-   - File and line number for each issue
-   - Recommended correction
-   - Explanation of why it's important
-
-## Tips for Interpreting the Validation Report
-
-1. **Fix critical issues first** - These break the framework
-2. **Work top-down** - Fix L1 issues before L2, etc.
-3. **Re-validate after fixes** - Ensure fixes didn't create new issues
-4. **Document exceptions** - If you intentionally violate a rule, document why
-
-## Expected Outcome
-
-- Validation report with all issues identified
-- Actionable fixes for each violation
-- Compliance score to track improvement
-- Confidence that specification follows framework correctly

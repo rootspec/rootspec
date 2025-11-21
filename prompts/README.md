@@ -1,72 +1,265 @@
 # AI Assistant Prompt Library
 
-Complete, detailed prompts for working with the Hierarchical Specification Framework v3.6.0.
+**Context-aware prompt templates for RootSpec v4.0.0**
 
-These prompts are designed for use with AI assistants (like Claude, GPT-4, etc.) to help you create, maintain, and evolve your product specifications.
+These are **template files** that are automatically filled by the RootSpec CLI with your project's actual context (framework, directories, files, etc.). The CLI scans your codebase and generates ready-to-use prompts that you can paste directly into your AI assistant.
 
-## Available Prompts
+## Overview
 
-| Prompt | Use Case | File |
-|--------|----------|------|
-| **Initialize Spec** | Create a new specification from scratch (greenfield) | [initialize-spec.md](initialize-spec.md) |
-| **Adopt Framework for Existing Project** | Apply framework to existing codebase (brownfield) | [adopt-framework-existing.md](adopt-framework-existing.md) |
-| **Migrate Spec** | Upgrade specification to newer framework version | [migrate-spec.md](migrate-spec.md) |
-| **Validate Spec** | Comprehensive validation of existing specification | [validate-spec.md](validate-spec.md) |
-| **Add Feature** | Add new feature to existing specification | [add-feature.md](add-feature.md) |
-| **Generate Docs** | Create PRDs, TDDs, and other artifacts from spec | [generate-docs.md](generate-docs.md) |
-| **Review Feature** | Validate implementation against specification | [review-feature.md](review-feature.md) |
-| **Tips & Best Practices** | AI usage tips, common commands, troubleshooting | [tips-and-best-practices.md](tips-and-best-practices.md) |
+**RootSpec v4.0+** includes a CLI that transforms these template files into contextual prompts by:
+- **Auto-detecting** your project's framework (Next.js, Nuxt, React, Vue, etc.)
+- **Scanning** your source directories (`src/`, `lib/`, `app/`, etc.)
+- **Finding** your configuration files (`tsconfig.json`, `package.json`, etc.)
+- **Filling** template placeholders with your actual project information
 
-## How to Use These Prompts
+**The result:** Prompts tailored to your specific project, no manual editing required.
 
-1. **Choose the appropriate prompt** for your task from the table above
-2. **Read the prompt file** to understand what it does and any prerequisites
-3. **Copy the entire prompt** from the markdown code block
-4. **Replace placeholders** (marked with `[brackets]`) with your specific details
-5. **Paste into your AI assistant** conversation
-6. **Provide requested information** as the AI asks follow-up questions
+---
 
-## Quick Start
+## Using the CLI (Recommended)
+
+### Quick Start
+
+```bash
+# List all available prompts
+rootspec prompts
+
+# Generate a specific prompt (automatically fills your project context)
+rootspec prompts <command>
+```
+
+### Available Commands
+
+| CLI Command | Use Case | Template File |
+|-------------|----------|---------------|
+| `rootspec prompts init` | Create new specification (greenfield) | [initialize-spec.md](initialize-spec.md) |
+| `rootspec prompts adopt` | Adopt framework for existing project (brownfield) | [adopt-framework-existing.md](adopt-framework-existing.md) |
+| `rootspec prompts migrate` | Upgrade to newer framework version | [migrate-spec.md](migrate-spec.md) |
+| `rootspec prompts validate` | Validate specification compliance | [validate-spec.md](validate-spec.md) |
+| `rootspec prompts add-feature` | Add feature to specification | [add-feature.md](add-feature.md) |
+| `rootspec prompts review` | Review implementation against spec | [review-feature.md](review-feature.md) |
+| `rootspec prompts generate-docs` | Generate PRDs, TDDs, documentation | [generate-docs.md](generate-docs.md) |
+| `rootspec prompts cypress-merge` | Merge Cypress templates with existing config | [cypress-merge.md](cypress-merge.md) |
+
+### Example: Adopting the Framework
+
+```bash
+# Run the adopt prompt command
+$ rootspec prompts adopt
+
+🌳 Adopt RootSpec Framework
+
+Analyzing your existing codebase...
+
+  ✓ Found src/
+  ✓ Found components/
+  ✓ Detected framework: Next.js
+  ✓ Found config files: tsconfig.json, package.json, next.config.js
+
+✅ Prompt ready! Copy and paste into your AI assistant:
+
+────────────────────────────────────────────────────────────
+
+I have an existing Next.js project and want to adopt the RootSpec framework.
+
+**Source directories:**
+- src/
+- components/
+
+**Framework/Stack:** Next.js
+**Configuration files:**
+- tsconfig.json
+- package.json
+- next.config.js
+
+[... rest of contextualized prompt ...]
+```
+
+The CLI automatically filled in your framework, directories, and files!
+
+---
+
+## Understanding Template Placeholders
+
+These markdown files contain template syntax that the CLI replaces:
+
+### Variable Syntax
+```markdown
+{{VARIABLE_NAME}}
+```
+Example: `{{FRAMEWORK}}` becomes `Next.js` or `React`
+
+### Conditional Syntax
+```markdown
+{{#IF CONDITION}}
+  Content shown only if condition is true
+{{/IF}}
+```
+Example:
+```markdown
+{{#IF FRAMEWORK}}
+Framework detected: {{FRAMEWORK}}
+{{/IF}}
+{{#IF NO_FRAMEWORK}}
+No framework detected
+{{/IF}}
+```
+
+### List Syntax
+```markdown
+{{#EACH ARRAY_NAME}}
+- {{ITEM}}
+{{/EACH}}
+```
+Example:
+```markdown
+**Source directories:**
+{{#EACH SOURCE_DIRS}}
+- {{ITEM}}
+{{/EACH}}
+```
+
+---
+
+## Manual Usage (Advanced)
+
+If you prefer not to use the CLI or want to understand the templates:
+
+### Reading Template Files Directly
+
+1. Open the template file (e.g., `adopt-framework-existing.md`)
+2. You'll see placeholders like `{{FRAMEWORK}}`, `{{SOURCE_DIRS}}`, etc.
+3. Manually replace these with your project's information
+4. Copy the filled prompt to your AI assistant
+
+### Common Placeholders
+
+- `{{FRAMEWORK}}` - Project framework (Next.js, React, Vue, etc.)
+- `{{SOURCE_DIRS}}` - Array of source directories
+- `{{CONFIG_FILES}}` - Array of configuration files
+- `{{SPEC_DIR}}` - Specification directory location
+- `{{DESIGN_PILLARS}}` - Your specification's design pillars
+- `{{SYSTEMS}}` - Your specification's systems
+
+### When to Use Manual Approach
+
+- **Learning**: Understanding how templates work
+- **Customization**: Need to modify prompt structure
+- **Offline**: No npm access
+- **CI/CD**: Scripting prompt generation
+
+---
+
+## Quick Start Guide
 
 ### For New Projects (Greenfield)
 
-Start with [initialize-spec.md](initialize-spec.md) to create your first specification from scratch.
+```bash
+# 1. Initialize RootSpec
+npx rootspec init
+
+# 2. Generate initialization prompt
+rootspec prompts init
+
+# 3. Copy output and paste into AI assistant
+```
+
+The AI will guide you through creating all 5 specification levels.
 
 ### For Existing Projects (Brownfield)
 
-Use [adopt-framework-existing.md](adopt-framework-existing.md) to apply the framework to an existing codebase or product.
+```bash
+# 1. Initialize RootSpec in your project
+npx rootspec init
+
+# 2. Generate adoption prompt (auto-detects your codebase)
+rootspec prompts adopt
+
+# 3. Copy output and paste into AI assistant
+```
+
+The AI will help you reverse-engineer or define your specification.
 
 ### For Validating Specifications
 
-Use [validate-spec.md](validate-spec.md) to check if your specification follows framework rules correctly.
+```bash
+# Generate validation prompt (scans your spec files)
+rootspec prompts validate
+```
 
-### For Framework Version Migration
+The AI will check for hierarchy violations, missing sections, and anti-patterns.
 
-Use [migrate-spec.md](migrate-spec.md) when updating to a newer version of the framework.
-
-## Customizing Prompts
-
-Each prompt is designed to be comprehensive and cover common scenarios. You can:
-
-- **Remove sections** not relevant to your project type
-- **Add domain-specific requirements** to fit your industry (e.g., healthcare compliance, gaming mechanics)
-- **Adjust detail level** based on project complexity (simpler for MVPs, more detailed for complex systems)
-- **Modify examples** to match your product domain
+---
 
 ## Tips for Best Results
 
-1. **Be specific** - The more context you provide about your product, the better the AI can help
-2. **Answer follow-up questions thoroughly** - AI assistants use your answers to generate better specifications
-3. **Review and refine** - Treat AI-generated content as a draft; review and refine based on your expertise
-4. **Iterate** - It's okay to regenerate sections if they don't match your vision
-5. **Use validation** - Regularly use the validation prompt to ensure hierarchy rules are followed
+1. **Use the CLI** - Auto-detection ensures accurate context
+2. **Keep templates updated** - Template files are part of the framework, update with `npm update -g rootspec`
+3. **Be specific in responses** - When AI asks follow-up questions, provide detailed answers
+4. **Iterate freely** - AI-generated content is a draft; refine based on your expertise
+5. **Validate regularly** - Use `rootspec prompts validate` to catch issues early
 
-## Contributing
+---
 
-If you create custom prompts or improvements to existing ones, consider contributing them back to the framework repository.
+## How It Works
+
+```
+┌─────────────────┐
+│   Your Project  │
+│                 │
+│  ├── src/       │
+│  ├── lib/       │
+│  └── package.json
+└─────────────────┘
+        │
+        ├─────────────────────────┐
+        │   RootSpec CLI          │
+        │                         │
+        │  1. Scans project       │
+        │  2. Detects framework   │
+        │  3. Finds directories   │
+        │  4. Loads template      │
+        │  5. Fills placeholders  │
+        └─────────────────────────┘
+                │
+                ▼
+        ┌──────────────────┐
+        │ Generated Prompt │
+        │                  │
+        │ "I have a Next.js│
+        │  project with... "│
+        └──────────────────┘
+                │
+                ▼
+        [ Paste into AI Assistant ]
+```
+
+---
 
 ## Version Compatibility
 
-These prompts are designed for **Hierarchical Specification Framework v3.6.0**.
+These templates are designed for **RootSpec v4.0.0**.
 
-For earlier versions, see the framework's [CHANGELOG.md](../CHANGELOG.md) for migration guidance.
+For earlier versions without CLI support:
+- v3.x - Use manual workflow (download framework, edit prompts by hand)
+- v2.x - See [CHANGELOG.md](../CHANGELOG.md) for migration to v3/v4
+
+---
+
+## Contributing
+
+Improvements to template files or new templates are welcome! When contributing:
+
+1. Keep templates focused and action-oriented
+2. Use clear placeholder names (e.g., `{{FRAMEWORK}}` not `{{FW}}`)
+3. Test with CLI to ensure placeholders are filled correctly
+4. Update this README with new template documentation
+
+---
+
+## Questions?
+
+- **CLI Help**: Run `rootspec --help` or `rootspec prompts --help`
+- **Template Issues**: Check that your CLI version matches the framework version
+- **Framework Questions**: See [00.SPEC_FRAMEWORK.md](../00.SPEC_FRAMEWORK.md)
+- **Getting Started**: See [docs/QUICK_START.md](../docs/QUICK_START.md)
