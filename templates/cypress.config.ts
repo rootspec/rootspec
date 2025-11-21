@@ -149,6 +149,23 @@ export default defineConfig({
         },
 
         /**
+         * PRESCRIPTIVE PATTERN: Log browser console output to terminal.
+         *
+         * This task receives console logs from the browser (via e2e.ts)
+         * and outputs them to the Node.js console, making them visible
+         * in headless mode and CI environments.
+         *
+         * @param payload - Log level and message from browser console
+         * @returns null (required by Cypress)
+         */
+        log(payload: { level: string; message: string }) {
+          const timestamp = new Date().toISOString().substring(11, 23);
+          const prefix = `[${timestamp}] [Browser ${payload.level}]`;
+          console.log(`${prefix} ${payload.message}`);
+          return null;
+        },
+
+        /**
          * Add custom tasks here to support domain-specific test steps.
          *
          * Examples:
