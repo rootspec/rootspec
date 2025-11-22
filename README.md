@@ -15,6 +15,13 @@
   <a href="prompts/">Prompts</a>
 </p>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/rootspec"><img src="https://img.shields.io/npm/v/rootspec.svg?style=flat-square" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/rootspec"><img src="https://img.shields.io/npm/dm/rootspec.svg?style=flat-square" alt="npm downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT"></a>
+  <a href="https://github.com/rootspec/rootspec"><img src="https://img.shields.io/github/stars/rootspec/rootspec?style=flat-square" alt="GitHub stars"></a>
+</p>
+
 ---
 
 **Version 4.0.0**
