@@ -1,0 +1,99 @@
+name: Feature Request
+description: Suggest a new feature for RootSpec
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature!
+
+        Before submitting, please search existing issues to see if someone else
+        has already requested this feature.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What is the pain point?
+      placeholder: |
+        I'm always frustrated when...
+        It would be helpful if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this feature to work?
+      placeholder: |
+        I would like to be able to...
+        The CLI could provide...
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example Usage
+      description: Show how you envision using this feature
+      render: bash
+      placeholder: |
+        $ rootspec new-command --option
+        Output: ...
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other solutions have you considered?
+      placeholder: |
+        I could manually...
+        Another approach would be...
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which Component?
+      description: Which part of RootSpec would this feature affect?
+      options:
+        - CLI Commands
+        - Prompt Templates
+        - Framework Documentation
+        - Cypress Integration
+        - Template Engine
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would be helpful
+        - Important
+        - Critical
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other information or screenshots about the feature request
+      placeholder: This would be especially useful for...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched for existing feature requests
+          required: true
+        - label: I have clearly described the problem and solution
+          required: true
+        - label: This aligns with RootSpec's philosophy-first approach
+          required: false
