@@ -17,7 +17,7 @@
 
 ---
 
-**Version 3.6.0**
+**Version 4.0.0**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -199,6 +199,30 @@ Implementation & Tests (Level 5)
 - Philosophy explicit and stable
 - Easy to validate implementation against spec
 
+## Installation
+
+RootSpec v4.0+ includes a CLI that automates framework setup and prompt generation.
+
+### Using npm (Recommended)
+
+```bash
+# Install globally
+npm install -g rootspec
+
+# Or use directly with npx (no installation)
+npx rootspec init
+```
+
+### Manual Installation (Alternative)
+
+If you prefer not to use npm or need offline access, you can manually download the framework:
+
+```bash
+curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+```
+
+**Note:** The CLI provides additional commands for generating AI prompts with auto-detected project context, Cypress test setup, and specification validation. See `rootspec --help` for all commands.
+
 ## Getting Started
 
 Choose your path based on your project stage:
@@ -207,25 +231,54 @@ Choose your path based on your project stage:
 
 **Starting from scratch with a new product concept**
 
-**Step 1: Copy the framework definition to your project**
+**Step 1: Initialize RootSpec in your project**
 
 ```bash
-# Download the framework file
-curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+# Initialize with CLI (creates spec/ directory and copies framework)
+npx rootspec init
 
-# Or manually download and copy 00.SPEC_FRAMEWORK.md to your project root
+# Or specify custom path
+npx rootspec init --path ./docs/spec
 ```
+
+This creates:
+- `spec/00.SPEC_FRAMEWORK.md` - Framework definition (reference)
+- `.rootspecrc.json` - Configuration file tracking your setup
 
 **Step 2: Generate your specification with AI**
 
-Use the detailed prompt: **[prompts/initialize-spec.md](prompts/initialize-spec.md)**
+```bash
+# Generate AI prompt for new project
+rootspec prompts init
+```
 
-The AI will:
+This command:
+- **Scans your project structure** (detects framework, source directories, config files)
+- **Generates a ready-to-use prompt** with your project context already filled in
+- **Outputs** a prompt you can paste directly into your AI assistant (Claude, ChatGPT, etc.)
+
+The AI will then:
 - Read `00.SPEC_FRAMEWORK.md` to understand the framework structure
 - Ask you questions level-by-level (WHY → WHAT → HOW → HOW MUCH)
 - Generate your complete specification files (01-05)
 
 **Time estimate:** 2-4 hours for initial draft
+
+<details>
+<summary><strong>Alternative: Manual workflow (without CLI)</strong></summary>
+
+If you prefer not to use the CLI:
+
+1. Download the framework file:
+   ```bash
+   curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+   ```
+
+2. Read and copy the prompt from **[prompts/initialize-spec.md](prompts/initialize-spec.md)**, manually filling in your project details
+
+3. Paste into your AI assistant
+
+</details>
 
 **Step 3: Your project structure becomes:**
 
@@ -255,14 +308,55 @@ Your YAML user stories will automatically generate end-to-end tests.
 
 **Applying the framework to an existing codebase or product**
 
-**Step 1: Copy the framework definition**
+**Step 1: Initialize RootSpec in your existing project**
 
 ```bash
+# Navigate to your project root
 cd your-existing-project/
-curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+
+# Initialize RootSpec
+npx rootspec init
 ```
 
-**Step 2: Choose your approach**
+**Step 2: Generate specification with AI (auto-detects your codebase)**
+
+```bash
+# Generate adoption prompt with auto-detected context
+rootspec prompts adopt
+```
+
+**What the CLI automatically detects:**
+- **Framework/Stack**: Next.js, Nuxt, React, Vue, Angular, Express, Fastify, etc.
+- **Source directories**: `src/`, `lib/`, `app/`, `components/`, `pages/`, etc.
+- **Configuration files**: `tsconfig.json`, `package.json`, `vite.config.ts`, etc.
+- **Existing specification**: Detects if you have partial specs already
+
+**Example output:**
+```
+🌳 Adopt RootSpec Framework
+
+Analyzing your existing codebase...
+
+  ✓ Found src/
+  ✓ Found components/
+  ✓ Detected framework: Next.js
+  ✓ Found config files: tsconfig.json, package.json, next.config.js
+
+✅ Prompt ready! Copy and paste into your AI assistant:
+
+I have an existing Next.js project and want to adopt the RootSpec framework.
+
+**Source directories:**
+- src/
+- components/
+
+**Framework/Stack:** Next.js
+...
+```
+
+**Step 3: Choose your approach**
+
+The prompt will ask you to choose:
 
 **Specification-First (Recommended):**
 - Define ideal philosophy and architecture
@@ -276,11 +370,7 @@ curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWO
 - Extract retrospective philosophy
 - Validate spec matches reality
 
-**Step 3: Generate specification with AI**
-
-Use the detailed prompt: **[prompts/adopt-framework-existing.md](prompts/adopt-framework-existing.md)**
-
-The AI will help you:
+The AI will then help you:
 - Map existing code to framework levels
 - Define Design Pillars that match your decisions
 - Create gap analysis (if Specification-First)
@@ -315,13 +405,25 @@ The AI will help you:
 
 This framework is specifically designed for AI-assisted specification development. Use the prompts below with AI assistants (Claude, GPT-4, etc.) to create and maintain your specifications.
 
-**Quick workflow:**
+**Quick workflow with CLI (v4.0+):**
 
-1. Copy `00.SPEC_FRAMEWORK.md` to your project
-2. Use a prompt from the sections below (or from [prompts/](prompts/) for detailed versions)
-3. AI reads framework and generates your spec files (01-05)
+1. Run `npx rootspec init` to set up the framework
+2. Run `rootspec prompts <command>` to generate context-aware prompts
+3. CLI **auto-scans your project** (framework, directories, files) and fills in placeholders
+4. Copy the generated prompt and paste into your AI assistant
+5. AI reads framework and generates your spec files (01-05)
 
-**📚 Full prompt library:** See [prompts/](prompts/) directory for detailed, comprehensive prompts for every use case.
+**CLI Commands for Common Tasks:**
+- `rootspec prompts init` - Initialize new specification
+- `rootspec prompts adopt` - Adopt framework for existing project
+- `rootspec prompts validate` - Validate specification
+- `rootspec prompts add-feature` - Add feature to spec
+- `rootspec prompts review` - Review feature against spec
+- `rootspec prompts` - See all available prompts
+
+**📚 Full prompt library:** See [prompts/](prompts/) directory for detailed prompt templates (auto-filled by CLI)
+
+**💡 Note:** The prompts below are simplified quick versions. Use the CLI commands for auto-contextualized prompts, or see [prompts/](prompts/) for detailed template files.
 
 ---
 

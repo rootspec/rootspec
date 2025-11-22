@@ -18,19 +18,57 @@ Brief guidance for Claude Code when working in this repository.
 
 ---
 
+## CLI-Aware Workflows (v4.0+)
+
+**RootSpec v4.0+** includes a CLI that auto-generates prompts with project context.
+
+### Using the CLI
+
+When you see prompt references like `prompts/initialize-spec.md` in this guide:
+- **Preferred**: User runs `rootspec prompts <name>` to get auto-filled prompt
+- **Manual**: User reads template file directly (contains `{{PLACEHOLDERS}}`)
+
+### What the CLI Does
+
+The CLI automatically scans the user's codebase to fill in:
+- **Framework detection**: Next.js, Nuxt, React, Vue, Angular, Express, Fastify, etc.
+- **Source directories**: `src/`, `lib/`, `app/`, `components/`, `pages/`, etc.
+- **Configuration files**: `tsconfig.json`, `package.json`, build configs, etc.
+- **Specification directory**: Location from `.rootspecrc.json` or scanning
+
+### CLI Commands for Common Tasks
+
+- `rootspec init` - Initialize framework in project
+- `rootspec prompts init` - New project prompt (auto-scanned)
+- `rootspec prompts adopt` - Existing project prompt (auto-scanned)
+- `rootspec prompts validate` - Validation prompt (scans spec files)
+- `rootspec prompts add-feature` - Add feature prompt (scans spec)
+- `rootspec prompts review` - Review feature prompt (scans spec)
+- `rootspec cypress` - Install Cypress templates
+- `rootspec validate` - Run validation checks
+
+### When to Mention CLI
+
+If user asks about:
+- "How do I start?" → Suggest `rootspec init` + `rootspec prompts <name>`
+- "How do I use prompts?" → Mention CLI auto-fills context
+- "Can I do this manually?" → Yes, prompts/ files are templates
+
+---
+
 ## User's Project Scenario
 
 **Is this a NEW project (greenfield)?**
 - Starting from scratch with new product concept
 - No existing codebase or minimal implementation
-- Use `prompts/initialize-spec.md`
+- Use `rootspec prompts init` (or manually read `prompts/initialize-spec.md`)
 - Generate specs level-by-level: L1 → L2 → L3 → L4 → L5
 - Work top-down from philosophy to implementation
 
 **Is this an EXISTING project (brownfield)?**
 - Has existing codebase or partially-built product
 - Applying framework retroactively
-- Use `prompts/adopt-framework-existing.md`
+- Use `rootspec prompts adopt` (or manually read `prompts/adopt-framework-existing.md`)
 - **Choose approach:**
   - **Specification-First (recommended):** Define ideal state, create gap analysis, refactor toward spec
   - **Reverse-Engineering:** Document current state, infer philosophy from implementation
@@ -108,17 +146,19 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 
 ### Creating a New Spec
 
-1. Read `00.SPEC_FRAMEWORK.md` (complete framework definition)
-2. Use prompt from `prompts/initialize-spec.md`
-3. Follow AI Assistant Guidance section in 00.SPEC (after line 771)
-4. Work level-by-level: L1 → L2 → L3 → L4 → L5
+1. Run `rootspec init` to initialize framework
+2. Run `rootspec prompts init` to generate context-aware prompt (or read `prompts/initialize-spec.md`)
+3. Paste generated prompt into AI assistant
+4. Follow AI Assistant Guidance section in 00.SPEC (after line 771)
+5. Work level-by-level: L1 → L2 → L3 → L4 → L5
 
 ### Validating a Spec
 
-1. Check reference hierarchy (L1→external, L2→L1+external, etc.)
-2. Verify no numeric values in L1-4 (placeholders only)
-3. Ensure Design Pillars focus on feelings, not features
-4. See validation checklists in `00.SPEC_FRAMEWORK.md` or use `prompts/validate-spec.md`
+1. Run `rootspec validate` for automated checks
+2. Run `rootspec prompts validate` for detailed AI validation (or read `prompts/validate-spec.md`)
+3. Check reference hierarchy (L1→external, L2→L1+external, etc.)
+4. Verify no numeric values in L1-4 (placeholders only)
+5. Ensure Design Pillars focus on feelings, not features
 
 ### Modifying a Spec
 
@@ -126,14 +166,14 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 2. Make changes at that level
 3. Propagate downward (never upward)
 4. Verify no new reference violations
-5. See `prompts/add-feature.md` for detailed guidance
+5. Use `rootspec prompts add-feature` for AI guidance (or read `prompts/add-feature.md`)
 
 ### Implementing from Tests
 
 **Use when:** Implementing application iteratively from YAML user stories (spec-first development)
 
 **For AI assistance:**
-1. Use prompt from `prompts/implement-from-tests.md`
+1. Use `rootspec prompts implement` (or read `prompts/implement-from-tests.md`)
 2. **Phase 1:** Analyze all YAML tests, identify global setup needs
 3. **Phase 2:** Implement global setup (auth, DB reset, seed data)
 4. **Phase 3:** Iterate through MVP tests, implement one at a time
