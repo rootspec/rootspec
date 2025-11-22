@@ -1,35 +1,44 @@
-# Review Feature Against Specification
+I want to review a feature against my RootSpec specification.
 
-Prompt for validating a proposed feature or implementation against your specification.
+## Current Specification
 
-## Prerequisites
+**Location:** {{SPEC_DIR}}/
 
-- [ ] Complete specification (01-05 files)
-- [ ] 00.SPEC_FRAMEWORK.md in your project directory
-- [ ] Feature proposal or implementation to review
+**Design Pillars (from 01.FOUNDATIONAL_PHILOSOPHY.md):**
+{{#EACH DESIGN_PILLARS}}
+- {{ITEM}}
+{{/EACH}}
+{{#IF NO_DESIGN_PILLARS}}(Not yet defined){{/IF}}
 
-## When to Use This Prompt
+**Stable Truths (from 02.STABLE_TRUTHS.md):**
+{{#EACH STABLE_TRUTHS}}
+- {{ITEM}}
+{{/EACH}}
+{{#IF NO_STABLE_TRUTHS}}(Not yet defined){{/IF}}
 
-Use this prompt when:
+## RootSpec Framework
 
-- Evaluating a new feature proposal
-- Reviewing code/design before merge
-- Assessing third-party suggestions
-- Ensuring implementation matches spec
-- Conducting design reviews
+Please fetch the framework definition:
+https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
 
-## The Prompt
+## The Feature to Review
 
-```
-I have a feature proposal/implementation and want to validate it
-against my specification.
+[Describe the feature or paste the implementation code here]
 
-Feature/Implementation: [Describe or paste code/design]
+## What I Need
 
-My specification follows Hierarchical Specification Framework v3.6.0.
+Please help me review this feature against the specification:
 
-Please read 00.SPEC_FRAMEWORK.md to understand the framework validation
-rules and compliance criteria.
+1. **Design Pillar Alignment** - Which pillar(s) does this feature support?
+2. **Stable Truth Compliance** - Does it follow our core strategies?
+3. **Consistency Check** - Does it match the documented behavior?
+4. **Gaps or Conflicts** - Are there any discrepancies?
+
+Please read my specification files to understand the product vision, then provide a detailed review.
+
+---
+
+Below is additional guidance from the framework:
 
 ## REVIEW CRITERIA BY LEVEL
 
@@ -210,37 +219,3 @@ Please review my feature/implementation and answer:
 - ✅ Approved / ⚠️ Needs Changes / ❌ Violates Spec
 - List specific issues and suggested fixes
 - Reference the review criteria and scenarios above
-```
-
-## Tips for Providing Context to the AI
-
-1. **Be complete** - Provide the full feature description or implementation code
-2. **Include rationale** - Explain why this feature was proposed and what problem it solves
-3. **Note constraints** - Mention any technical or business constraints that influenced the design
-4. **Highlight concerns** - If you have specific concerns about alignment, mention them upfront
-
-## Expected Outcome
-
-After the AI completes its review, you'll receive:
-
-- **Clear verdict** - ✅ Approved / ⚠️ Needs Changes / ❌ Violates Spec
-- **Level-by-level analysis** - How the feature aligns (or doesn't) with each specification level
-- **Specific issues** - File and line references for violations
-- **Actionable recommendations** - Concrete suggestions for fixes or improvements
-
-## Next Steps
-
-### If ✅ Approved:
-1. Proceed with implementation or merge
-2. Update any relevant documentation
-3. Add to backlog/roadmap
-
-### If ⚠️ Needs Changes:
-1. Make the recommended changes
-2. Re-review using this prompt again
-3. Update feature proposal if needed
-
-### If ❌ Violates Spec:
-1. **Option A:** Reject the feature (if it violates inviolable principles)
-2. **Option B:** Redesign the feature to align with the spec
-3. **Option C:** Update the spec if the feature reveals the spec is wrong (rare, requires full review process)

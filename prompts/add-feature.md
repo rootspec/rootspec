@@ -1,34 +1,49 @@
-# Add Feature to Existing Specification
-
-Complete prompt for adding a new feature to your existing specification while maintaining hierarchy integrity.
-
-## Prerequisites
-
-- [ ] Existing specification (01-05 files)
-- [ ] 00.SPEC_FRAMEWORK.md in your project directory
-- [ ] Clear understanding of the new feature
-- [ ] Knowledge of which Design Pillars the feature supports
-
-## When to Use This Prompt
-
-Use this prompt when:
-
-- Adding new functionality to your product
-- Extending existing systems
-- Creating new systems
-- Expanding user stories
-
-## The Prompt
-
-```
 I want to add a new feature to my existing specification.
 
-Feature description: [Describe the feature]
+## Current Specification
 
-My specification follows Hierarchical Specification Framework v3.6.0.
+**Location:** {{SPEC_DIR}}/
 
-Please read 00.SPEC_FRAMEWORK.md to understand the framework structure,
-hierarchy rules, and formatting requirements for each level.
+**Design Pillars (from 01.FOUNDATIONAL_PHILOSOPHY.md):**
+{{#EACH DESIGN_PILLARS}}
+- {{ITEM}}
+{{/EACH}}
+{{#IF NO_DESIGN_PILLARS}}(Not yet defined){{/IF}}
+
+**Existing Systems (from 04.SYSTEMS/):**
+{{#EACH SYSTEMS}}
+- {{ITEM}}
+{{/EACH}}
+{{#IF NO_SYSTEMS}}(Not yet defined){{/IF}}
+
+## RootSpec Framework
+
+Please fetch the framework definition:
+https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
+
+## The Feature I Want to Add
+
+[Describe your feature here]
+
+## What I Need
+
+Please help me:
+
+1. **Validate alignment** - Ensure the feature supports at least one Design Pillar
+2. **Determine appropriate level** - Where should this feature be documented?
+   - L2 (STABLE_TRUTHS) - Core strategy or mental model
+   - L3 (INTERACTION_ARCHITECTURE) - User journey or behavioral loop
+   - L4 (SYSTEMS) - Technical system or component
+   - L5 (IMPLEMENTATION) - Specific implementation detail
+
+3. **Guide implementation** - Help me write the appropriate section(s)
+4. **Maintain hierarchy** - Ensure no reference violations
+
+Please read my existing specification files to understand the context, then guide me through adding this feature.
+
+---
+
+Below is additional guidance from the framework:
 
 ## DECISION TREE: WHERE DOES THIS FEATURE BELONG?
 
@@ -147,29 +162,3 @@ After drafting changes, verify:
 **Result:** Clear roadmap for implementing feature while maintaining spec integrity
 
 Guide me through this systematically, starting with pillar alignment.
-```
-
-## Tips for Articulating Your Feature to the AI
-
-1. **Start with "Why"** - If you can't explain how the feature supports a pillar, reconsider it
-2. **Be conservative with L1-2 changes** - Most features shouldn't change philosophy
-3. **Document tradeoffs** - Note what you're NOT doing in favor of this feature
-4. **Provide context** - Explain what user problem this solves and how it supports your design pillars
-5. **Be specific** - "Add collaborative task editing" is better than "make it more social"
-
-## Expected Outcome
-
-After the AI completes its analysis, you'll have:
-
-- **Impact assessment** - Which levels need updates
-- **Pillar validation** - Confirmation that feature supports at least one design pillar
-- **Draft changes** - Specific additions/modifications for each affected level
-- **Validation checklist** - Items to verify before finalizing
-
-## Next Steps
-
-1. **Review AI's proposed changes** - Ensure they match your vision
-2. **Iterate if needed** - Ask AI to adjust if something doesn't fit
-3. **Run validation** - Use validate-spec.md prompt to check hierarchy compliance
-4. **Implement** - Make the changes to your spec files
-5. **Update cross-references** - Ensure all file references remain accurate

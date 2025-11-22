@@ -1,26 +1,4 @@
-# Migrate Specification to Newer Framework Version
-
-Complete prompt for upgrading your specification to a newer version of the Hierarchical Specification Framework.
-
-## Prerequisites
-
-- [ ] Existing specification using an older framework version
-- [ ] Downloaded new version of `00.SPEC_FRAMEWORK.md`
-- [ ] Read CHANGELOG.md to understand what changed
-- [ ] Backup of your current specification
-
-## When to Use This Prompt
-
-Use this prompt when:
-
-- A new major version of the framework is released (e.g., v2.x → v3.0)
-- You want to adopt new framework features
-- You need to ensure compatibility with updated tooling
-
-## The Prompt
-
-````
-I have an existing specification using Hierarchical Specification Framework
+I have an existing specification using RootSpec
 v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.6.0.
 
 Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
@@ -138,27 +116,3 @@ Help me migrate my specification by:
    - Confirm no content was lost
 
 Walk me through each step with specific changes for each file.
-````
-
-## Tips for Working with AI on Migration
-
-1. **Don't rush** - Take time to understand what changed
-2. **Test incrementally** - Validate each file as you migrate it
-3. **Keep backups** - Maintain original files until migration is complete
-4. **Update cross-references** - Search for all references to renamed files
-5. **Use validation prompt** - Run validation after migration
-
-## Expected Outcome
-
-- All specification files updated to new framework version
-- New features adopted (e.g., YAML user stories, Design Pillars)
-- Validation passing
-- Cross-references updated
-
-## Next Steps
-
-After migration:
-1. Run [validate-spec.md](validate-spec.md) to ensure compliance
-2. Review with team to ensure content integrity
-3. Update any custom tooling to work with new format
-4. Archive old version for reference
