@@ -1,0 +1,73 @@
+name: Question
+description: Ask a question about RootSpec
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about RootSpec? We're here to help!
+
+        **Note:** For general discussions, please use [GitHub Discussions](https://github.com/rootspec/rootspec/discussions)
+        instead of creating an issue.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What is your question about?
+      options:
+        - Getting Started / Installation
+        - CLI Commands / Usage
+        - Specification Framework / Structure
+        - Cypress Integration / Testing
+        - AI Prompts / Templates
+        - Best Practices / Recommendations
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: How do I...? What is the best way to...?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide any relevant context about your project or use case
+      placeholder: |
+        I'm working on a Next.js project...
+        I'm trying to integrate RootSpec with...
+
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What Have You Tried?
+      description: What have you already attempted or researched?
+      placeholder: |
+        I've looked at the documentation for...
+        I tried running...
+
+  - type: input
+    id: version
+    attributes:
+      label: RootSpec Version
+      description: Which version are you using?
+      placeholder: "4.0.0"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: I have checked the documentation
+          required: false
+        - label: This is a specific question, not a discussion topic
+          required: true
