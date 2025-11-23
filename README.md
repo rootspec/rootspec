@@ -24,7 +24,7 @@
 
 ---
 
-**Version 4.0.0**
+**Version 4.1.0**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 

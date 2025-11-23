@@ -84,7 +84,7 @@ async function runInit(options: InitOptions): Promise<void> {
   // Step 1.5: Save config file
   await saveConfig(cwd, {
     specDirectory: relativePath,
-    version: '4.0.0',
+    version: '4.1.0',
   });
 
   // Step 2: Ask about Cypress templates
@@ -104,7 +104,7 @@ async function runInit(options: InitOptions): Promise<void> {
     // Update config with Cypress integration flag
     await saveConfig(cwd, {
       specDirectory: relativePath,
-      version: '4.0.0',
+      version: '4.1.0',
       cypressIntegration: true,
     });
   }

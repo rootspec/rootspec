@@ -5,6 +5,39 @@ All notable changes to **RootSpec** (Hierarchical Specification Framework) will 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2025-11-23
+
+### Changed
+
+#### RootSpec CLI
+
+**`rootspec cypress` no longer creates untracked `templates/` directory** - Example user stories are now opt-in to avoid cluttering projects.
+
+**Before:**
+- Automatically copied examples to `templates/USER_STORIES/` when spec directory had no user stories
+- Created untracked directory even in projects with existing Cypress setup
+
+**After:**
+- Default: References examples in `node_modules/rootspec/dist/templates/USER_STORIES/`
+- Shows manual copy command: `cp -r node_modules/rootspec/dist/templates/USER_STORIES/* spec/05.IMPLEMENTATION/USER_STORIES/`
+- New `--with-examples` flag: Copies examples to spec directory only when explicitly requested
+- Only copies if destination doesn't already exist
+
+**Usage:**
+```bash
+# Clean install (no template clutter)
+rootspec cypress
+
+# Install with examples copied to spec directory
+rootspec cypress --with-examples
+```
+
+**Benefits:**
+- No untracked files in projects with existing Cypress
+- `templates/` directory won't conflict with project-specific templates
+- Examples always accessible in node_modules
+- Opt-in copying when needed
+
 ## [4.0.0] - 2025-11-21
 
 ### Added
@@ -1080,7 +1113,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/rootspec/rootspec/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/rootspec/rootspec/compare/v3.6.0...v4.0.0
 [3.6.0]: https://github.com/rootspec/rootspec/compare/v3.5.2...v3.6.0
 [3.5.2]: https://github.com/rootspec/rootspec/compare/v3.5.1...v3.5.2
