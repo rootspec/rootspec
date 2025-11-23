@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 // Path to framework files (copied to dist/ during build)
 const FRAMEWORK_ROOT = path.resolve(__dirname, '../..');
 
-export async function cypressCommand(): Promise<void> {
+export async function cypressCommand(options: { withExamples?: boolean } = {}): Promise<void> {
   const cwd = process.cwd();
 
   console.log(chalk.bold('\n🧪 RootSpec - Cypress Testing Setup\n'));
@@ -54,19 +54,32 @@ export async function cypressCommand(): Promise<void> {
   // Get spec directory from config
   const specDir = await getSpecDirectory(cwd) || './spec';
 
-  // Copy example user stories if they don't exist
+  // Copy example user stories if --with-examples flag provided
   const userStoriesDir = path.join(cwd, specDir, '05.IMPLEMENTATION', 'USER_STORIES');
-  if (!await fs.pathExists(userStoriesDir)) {
-    console.log(chalk.blue('📄 Copying example user stories...'));
-    await fs.copy(
-      path.join(templatesSrc, 'USER_STORIES'),
-      path.join(cwd, 'templates', 'USER_STORIES')
-    );
-    console.log(chalk.green('   ✓ templates/USER_STORIES/ (examples)'));
+  if (options.withExamples) {
+    if (await fs.pathExists(userStoriesDir)) {
+      console.log(chalk.yellow('⚠️  User stories directory already exists, skipping examples'));
+    } else {
+      console.log(chalk.blue('📄 Copying example user stories...'));
+      await fs.copy(
+        path.join(templatesSrc, 'USER_STORIES'),
+        userStoriesDir
+      );
+      console.log(chalk.green(`   ✓ ${specDir}/05.IMPLEMENTATION/USER_STORIES/ (examples)`));
+    }
   }
 
   // Success message
   console.log(chalk.bold.green('\n✅ Cypress templates installed!\n'));
+
+  // Show example location if not copied
+  if (!options.withExamples) {
+    console.log(chalk.bold('Example user stories available at:'));
+    console.log(chalk.gray('  node_modules/rootspec/dist/templates/USER_STORIES/\n'));
+    console.log(chalk.bold('To copy examples to your spec directory:'));
+    console.log(chalk.cyan(`  cp -r node_modules/rootspec/dist/templates/USER_STORIES/* ${specDir}/05.IMPLEMENTATION/USER_STORIES/`));
+    console.log(chalk.gray('  or run: ') + chalk.cyan('rootspec cypress --with-examples\n'));
+  }
 
   console.log(chalk.bold('Next steps:'));
   console.log(chalk.gray('1.') + ' Install dependencies:');
