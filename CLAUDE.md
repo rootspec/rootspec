@@ -207,12 +207,16 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 ```bash
 # 1. Update CHANGELOG.md with new version section at top (manually edit)
 
+# 1.5. Update UPGRADE.md with migration instructions
+# Add new section at top with version upgrade path
+# Include: what changed, action required, breaking changes
+
 # 2. Find and update all version references in docs
 grep -r "v3\.[0-3]\.0" --include="*.md" . | grep -v ".git" | grep -v "CHANGELOG.md"
 # Update: 00.SPEC_FRAMEWORK.md, README.md (2 places), CHANGELOG.md links, all prompts/*
 
 # 3. Commit feature changes
-git add CHANGELOG.md 00.SPEC_FRAMEWORK.md README.md prompts/ docs/ templates/
+git add CHANGELOG.md UPGRADE.md 00.SPEC_FRAMEWORK.md README.md prompts/ docs/ templates/
 git commit -m "Add [feature name] (vX.Y.0)
 
 [Description]
