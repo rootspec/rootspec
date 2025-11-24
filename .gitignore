@@ -76,3 +76,18 @@ desktop.ini
 *.bak
 *.swp
 *.swo
+
+# --- Claude Code ---
+
+# Ignore local configuration overrides (machine-specific paths, personal preferences)
+.claude/settings.local.json
+
+# Ignore local context and memory files (personal scratchpads, "don't do this" notes)
+CLAUDE.local.md
+
+# (Optional) Ignore temporary or local-only subagents
+.claude/agents/*.local.md
+
+# (Optional) Ignore local history/session logs if your plugin stores them in-repo
+.claude/history/
+.claude/sessions/
