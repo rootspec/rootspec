@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc && npm run copy-assets",
-    "copy-assets": "node -e \"const fs=require('fs-extra');fs.copySync('../../00.SPEC_FRAMEWORK.md','dist/00.SPEC_FRAMEWORK.md');fs.copySync('../../prompts','dist/prompts');fs.copySync('../../templates','dist/templates')\"",
+    "copy-assets": "node -e \"const fs=require('fs-extra');fs.copySync('../../00.SPEC_FRAMEWORK.md','dist/00.SPEC_FRAMEWORK.md');fs.copySync('../../UPGRADE.md','dist/UPGRADE.md');fs.copySync('../../prompts','dist/prompts');fs.copySync('../../templates','dist/templates')\"",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
