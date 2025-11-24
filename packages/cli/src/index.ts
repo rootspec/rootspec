@@ -11,7 +11,7 @@ const program = new Command();
 program
   .name('rootspec')
   .description('RootSpec - Hierarchical Specification Framework')
-  .version('4.0.0')
+  .version('4.1.0')
   .addHelpText('before', `
 ╭───────────────────────────────────────────────────────────╮
 │  RootSpec - Hierarchical Specification Framework         │
@@ -58,6 +58,7 @@ Examples:
 program
   .command('cypress')
   .description('Add Cypress testing templates for YAML user story testing')
+  .option('-e, --with-examples', 'Copy example user stories to spec directory')
   .addHelpText('after', `
 Description:
   Installs Cypress configuration and test generators that automatically
@@ -67,10 +68,13 @@ Description:
   - cypress.config.ts with RootSpec tasks (loginAs, seedItem, resetDatabase)
   - Test generators (by_priority, by_journey, by_system)
   - DSL schema and step implementations
-  - Example user stories
+
+  Example user stories are available in:
+    node_modules/rootspec/dist/templates/USER_STORIES/
 
 Examples:
-  $ rootspec cypress                 # Install Cypress templates
+  $ rootspec cypress                 # Install Cypress config only
+  $ rootspec cypress --with-examples # Install config + copy examples to spec/
 `)
   .action(cypressCommand);
 
