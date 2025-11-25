@@ -5,6 +5,51 @@ All notable changes to **RootSpec** (Hierarchical Specification Framework) will 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0] - 2025-11-24
+
+### Fixed
+
+- **Critical**: Fixed `FRAMEWORK_ROOT` path calculation in CLI commands - prompts and templates were not found after npm install because path pointed to wrong directory (`../..` instead of `..`)
+
+### Added
+
+#### Migrate Command Version Detection
+
+**`rootspec prompts migrate` now auto-detects your current version** from multiple sources instead of asking.
+
+**Version sources checked:**
+1. `00.SPEC_FRAMEWORK.md` - parses `**Version:** X.Y.Z` header
+2. `.rootspecrc.json` - reads `version` field if present
+3. `package.json` - checks rootspec dependency version
+
+**Features:**
+- Shows all detected version sources
+- Warns on version mismatches between sources
+- Target version automatically set from CLI version (no prompts)
+- Template variables filled automatically
+
+**Example output:**
+```
+📦 Migrate Specification
+
+Scanning for specification files...
+  ✓ Found specification in ./spec/
+
+Version sources detected:
+  ✓ 00.SPEC_FRAMEWORK.md: v4.1.0
+  ✓ .rootspecrc.json: v4.1.0
+  - package.json: (no rootspec dependency)
+
+Migrating: v4.1.0 → v4.3.0
+
+✅ Prompt ready!
+```
+
+### Changed
+
+- `migrate-spec.md` prompt template now uses template variables (`{{OLD_VERSION}}`, `{{TARGET_VERSION}}`, `{{SPEC_DIR}}`) instead of hardcoded versions
+- Added "Update Version References" step to migration prompt listing all files that need version updates
+
 ## [4.2.1] - 2025-11-24
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Fast-track guides for getting started with RootSpec v4.2.
+Fast-track guides for getting started with RootSpec v4.3.
 
 ---
 

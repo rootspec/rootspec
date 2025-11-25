@@ -1,11 +1,10 @@
 I have an existing specification using RootSpec
-v[OLD_VERSION]. I've updated 00.SPEC_FRAMEWORK.md to v3.6.0.
+{{OLD_VERSION}}. I want to upgrade to {{TARGET_VERSION}}.
 
 Please read the updated 00.SPEC_FRAMEWORK.md and CHANGELOG.md to understand
 what has changed.
 
-My current specification structure:
-[Paste your current file structure or describe your spec]
+My specification is located in: {{SPEC_DIR}}
 
 ## MIGRATION STRATEGY
 
@@ -93,7 +92,7 @@ test:
 Help me migrate my specification by:
 
 1. **Identify Breaking Changes**
-   - Read CHANGELOG.md between v[OLD_VERSION] and v3.5.1
+   - Read CHANGELOG.md between {{OLD_VERSION}} and {{TARGET_VERSION}}
    - List all breaking changes that affect my spec
    - Highlight critical changes that require immediate attention
 
@@ -110,9 +109,19 @@ Help me migrate my specification by:
    - Update all cross-references
 
 4. **Validate Migrated Spec**
-   - Ensure it follows v3.6.0 rules from 00.SPEC_FRAMEWORK.md
+   - Ensure it follows {{TARGET_VERSION}} rules from 00.SPEC_FRAMEWORK.md
    - Check reference hierarchy compliance
    - Verify all cross-references work
    - Confirm no content was lost
+
+5. **Update Version References**
+   After migration, ensure all version references are updated:
+   - `00.SPEC_FRAMEWORK.md` - replace with new version from rootspec package
+{{#IF HAS_CONFIG}}
+   - `.rootspecrc.json` - update `version` field to {{TARGET_VERSION}}
+{{/IF}}
+{{#IF HAS_PACKAGE}}
+   - `package.json` - update rootspec dependency to {{TARGET_VERSION}}
+{{/IF}}
 
 Walk me through each step with specific changes for each file.

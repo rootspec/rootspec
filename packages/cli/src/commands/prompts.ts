@@ -3,15 +3,20 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { exec } from 'child_process';
-import { getSpecDirectory } from '../utils/config.js';
+import { getSpecDirectory, loadConfig } from '../utils/config.js';
 import { replaceTemplates } from '../utils/template.js';
+
+// Get CLI version from package.json
+const require = createRequire(import.meta.url);
+const CLI_VERSION = require('../../package.json').version;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Path to framework files (copied to dist/ during build)
-const FRAMEWORK_ROOT = path.resolve(__dirname, '../..');
+const FRAMEWORK_ROOT = path.resolve(__dirname, '..');
 const PROMPTS_DIR = path.join(FRAMEWORK_ROOT, 'prompts');
 
 const GITHUB_PROMPTS_URL = 'https://github.com/rootspec/rootspec/tree/main/prompts';
@@ -667,6 +672,57 @@ async function listSystems(specDir: string): Promise<string[]> {
   }
 }
 
+interface VersionSources {
+  config: string | null;      // from .rootspecrc.json
+  framework: string | null;   // from 00.SPEC_FRAMEWORK.md
+  package: string | null;     // from package.json rootspec dep
+}
+
+/**
+ * Detect RootSpec version from multiple sources
+ */
+async function detectAllVersions(specDir: string): Promise<VersionSources> {
+  const cwd = process.cwd();
+  const versions: VersionSources = { config: null, framework: null, package: null };
+
+  // 1. Check .rootspecrc.json
+  const config = await loadConfig(cwd);
+  if (config?.version) {
+    versions.config = config.version.startsWith('v') ? config.version : `v${config.version}`;
+  }
+
+  // 2. Parse 00.SPEC_FRAMEWORK.md header
+  const frameworkPath = path.join(cwd, specDir, '00.SPEC_FRAMEWORK.md');
+  if (await fs.pathExists(frameworkPath)) {
+    try {
+      const content = await fs.readFile(frameworkPath, 'utf-8');
+      const match = content.match(/^\*\*Version:\*\*\s*([\d.]+)/m);
+      if (match) {
+        versions.framework = `v${match[1]}`;
+      }
+    } catch (e) {
+      // Ignore read errors
+    }
+  }
+
+  // 3. Check package.json for rootspec dependency
+  const pkgPath = path.join(cwd, 'package.json');
+  if (await fs.pathExists(pkgPath)) {
+    try {
+      const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8'));
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+      if (deps['rootspec']) {
+        const ver = deps['rootspec'].replace(/^[\^~]/, '');
+        versions.package = ver.startsWith('v') ? ver : `v${ver}`;
+      }
+    } catch (e) {
+      // Ignore parse errors
+    }
+  }
+
+  return versions;
+}
+
 /**
  * Interactive prompt for init
  * Asks for product description
@@ -698,23 +754,78 @@ async function runInitPrompt(): Promise<void> {
 
 /**
  * Interactive prompt for migrate
- * Asks for old version
+ * Auto-detects versions from project files
  */
 async function runMigratePrompt(): Promise<void> {
   console.log(chalk.bold('\n📦 Migrate Specification\n'));
+  console.log(chalk.gray('Scanning for specification files...\n'));
 
-  const oldVersion = await input({
-    message: 'Your current RootSpec version (e.g., v3.5.0):',
-    default: 'v3.5.0',
-  });
+  // Find spec directory
+  const specInfo = await findSpecDirectory();
+  if (!specInfo.found) {
+    console.log(chalk.yellow('  ⚠️  No specification found. Run `rootspec init` first.'));
+    console.log();
+    return;
+  }
+
+  console.log(chalk.green(`  ✓ Found specification in ${specInfo.dir}/`));
+  console.log();
+
+  // Detect versions from all sources
+  const versions = await detectAllVersions(specInfo.dir);
+  const detectedVersions: string[] = [];
+
+  console.log(chalk.gray('Version sources detected:'));
+
+  if (versions.framework) {
+    console.log(chalk.green(`  ✓ 00.SPEC_FRAMEWORK.md: ${versions.framework}`));
+    detectedVersions.push(versions.framework);
+  } else {
+    console.log(chalk.gray('  - 00.SPEC_FRAMEWORK.md: (no version found)'));
+  }
+
+  if (versions.config) {
+    console.log(chalk.green(`  ✓ .rootspecrc.json: ${versions.config}`));
+    detectedVersions.push(versions.config);
+  } else {
+    console.log(chalk.gray('  - .rootspecrc.json: (no version field)'));
+  }
+
+  if (versions.package) {
+    console.log(chalk.green(`  ✓ package.json (rootspec): ${versions.package}`));
+    detectedVersions.push(versions.package);
+  } else {
+    console.log(chalk.gray('  - package.json: (no rootspec dependency)'));
+  }
+
+  // Check for version mismatches
+  const uniqueVersions = [...new Set(detectedVersions)];
+  if (uniqueVersions.length > 1) {
+    console.log();
+    console.log(chalk.yellow(`  ⚠️  Version mismatch detected: ${uniqueVersions.join(' vs ')}`));
+  }
+
+  // Determine current version (prefer framework file, then config, then package)
+  const currentVersion = versions.framework || versions.config || versions.package || 'unknown';
+  const targetVersion = `v${CLI_VERSION}`;
 
   console.log();
+  console.log(chalk.cyan(`Migrating: ${currentVersion} → ${targetVersion}`));
+  console.log();
+
   console.log(chalk.green('✅ Prompt ready! Copy and paste into your AI assistant:\n'));
   console.log(chalk.gray('─'.repeat(60)));
   console.log();
 
+  // Read and fill template
   const promptContent = await fs.readFile(path.join(PROMPTS_DIR, 'migrate-spec.md'), 'utf-8');
-  const filledPrompt = promptContent.replace(/v\[OLD_VERSION\]/g, oldVersion);
+  const filledPrompt = replaceTemplates(promptContent, {
+    OLD_VERSION: currentVersion,
+    TARGET_VERSION: targetVersion,
+    SPEC_DIR: specInfo.dir,
+    HAS_CONFIG: !!versions.config,
+    HAS_PACKAGE: !!versions.package,
+  });
 
   console.log(filledPrompt);
   console.log();
