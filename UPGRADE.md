@@ -4,6 +4,25 @@ Migration instructions for upgrading between RootSpec versions.
 
 ---
 
+## Upgrading to 4.2.1 from 4.2.0
+
+**Release Date:** 2025-11-24
+
+### What Changed
+
+- Fixed CLI `--version` showing wrong version (4.1.0 instead of 4.2.0)
+- Fixed npm warning about bin file not found
+
+### Action Required
+
+**None** - Just update: `npm install -g rootspec@4.2.1`
+
+### Breaking Changes
+
+None
+
+---
+
 ## Upgrading to 4.2.0 from 4.1.0
 
 **Release Date:** 2025-11-24

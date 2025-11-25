@@ -11,7 +11,7 @@ const program = new Command();
 program
   .name('rootspec')
   .description('RootSpec - Hierarchical Specification Framework')
-  .version('4.1.0')
+  .version('4.2.1')
   .addHelpText('before', `
 ╭───────────────────────────────────────────────────────────╮
 │  RootSpec - Hierarchical Specification Framework         │
