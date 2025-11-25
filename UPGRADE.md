@@ -4,6 +4,35 @@ Migration instructions for upgrading between RootSpec versions.
 
 ---
 
+## Upgrading to 4.3.0 from 4.2.x
+
+**Release Date:** 2025-11-24
+
+### What Changed
+
+**Critical Bug Fix:**
+- Fixed `FRAMEWORK_ROOT` path in CLI - prompts and templates were not found after npm install
+
+**New Feature:**
+- `rootspec prompts migrate` now auto-detects your current RootSpec version
+- Shows version from multiple sources (framework file, config, package.json)
+- Warns on version mismatches
+- No more manual version entry
+
+### Action Required
+
+**Update immediately** - v4.2.x has a critical bug where `rootspec prompts migrate` (and potentially other prompt commands) fail with "ENOENT: no such file or directory" after npm install.
+
+```bash
+npm install -g rootspec@4.3.0
+```
+
+### Breaking Changes
+
+None
+
+---
+
 ## Upgrading to 4.2.1 from 4.2.0
 
 **Release Date:** 2025-11-24

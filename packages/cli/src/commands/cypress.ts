@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Path to framework files (copied to dist/ during build)
-const FRAMEWORK_ROOT = path.resolve(__dirname, '../..');
+const FRAMEWORK_ROOT = path.resolve(__dirname, '..');
 
 export async function cypressCommand(options: { withExamples?: boolean } = {}): Promise<void> {
   const cwd = process.cwd();
