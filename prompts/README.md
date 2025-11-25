@@ -1,12 +1,12 @@
 # AI Assistant Prompt Library
 
-**Context-aware prompt templates for RootSpec v4.1.0**
+**Context-aware prompt templates for RootSpec v4.2.0**
 
 These are **template files** that are automatically filled by the RootSpec CLI with your project's actual context (framework, directories, files, etc.). The CLI scans your codebase and generates ready-to-use prompts that you can paste directly into your AI assistant.
 
 ## Overview
 
-**RootSpec v4.0+** includes a CLI that transforms these template files into contextual prompts by:
+**RootSpec v4.2+** includes a CLI that transforms these template files into contextual prompts by:
 - **Auto-detecting** your project's framework (Next.js, Nuxt, React, Vue, etc.)
 - **Scanning** your source directories (`src/`, `lib/`, `app/`, etc.)
 - **Finding** your configuration files (`tsconfig.json`, `package.json`, etc.)
@@ -238,7 +238,7 @@ The AI will check for hierarchy violations, missing sections, and anti-patterns.
 
 ## Version Compatibility
 
-These templates are designed for **RootSpec v4.1.0**.
+These templates are designed for **RootSpec v4.2.0**.
 
 For earlier versions without CLI support:
 - v3.x - Use manual workflow (download framework, edit prompts by hand)
