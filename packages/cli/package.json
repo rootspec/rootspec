@@ -1,6 +1,6 @@
 {
   "name": "rootspec",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Hierarchical Specification Framework - Philosophy guides implementation",
   "type": "module",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
     "rootspec": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && npm run copy-assets",
+    "build": "tsc && chmod +x dist/index.js && npm run copy-assets",
     "copy-assets": "node -e \"const fs=require('fs-extra');fs.copySync('../../00.SPEC_FRAMEWORK.md','dist/00.SPEC_FRAMEWORK.md');fs.copySync('../../UPGRADE.md','dist/UPGRADE.md');fs.copySync('../../prompts','dist/prompts');fs.copySync('../../templates','dist/templates')\"",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
