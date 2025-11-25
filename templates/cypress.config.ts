@@ -13,6 +13,18 @@ import vitePreprocessor from 'cypress-vite';
  * Customize this file for your project's needs.
  */
 
+/**
+ * Task logging utility.
+ * Set CYPRESS_QUIET=1 to suppress task logs, or CYPRESS_LOG_TASKS=1 for verbose output.
+ * Default: minimal logging (errors only).
+ */
+const logTask = (message: string, data?: any) => {
+  if (process.env.CYPRESS_QUIET === '1') return;
+  if (process.env.CYPRESS_LOG_TASKS === '1') {
+    console.log(`[Task] ${message}`, data !== undefined ? data : '');
+  }
+};
+
 export default defineConfig({
   e2e: {
     // Test file patterns - matches the generated test files
@@ -46,7 +58,7 @@ export default defineConfig({
          * @returns null (required by Cypress)
          */
         async loginAs(role: string) {
-          console.log(`[Task] Authenticating as role: ${role}`);
+          logTask(`Authenticating as role: ${role}`);
 
           // TODO: Implement your authentication logic here
           // Example approaches:
@@ -79,7 +91,7 @@ export default defineConfig({
          * @returns null (required by Cypress)
          */
         async seedItem(payload: { slug: string; status: string; [key: string]: any }) {
-          console.log(`[Task] Seeding item:`, payload);
+          logTask(`Seeding item: ${payload.slug}`, payload);
 
           // TODO: Implement your data seeding logic here
           // Example approaches:
@@ -116,7 +128,7 @@ export default defineConfig({
          * @returns null (required by Cypress)
          */
         async resetDatabase() {
-          console.log('[Task] Resetting database to clean state');
+          logTask('Resetting database');
 
           // TODO: Implement your database reset logic here
           // Example approaches:
@@ -149,19 +161,26 @@ export default defineConfig({
         },
 
         /**
-         * PRESCRIPTIVE PATTERN: Log browser console output to terminal.
+         * Log browser console output to terminal.
          *
          * This task receives console logs from the browser (via e2e.ts)
-         * and outputs them to the Node.js console, making them visible
-         * in headless mode and CI environments.
+         * and outputs them to the Node.js console.
+         *
+         * Set CYPRESS_LOG_BROWSER=1 to enable browser console output.
+         * Errors are always shown unless CYPRESS_QUIET=1.
          *
          * @param payload - Log level and message from browser console
          * @returns null (required by Cypress)
          */
         log(payload: { level: string; message: string }) {
-          const timestamp = new Date().toISOString().substring(11, 23);
-          const prefix = `[${timestamp}] [Browser ${payload.level}]`;
-          console.log(`${prefix} ${payload.message}`);
+          if (process.env.CYPRESS_QUIET === '1') return null;
+
+          // Always show errors, optionally show other levels
+          const isError = payload.level === 'ERROR';
+          if (isError || process.env.CYPRESS_LOG_BROWSER === '1') {
+            const prefix = isError ? '🔴' : '📋';
+            console.log(`${prefix} [Browser] ${payload.message}`);
+          }
           return null;
         },
 
@@ -176,13 +195,13 @@ export default defineConfig({
          */
 
         // async createProject(payload: { name: string; owner: string }) {
-        //   console.log(`[Task] Creating project:`, payload);
+        //   logTask('Creating project', payload);
         //   // Implementation here
         //   return null;
         // },
 
         // async inviteUser(payload: { email: string; role: string }) {
-        //   console.log(`[Task] Inviting user:`, payload);
+        //   logTask('Inviting user', payload);
         //   // Implementation here
         //   return null;
         // },
@@ -197,6 +216,26 @@ export default defineConfig({
      */
     baseUrl: 'http://localhost:3000',
   },
+
+  /**
+   * Reporter configuration.
+   *
+   * Default: 'spec' reporter for human-readable terminal output.
+   *
+   * For JSON output (useful for AI/LLM consumption or CI):
+   *   npm install --save-dev mochawesome mochawesome-merge
+   *   Then uncomment the reporter options below.
+   */
+  reporter: 'spec',
+
+  // Uncomment for JSON reports (AI/CI friendly):
+  // reporter: 'mochawesome',
+  // reporterOptions: {
+  //   reportDir: 'cypress/results',
+  //   overwrite: false,
+  //   html: false,
+  //   json: true,
+  // },
 
   /**
    * Additional Cypress configuration options.
