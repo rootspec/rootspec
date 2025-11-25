@@ -1,14 +1,17 @@
 /**
- * Test Suite Runner - Example Template
+ * Test Suite Runner
  *
- * USAGE: Copy this file and modify the glob pattern below to create
- * test suites that load specific YAML user story files.
+ * USAGE: Use --env stories=<filter> to run specific YAML user story files.
  *
- * Examples of test suites you might create:
- * - mvp.cy.ts           → loads by_priority/MVP/**/*.yaml
- * - onboarding.cy.ts    → loads by_journey/ONBOARDING/**/*.yaml
- * - tasks.cy.ts         → loads by_system/TASKS/**/*.yaml
- * - all-tests.cy.ts     → loads **/*.yaml (everything)
+ * Examples:
+ *   cypress run --env stories=by_priority/MVP
+ *   cypress run --env stories=ONBOARDING
+ *   cypress run                              # runs all stories
+ *
+ * The filter matches any path containing the string (case-sensitive).
+ *
+ * Only copy this file if you need exceptional customizations.
+ * For most cases, a single test file with env filtering is sufficient.
  *
  * Test organization:
  * - Each story becomes a describe block
@@ -21,27 +24,34 @@ import { StorySchema, type Story, type AC } from '../support/schema';
 import { runSetupSteps, runAssertionSteps } from '../support/steps';
 
 /**
- * ⚠️  CUSTOMIZE THIS GLOB PATTERN for your test suite.
+ * ⚠️  CUSTOMIZE THIS GLOB PATTERN for your project structure.
  *
  * This uses Vite's import.meta.glob to load YAML files at spec-eval time.
  * Path is relative to this file (cypress/e2e/).
  *
- * Example patterns:
- * - MVP only:        '.../USER_STORIES/by_priority/MVP/**/*.yaml'
- * - All priority:    '.../USER_STORIES/by_priority/**/*.yaml'
- * - Onboarding:      '.../USER_STORIES/by_journey/ONBOARDING/**/*.yaml'
- * - Task system:     '.../USER_STORIES/by_system/TASKS/**/*.yaml'
- * - Everything:      '.../USER_STORIES/**/*.yaml'
+ * Load ALL user stories - filtering is done at runtime via --env stories=<filter>
  *
  * Adjust the base path for your project structure:
- * - Standard:   '../../../05.IMPLEMENTATION/USER_STORIES/...'
- * - Content:    '../../content/spec/05.IMPLEMENTATION/USER_STORIES/...'
- * - Monorepo:   '../../../packages/spec/USER_STORIES/...'
+ * - Standard:   '../../../05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
+ * - Content:    '../../content/spec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
+ * - Monorepo:   '../../../packages/spec/USER_STORIES/**/*.yaml'
  */
 const rawFiles = import.meta.glob(
-  '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml',
+  '../../content/spec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml',
   { query: '?raw', import: 'default', eager: true }
 ) as Record<string, string>;
+
+/**
+ * Filter files based on --env stories=<filter>
+ * Matches any path containing the filter string (case-sensitive).
+ * No filter = run all stories.
+ */
+const storyFilter = Cypress.env('stories') as string | undefined;
+const filteredFiles = storyFilter
+  ? Object.fromEntries(
+      Object.entries(rawFiles).filter(([path]) => path.includes(storyFilter))
+    )
+  : rawFiles;
 
 /**
  * Parse and validate all user story YAML files.
@@ -52,7 +62,7 @@ const rawFiles = import.meta.glob(
 function loadStories(): Story[] {
   const stories: Story[] = [];
 
-  for (const [path, raw] of Object.entries(rawFiles)) {
+  for (const [path, raw] of Object.entries(filteredFiles)) {
     try {
       // Parse YAML - loadAll handles multiple documents separated by ---
       const documents = yaml.loadAll(raw);
