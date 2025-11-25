@@ -5,6 +5,14 @@ All notable changes to **RootSpec** (Hierarchical Specification Framework) will 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.0] - 2025-11-25
+
+### Changed
+
+- **Cypress workflow**: Single test file with runtime filtering replaces copy-per-suite pattern
+- Use `--env stories=<filter>` to run specific YAML files by path substring match
+- Template loads all stories, filters at runtime (no filter = run all)
+
 ## [4.3.0] - 2025-11-24
 
 ### Fixed
