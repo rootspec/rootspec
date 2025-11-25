@@ -4,6 +4,33 @@ Migration instructions for upgrading between RootSpec versions.
 
 ---
 
+## Upgrading to 4.4.0 from 4.3.x
+
+**Release Date:** 2025-11-25
+
+### What Changed
+
+**Cypress Workflow Simplified:**
+- Single test file with runtime filtering replaces copy-per-suite pattern
+- Use `--env stories=<filter>` to run specific YAML files by path substring
+- Template loads all stories, filters at runtime (no filter = run all)
+
+### Action Required
+
+If using Cypress templates:
+1. Update your test file's glob to load ALL yaml files (`**/*.yaml`)
+2. Use `--env stories=by_priority/MVP` instead of separate test files
+
+```bash
+npm install -g rootspec@4.4.0
+```
+
+### Breaking Changes
+
+None - existing multiple-file setups still work, but single-file + env filtering is now recommended.
+
+---
+
 ## Upgrading to 4.3.0 from 4.2.x
 
 **Release Date:** 2025-11-24
