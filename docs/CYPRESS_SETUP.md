@@ -125,59 +125,40 @@ After creating test suites for your project:
 
 ---
 
-## Step 2b: Create Test Suite Files
+## Step 2b: Configure the Test File
 
-For each collection or subset of tests you want to run independently:
-
-1. Copy `cypress/e2e/example.cy.ts` to a new file (e.g., `mvp.cy.ts`)
-2. Edit the glob pattern to load your specific YAML files
+Edit the glob pattern in `cypress/e2e/example.cy.ts` to match your project structure:
 
 ```typescript
-// In cypress/e2e/mvp.cy.ts
 const rawFiles = import.meta.glob(
-  '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml',  // ← Your path
-  { as: 'raw', eager: true }
+  '../../../05.IMPLEMENTATION/USER_STORIES/**/*.yaml',  // ← Your path
+  { query: '?raw', import: 'default', eager: true }
 ) as Record<string, string>;
 ```
 
 **Path format:**
 - Relative to the test file location (`cypress/e2e/`)
 - Use `../../../` to navigate to project root
-- Must be a literal string (Vite requirement - cannot use variables)
+- Load ALL yaml files - filtering is done at runtime
 
-**Example test suite patterns:**
+**Example paths for different project structures:**
 
-MVP tests only:
+Standard:
 ```typescript
-'../../../05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml'
-```
-
-All priority tests:
-```typescript
-'../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'
-```
-
-Onboarding journey:
-```typescript
-'../../../05.IMPLEMENTATION/USER_STORIES/by_journey/ONBOARDING/**/*.yaml'
+'../../../05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
 ```
 
 Content subdirectory:
 ```typescript
-'../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'
+'../../content/spec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
 ```
 
 Monorepo:
 ```typescript
-'../../../packages/app-spec/USER_STORIES/by_priority/**/*.yaml'
+'../../../packages/app-spec/USER_STORIES/**/*.yaml'
 ```
 
-Flat structure:
-```typescript
-'../../../stories/priority/**/*.yaml'
-```
-
-> **Note:** Each test file has inline comments with these examples. Look for the `import.meta.glob()` call and follow the instructions in the JSDoc comment above it.
+**One file is usually enough.** Use `--env stories=<filter>` to run specific suites (see Step 7). Only copy the template if you need exceptional customizations to the test runner itself.
 
 ---
 
@@ -190,25 +171,14 @@ Add these scripts to your `package.json`:
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test:e2e": "cypress run --spec 'cypress/e2e/**/*.cy.ts'"
+    "test:e2e": "cypress run",
+    "test:e2e:mvp": "cypress run --env stories=by_priority/MVP",
+    "test:e2e:onboarding": "cypress run --env stories=by_journey/ONBOARDING"
   }
 }
 ```
 
-**Add scripts for your test suites:**
-```json
-{
-  "scripts": {
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
-    "test:e2e": "cypress run --spec 'cypress/e2e/**/*.cy.ts'",
-    "test:e2e:mvp": "cypress run --spec 'cypress/e2e/mvp.cy.ts'",
-    "test:e2e:onboarding": "cypress run --spec 'cypress/e2e/onboarding.cy.ts'"
-  }
-}
-```
-
-Customize script names based on your test suite files.
+The `--env stories=<filter>` flag filters which YAML files to run by path substring match.
 
 ---
 
@@ -389,20 +359,30 @@ npm run cypress:open
 
 **What you should see:**
 - Cypress Test Runner opens
-- E2E Testing section shows your test suite files (e.g., `mvp.cy.ts`, `onboarding.cy.ts`)
-- Click any file to see generated test suites
+- E2E Testing section shows `example.cy.ts` (or your renamed file)
+- Click to run all stories
 
 **Run tests headless:**
 ```bash
 npm run cypress:run
 ```
 
-**Run specific test suite:**
+**Filter by story path:**
+
+Use `--env stories=<filter>` to run only stories whose file paths contain the filter string:
+
 ```bash
-npm run test:e2e:mvp        # Only MVP tests
-npm run test:e2e:onboarding # Only onboarding journey
-cypress run --spec 'cypress/e2e/tasks.cy.ts'  # Direct command
+# Run MVP priority stories
+cypress run --env stories=by_priority/MVP
+
+# Run onboarding journey
+cypress run --env stories=ONBOARDING
+
+# Run all stories (no filter)
+cypress run
 ```
+
+The filter is case-sensitive and matches any part of the path.
 
 **Control output verbosity:**
 ```bash
