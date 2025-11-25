@@ -111,31 +111,31 @@ your-project/
     │   ├── schema.ts             # Zod validation schema
     │   └── steps.ts              # DSL-to-Cypress converter
     └── e2e/
-        ├── by_priority.cy.ts     # Runtime generator (priority view)
-        ├── by_journey.cy.ts      # Runtime generator (journey view)
-        └── by_system.cy.ts       # Runtime generator (system view)
+        └── example.cy.ts         # Template - copy to create test suites
+```
+
+After creating test suites for your project:
+```
+    └── e2e/
+        ├── example.cy.ts         # Template (can delete after copying)
+        ├── mvp.cy.ts             # Loads by_priority/MVP/**/*.yaml
+        ├── onboarding.cy.ts      # Loads by_journey/ONBOARDING/**/*.yaml
+        └── tasks.cy.ts           # Loads by_system/TASKS/**/*.yaml
 ```
 
 ---
 
-## Step 2b: Customize Story Paths (If Needed)
+## Step 2b: Create Test Suite Files
 
-By default, the test loaders look for user stories in:
-- `05.IMPLEMENTATION/USER_STORIES/by_priority/`
-- `05.IMPLEMENTATION/USER_STORIES/by_journey/`
-- `05.IMPLEMENTATION/USER_STORIES/by_system/`
+For each collection or subset of tests you want to run independently:
 
-**If your project uses a different directory structure**, you must edit the glob pattern in each test file:
-
-1. Open `cypress/e2e/by_priority.cy.ts` (around line 34)
-2. Open `cypress/e2e/by_journey.cy.ts` (around line 34)
-3. Open `cypress/e2e/by_system.cy.ts` (around line 34)
-
-Find and edit the `import.meta.glob()` pattern:
+1. Copy `cypress/e2e/example.cy.ts` to a new file (e.g., `mvp.cy.ts`)
+2. Edit the glob pattern to load your specific YAML files
 
 ```typescript
+// In cypress/e2e/mvp.cy.ts
 const rawFiles = import.meta.glob(
-  '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml',  // ← Edit this line
+  '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml',  // ← Your path
   { as: 'raw', eager: true }
 ) as Record<string, string>;
 ```
@@ -145,11 +145,21 @@ const rawFiles = import.meta.glob(
 - Use `../../../` to navigate to project root
 - Must be a literal string (Vite requirement - cannot use variables)
 
-**Examples for common structures:**
+**Example test suite patterns:**
 
-Standard framework:
+MVP tests only:
+```typescript
+'../../../05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml'
+```
+
+All priority tests:
 ```typescript
 '../../../05.IMPLEMENTATION/USER_STORIES/by_priority/**/*.yaml'
+```
+
+Onboarding journey:
+```typescript
+'../../../05.IMPLEMENTATION/USER_STORIES/by_journey/ONBOARDING/**/*.yaml'
 ```
 
 Content subdirectory:
@@ -185,19 +195,20 @@ Add these scripts to your `package.json`:
 }
 ```
 
-**Optional but recommended:**
+**Add scripts for your test suites:**
 ```json
 {
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test:e2e": "cypress run --spec 'cypress/e2e/**/*.cy.ts'",
-    "test:e2e:priority": "cypress run --spec 'cypress/e2e/by_priority.cy.ts'",
-    "test:e2e:journey": "cypress run --spec 'cypress/e2e/by_journey.cy.ts'",
-    "test:e2e:system": "cypress run --spec 'cypress/e2e/by_system.cy.ts'"
+    "test:e2e:mvp": "cypress run --spec 'cypress/e2e/mvp.cy.ts'",
+    "test:e2e:onboarding": "cypress run --spec 'cypress/e2e/onboarding.cy.ts'"
   }
 }
 ```
+
+Customize script names based on your test suite files.
 
 ---
 
@@ -378,10 +389,7 @@ npm run cypress:open
 
 **What you should see:**
 - Cypress Test Runner opens
-- E2E Testing section shows 3 test files:
-  - `by_priority.cy.ts`
-  - `by_journey.cy.ts`
-  - `by_system.cy.ts`
+- E2E Testing section shows your test suite files (e.g., `mvp.cy.ts`, `onboarding.cy.ts`)
 - Click any file to see generated test suites
 
 **Run tests headless:**
@@ -389,11 +397,11 @@ npm run cypress:open
 npm run cypress:run
 ```
 
-**Run specific test organization:**
+**Run specific test suite:**
 ```bash
-npm run test:e2e:priority  # Only priority-based tests
-npm run test:e2e:journey   # Only journey-based tests
-npm run test:e2e:system    # Only system-based tests
+npm run test:e2e:mvp        # Only MVP tests
+npm run test:e2e:onboarding # Only onboarding journey
+cypress run --spec 'cypress/e2e/tasks.cy.ts'  # Direct command
 ```
 
 ---

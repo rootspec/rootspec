@@ -11,8 +11,8 @@ test suite. Guide me through this process systematically.
 First, analyze my complete test suite:
 
 1. **Scan all YAML user stories** in `05.IMPLEMENTATION/USER_STORIES/`
-   - Read all files in `by_priority/MVP.yaml` first
-   - Then scan `by_priority/POST_MVP.yaml` and higher priorities
+   - Read all files in `by_priority/MVP/` first
+   - Then scan `by_priority/SECONDARY/` and other priorities
    - Understand the complete scope of testing
 
 2. **Identify global setup requirements:**
@@ -21,10 +21,15 @@ First, analyze my complete test suite:
    - What pages/routes are visited? (look for `visit` steps)
    - What custom DSL steps are referenced but don't exist yet?
 
-3. **Create implementation roadmap:**
+3. **Create test suite files:**
+   - For each collection/subset you want to run independently, copy `cypress/e2e/example.cy.ts`
+   - Modify the glob pattern to load the specific YAML files (e.g., `by_priority/MVP/**/*.yaml`)
+   - Example: `mvp.cy.ts`, `onboarding.cy.ts`, `tasks.cy.ts`
+
+4. **Create implementation roadmap:**
    - List all unique DSL steps that need implementation
    - List all global setup needs (auth, fixtures, DB reset)
-   - Estimate order of implementation (global first, then tests)
+   - Plan order of implementation (global first, then tests)
 
 Present your findings before proceeding to Phase 2.
 
@@ -117,15 +122,15 @@ Now implement features iteratively to pass tests:
 
 **Strategy: Work through MVP tests first**
 
-1. Start with `by_priority/MVP.yaml`
+1. Start with `by_priority/MVP/` stories
 2. Pick the first failing acceptance criteria
 3. Focus on ONE acceptance criteria at a time
 
 ### Step 2: Run The Test
 
 ```bash
-# Run specific test file
-npm test -- --spec cypress/e2e/by_priority.cy.ts
+# Run your MVP test suite (assuming you created mvp.cy.ts)
+npm test -- --spec cypress/e2e/mvp.cy.ts
 
 # Or run single story by filtering
 npm test -- --grep "US-101"

@@ -89,7 +89,10 @@ export async function cypressCommand(options: { withExamples?: boolean } = {}): 
   console.log(chalk.gray('   - seedItem: Test data seeding'));
   console.log(chalk.gray('   - resetDatabase: Database cleanup'));
   console.log(chalk.gray('3.') + ` Create user stories in ${specDir}/05.IMPLEMENTATION/USER_STORIES/`);
-  console.log(chalk.gray('4.') + ' Run tests: ' + chalk.cyan('npx cypress open'));
+  console.log(chalk.gray('4.') + ' Create test suite files:');
+  console.log(chalk.gray('   Copy cypress/e2e/example.cy.ts and modify glob pattern'));
+  console.log(chalk.gray('   for each test suite (e.g., mvp.cy.ts, onboarding.cy.ts)'));
+  console.log(chalk.gray('5.') + ' Run tests: ' + chalk.cyan('npx cypress open'));
 
   console.log(chalk.gray('\nSee docs/CYPRESS_SETUP.md for detailed setup instructions.\n'));
 }
