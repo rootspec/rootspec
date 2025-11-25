@@ -5,6 +5,35 @@ All notable changes to **RootSpec** (Hierarchical Specification Framework) will 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2025-11-24
+
+### Changed
+
+#### Cypress Test Suites
+
+**Flexible test suite files** - Replaced prescriptive three-lane test structure with a single template that users copy and customize.
+
+**Before:**
+- Three hardcoded test files: `by_priority.cy.ts`, `by_journey.cy.ts`, `by_system.cy.ts`
+- Each file loaded ALL YAML from its collection (e.g., all of `by_priority/**/*.yaml`)
+- No way to run only MVP, only ONBOARDING, or any specific subset
+
+**After:**
+- Single template: `cypress/e2e/example.cy.ts`
+- Users/AI create test suite files for each subset they want to run independently
+- Example: `mvp.cy.ts` loads `by_priority/MVP/**/*.yaml`
+- Example: `onboarding.cy.ts` loads `by_journey/ONBOARDING/**/*.yaml`
+
+**Benefits:**
+- Run specific test subsets: `cypress run --spec 'cypress/e2e/mvp.cy.ts'`
+- Flexible organization based on project needs
+- AI assistant decides what suites to create based on spec
+
+**Migration:**
+- Copy `example.cy.ts` for each test suite you need
+- Modify the glob pattern to load your specific YAML files
+- Delete `example.cy.ts` after copying if desired
+
 ## [4.1.0] - 2025-11-23
 
 ### Changed

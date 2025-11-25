@@ -1,9 +1,14 @@
 /**
- * Runtime test generator for journey-based user stories.
+ * Test Suite Runner - Example Template
  *
- * This file dynamically loads all YAML user stories from the
- * 05.IMPLEMENTATION/USER_STORIES/by_journey/ directory and generates
- * Cypress tests organized by user journey (e.g., ONBOARDING, DAILY_USAGE).
+ * USAGE: Copy this file and modify the glob pattern below to create
+ * test suites that load specific YAML user story files.
+ *
+ * Examples of test suites you might create:
+ * - mvp.cy.ts           → loads by_priority/MVP/**/*.yaml
+ * - onboarding.cy.ts    → loads by_journey/ONBOARDING/**/*.yaml
+ * - tasks.cy.ts         → loads by_system/TASKS/**/*.yaml
+ * - all-tests.cy.ts     → loads **/*.yaml (everything)
  *
  * Test organization:
  * - Each story becomes a describe block
@@ -16,23 +21,25 @@ import { StorySchema, type Story, type AC } from '../support/schema';
 import { runSetupSteps, runAssertionSteps } from '../support/steps';
 
 /**
- * Load all YAML story files from the by_journey directory.
+ * ⚠️  CUSTOMIZE THIS GLOB PATTERN for your test suite.
  *
- * This uses Vite's import.meta.glob to load files at spec-eval time.
- * The 'as: raw' option loads file contents as strings.
- * The 'eager: true' option loads synchronously.
- *
- * To customize for your project structure, edit the glob pattern below.
+ * This uses Vite's import.meta.glob to load YAML files at spec-eval time.
  * Path is relative to this file (cypress/e2e/).
  *
- * Examples for different structures:
- * - Standard:  '../../../05.IMPLEMENTATION/USER_STORIES/by_journey/**​/*.yaml'
- * - Content:   '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_journey/**​/*.yaml'
- * - Monorepo:  '../../../packages/spec/USER_STORIES/by_journey/**​/*.yaml'
- * - Flat:      '../../../stories/journey/**​/*.yaml'
+ * Example patterns:
+ * - MVP only:        '.../USER_STORIES/by_priority/MVP/**/*.yaml'
+ * - All priority:    '.../USER_STORIES/by_priority/**/*.yaml'
+ * - Onboarding:      '.../USER_STORIES/by_journey/ONBOARDING/**/*.yaml'
+ * - Task system:     '.../USER_STORIES/by_system/TASKS/**/*.yaml'
+ * - Everything:      '.../USER_STORIES/**/*.yaml'
+ *
+ * Adjust the base path for your project structure:
+ * - Standard:   '../../../05.IMPLEMENTATION/USER_STORIES/...'
+ * - Content:    '../../content/spec/05.IMPLEMENTATION/USER_STORIES/...'
+ * - Monorepo:   '../../../packages/spec/USER_STORIES/...'
  */
 const rawFiles = import.meta.glob(
-  '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_journey/**/*.yaml',
+  '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml',
   { as: 'raw', eager: true }
 ) as Record<string, string>;
 
