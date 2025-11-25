@@ -212,11 +212,11 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 # Include: what changed, action required, breaking changes
 
 # 2. Find and update all version references in docs
-grep -r "v3\.[0-3]\.0" --include="*.md" . | grep -v ".git" | grep -v "CHANGELOG.md"
-# Update: 00.SPEC_FRAMEWORK.md, README.md (2 places), CHANGELOG.md links, all prompts/*
+grep -r "v4\.[0-9]\+\.0" --include="*.md" . | grep -v ".git" | grep -v "CHANGELOG.md"
+# Update: packages/cli/package.json, prompts/README.md, and any other version refs
 
 # 3. Commit feature changes
-git add CHANGELOG.md UPGRADE.md 00.SPEC_FRAMEWORK.md README.md prompts/ docs/ templates/
+git add CHANGELOG.md UPGRADE.md prompts/ docs/ templates/ packages/
 git commit -m "Add [feature name] (vX.Y.0)
 
 [Description]
@@ -244,7 +244,7 @@ See CHANGELOG.md for details."
 
 # 6. Verify
 git log --oneline -5
-git tag -l "v3.*" | tail -3
+git tag -l "v4.*" | tail -3
 git status
 
 # 7. Push

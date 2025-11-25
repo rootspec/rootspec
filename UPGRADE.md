@@ -4,6 +4,62 @@ Migration instructions for upgrading between RootSpec versions.
 
 ---
 
+## Upgrading to 4.2.0 from 4.1.0
+
+**Release Date:** 2025-11-24
+
+### What Changed
+
+**Test Suite Structure:**
+- Replaced 3 prescriptive test files (`by_priority.cy.ts`, `by_journey.cy.ts`, `by_system.cy.ts`) with single template (`example.cy.ts`)
+- Users/AI now create test suite files for each subset they want to run independently
+
+**Output Verbosity:**
+- Task logging now off by default (was spamming terminal)
+- Browser console capture only shows errors by default
+- Fixed Vite glob deprecation warning
+- Added mochawesome reporter config option for JSON output
+
+### Action Required
+
+**If you have existing Cypress setup from v4.1.0:**
+
+1. Your existing `by_priority.cy.ts`, `by_journey.cy.ts`, `by_system.cy.ts` files will continue to work
+2. To adopt the new pattern:
+   - Copy your existing test file to a new name (e.g., `mvp.cy.ts`)
+   - Modify the glob pattern to load specific YAML files
+   - Delete old files when ready
+
+### Migration Steps
+
+**To reduce test output noise:**
+
+Add environment variables when running tests:
+```bash
+# Quiet mode
+CYPRESS_QUIET=1 npm run cypress:run
+
+# Or enable verbose logging when debugging
+CYPRESS_LOG_TASKS=1 npm run cypress:run
+```
+
+**To fix the deprecation warning:**
+
+Update your test file glob syntax:
+```typescript
+// Old (deprecated)
+import.meta.glob('...', { as: 'raw', eager: true })
+
+// New
+import.meta.glob('...', { query: '?raw', import: 'default', eager: true })
+```
+
+### Breaking Changes
+
+None - existing test files continue to work.
+
+---
+
 ## Upgrading to 4.1.0 from 4.0.0
 
 **Release Date:** 2025-11-23
