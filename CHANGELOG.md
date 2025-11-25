@@ -34,6 +34,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modify the glob pattern to load your specific YAML files
 - Delete `example.cy.ts` after copying if desired
 
+#### Cypress Output Improvements
+
+**Cleaner, quieter test output** - Reduced verbosity and added output control via environment variables.
+
+**Changes:**
+- Task logging now off by default (was spamming every setup operation)
+- Browser console capture only shows errors by default
+- Fixed Vite glob deprecation warning (`as: 'raw'` → `query: '?raw'`)
+- Added reporter configuration section with JSON output option
+
+**Environment variables:**
+- `CYPRESS_QUIET=1` - Suppress all task/browser output
+- `CYPRESS_LOG_TASKS=1` - Enable verbose task logging
+- `CYPRESS_LOG_BROWSER=1` - Show all browser console output
+
+**JSON reports for AI/CI:**
+- Mochawesome reporter config included (commented out)
+- Uncomment and install `mochawesome` for structured JSON output
+
 ## [4.1.0] - 2025-11-23
 
 ### Changed

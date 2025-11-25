@@ -404,6 +404,24 @@ npm run test:e2e:onboarding # Only onboarding journey
 cypress run --spec 'cypress/e2e/tasks.cy.ts'  # Direct command
 ```
 
+**Control output verbosity:**
+```bash
+# Quiet mode (minimal output)
+CYPRESS_QUIET=1 npm run cypress:run
+
+# Verbose task logging (shows all setup operations)
+CYPRESS_LOG_TASKS=1 npm run cypress:run
+
+# Show browser console output
+CYPRESS_LOG_BROWSER=1 npm run cypress:run
+```
+
+**For JSON output (AI/CI consumption):**
+
+1. Install mochawesome: `npm install --save-dev mochawesome mochawesome-merge`
+2. Uncomment the reporter options in `cypress.config.ts`
+3. Run tests - JSON reports saved to `cypress/results/`
+
 ---
 
 ## Step 8: Validate Setup

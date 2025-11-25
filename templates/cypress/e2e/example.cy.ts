@@ -40,7 +40,7 @@ import { runSetupSteps, runAssertionSteps } from '../support/steps';
  */
 const rawFiles = import.meta.glob(
   '../../content/spec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP/**/*.yaml',
-  { as: 'raw', eager: true }
+  { query: '?raw', import: 'default', eager: true }
 ) as Record<string, string>;
 
 /**

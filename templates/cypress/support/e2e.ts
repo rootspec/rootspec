@@ -38,16 +38,15 @@ beforeEach(() => {
 });
 
 /**
- * PRESCRIPTIVE PATTERN: Capture browser console logs
+ * Capture browser console logs.
  *
- * Captures console.log, console.warn, console.error, console.info from the
- * application under test and outputs them to Cypress terminal (headless mode)
- * and Cypress UI (interactive mode).
+ * Forwards browser console output to terminal (via the 'log' task).
+ * Output is controlled by environment variables in cypress.config.ts:
+ * - CYPRESS_LOG_BROWSER=1  → Show all browser console output
+ * - CYPRESS_QUIET=1        → Suppress all output (including errors)
+ * - Default: Only browser errors are shown
  *
- * This is especially useful for:
- * - Detecting JavaScript errors in headless CI environments
- * - Debugging application behavior during test runs
- * - Catching warnings that might indicate issues
+ * To disable capture entirely, comment out this section.
  */
 Cypress.on('window:before:load', (win) => {
   // Store original console methods
