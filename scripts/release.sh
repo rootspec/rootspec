@@ -81,7 +81,7 @@ echo ""
 echo "Step 2: Verify no stale version references"
 echo "-------------------------------------------"
 echo "Checking for remaining references to $CURRENT_VERSION..."
-STALE_REFS=$(grep -r "$CURRENT_VERSION" --include="*.md" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v CHANGELOG.md | grep -v UPGRADE.md || true)
+STALE_REFS=$(grep -r "$CURRENT_VERSION" --include="*.md" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v CHANGELOG.md | grep -v UPGRADE.md | grep -v "/dist/" || true)
 if [ -n "$STALE_REFS" ]; then
   echo "Warning: Found remaining version references:"
   echo "$STALE_REFS"
