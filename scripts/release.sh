@@ -2,16 +2,32 @@
 set -e
 
 # RootSpec Release Script
-# Usage: ./scripts/release.sh <version> [--dry-run]
+# Usage: ./scripts/release.sh <version> [options]
 #
-# Example: ./scripts/release.sh 4.4.1
-#          ./scripts/release.sh 4.5.0 --dry-run
+# Options:
+#   --dry-run    Preview changes without executing
+#   -y           Auto-confirm all prompts
+#
+# Examples:
+#   ./scripts/release.sh 4.4.1
+#   ./scripts/release.sh 4.5.0 --dry-run
+#   ./scripts/release.sh 4.4.1 -y
 
 VERSION=$1
-DRY_RUN=$2
+shift || true
+
+# Parse options
+DRY_RUN=""
+AUTO_CONFIRM=""
+for arg in "$@"; do
+  case $arg in
+    --dry-run) DRY_RUN="--dry-run" ;;
+    -y) AUTO_CONFIRM="yes" ;;
+  esac
+done
 
 if [ -z "$VERSION" ]; then
-  echo "Usage: ./scripts/release.sh <version> [--dry-run]"
+  echo "Usage: ./scripts/release.sh <version> [--dry-run] [-y]"
   echo "Example: ./scripts/release.sh 4.4.1"
   exit 1
 fi
@@ -39,7 +55,7 @@ if [ -n "$(git status --porcelain)" ]; then
   echo "Warning: You have uncommitted changes:"
   git status --short
   echo ""
-  if [ "$DRY_RUN" != "--dry-run" ]; then
+  if [ "$DRY_RUN" != "--dry-run" ] && [ "$AUTO_CONFIRM" != "yes" ]; then
     read -p "Continue anyway? (y/N) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -105,7 +121,7 @@ echo "Please ensure CHANGELOG.md and UPGRADE.md are updated with:"
 echo "  - New version section in CHANGELOG.md"
 echo "  - Upgrade instructions in UPGRADE.md (if needed)"
 echo ""
-if [ "$DRY_RUN" != "--dry-run" ]; then
+if [ "$DRY_RUN" != "--dry-run" ] && [ "$AUTO_CONFIRM" != "yes" ]; then
   read -p "Have you updated CHANGELOG.md and UPGRADE.md? (y/N) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -113,7 +129,7 @@ if [ "$DRY_RUN" != "--dry-run" ]; then
     exit 1
   fi
 else
-  echo "[DRY RUN] Skipping confirmation"
+  echo "Skipping confirmation (${DRY_RUN:-auto-confirm})"
 fi
 
 echo ""
