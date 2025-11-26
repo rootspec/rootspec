@@ -39,10 +39,12 @@ if [ -n "$(git status --porcelain)" ]; then
   echo "Warning: You have uncommitted changes:"
   git status --short
   echo ""
-  read -p "Continue anyway? (y/N) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
+  if [ "$DRY_RUN" != "--dry-run" ]; then
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 1
+    fi
   fi
 fi
 
@@ -60,40 +62,41 @@ echo ""
 echo "Step 1: Update version references"
 echo "----------------------------------"
 
-# Files to update
-FILES_TO_UPDATE=(
-  "packages/cli/package.json"
-  "prompts/README.md"
-)
+# Files to update with their version patterns
+# package.json uses "version": "X.Y.Z"
+# README.md uses vX.Y.Z
+echo "Updating packages/cli/package.json..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  sed -i '' -E 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' packages/cli/package.json
+else
+  echo "[DRY RUN] Update version in packages/cli/package.json to $VERSION"
+fi
 
-for file in "${FILES_TO_UPDATE[@]}"; do
-  if [ -f "$file" ]; then
-    echo "Updating $file..."
-    if [ "$DRY_RUN" != "--dry-run" ]; then
-      sed -i '' "s/$CURRENT_VERSION/$VERSION/g" "$file"
-    else
-      echo "[DRY RUN] sed -i '' \"s/$CURRENT_VERSION/$VERSION/g\" $file"
-    fi
-  fi
-done
+echo "Updating prompts/*.md..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  find prompts -name "*.md" -exec sed -i '' -E 's/v[0-9]+\.[0-9]+\.[0-9]+/v'"$VERSION"'/g' {} \;
+else
+  echo "[DRY RUN] Update version references in prompts/*.md to v$VERSION"
+  grep -r "v[0-9]\+\.[0-9]\+\.[0-9]\+" prompts/ --include="*.md" | head -5
+fi
+
+echo "Updating README.md..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  sed -i '' -E 's/v[0-9]+\.[0-9]+\.[0-9]+/v'"$VERSION"'/g' README.md
+else
+  echo "[DRY RUN] Update version references in README.md to v$VERSION"
+fi
 
 echo ""
-echo "Step 2: Verify no stale version references"
-echo "-------------------------------------------"
-echo "Checking for remaining references to $CURRENT_VERSION..."
-STALE_REFS=$(grep -r "$CURRENT_VERSION" --include="*.md" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v CHANGELOG.md | grep -v UPGRADE.md | grep -v "/dist/" || true)
-if [ -n "$STALE_REFS" ]; then
-  echo "Warning: Found remaining version references:"
-  echo "$STALE_REFS"
-  echo ""
-  read -p "Continue anyway? (y/N) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
-else
-  echo "No stale references found."
+echo "Step 2: Verify version updates"
+echo "-------------------------------"
+UPDATED_PKG_VERSION=$(grep '"version"' packages/cli/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
+echo "package.json version: $UPDATED_PKG_VERSION"
+if [ "$UPDATED_PKG_VERSION" != "$VERSION" ]; then
+  echo "Error: package.json version not updated correctly"
+  exit 1
 fi
+echo "Version updates verified."
 
 echo ""
 echo "Step 3: Remind to update CHANGELOG.md and UPGRADE.md"
@@ -102,22 +105,26 @@ echo "Please ensure CHANGELOG.md and UPGRADE.md are updated with:"
 echo "  - New version section in CHANGELOG.md"
 echo "  - Upgrade instructions in UPGRADE.md (if needed)"
 echo ""
-read -p "Have you updated CHANGELOG.md and UPGRADE.md? (y/N) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo "Please update these files and run the script again."
-  exit 1
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  read -p "Have you updated CHANGELOG.md and UPGRADE.md? (y/N) " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Please update these files and run the script again."
+    exit 1
+  fi
+else
+  echo "[DRY RUN] Skipping confirmation"
 fi
 
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add -A"
+run "git add packages/cli/package.json prompts/ README.md"
 run "git commit -m 'Release v$VERSION
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
-Co-Authored-By: Claude <noreply@anthropic.com>'"
+Co-Authored-By: Claude <noreply@anthropic.com>'" || echo "Nothing new to commit."
 
 echo ""
 echo "Step 5: Create git tag"
@@ -136,7 +143,7 @@ echo ""
 echo "Step 7: Create GitHub release"
 echo "-----------------------------"
 # Extract changelog section for this version
-RELEASE_NOTES=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | head -n -1 | tail -n +2)
+RELEASE_NOTES=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '1d;$d')
 if [ -z "$RELEASE_NOTES" ]; then
   RELEASE_NOTES="See CHANGELOG.md for details."
 fi
