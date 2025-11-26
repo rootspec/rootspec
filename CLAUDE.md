@@ -198,60 +198,30 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 
 ### Releasing a New Framework Version
 
-**When making framework changes,** follow this process to commit and tag a new version.
+**ALWAYS use the release script** at `scripts/release.sh` when releasing a new version.
 
-**Version numbering:** Patch (3.4.1) = bug fixes | Minor (3.5.0) = new features | Major (4.0.0) = breaking changes
+**Version numbering:** Patch (4.4.1) = bug fixes | Minor (4.5.0) = new features | Major (5.0.0) = breaking changes
 
-**Steps:**
+**Before running the script:**
+1. Update `CHANGELOG.md` with new version section at top
+2. Update `UPGRADE.md` with migration instructions (if needed for minor/major)
+3. Commit feature changes first
 
+**Run the release:**
 ```bash
-# 1. Update CHANGELOG.md with new version section at top (manually edit)
-
-# 1.5. Update UPGRADE.md with migration instructions
-# Add new section at top with version upgrade path
-# Include: what changed, action required, breaking changes
-
-# 2. Find and update all version references in docs
-grep -r "v4\.[0-9]\+\.0" --include="*.md" . | grep -v ".git" | grep -v "CHANGELOG.md"
-# Update: packages/cli/package.json, prompts/README.md, and any other version refs
-
-# 3. Commit feature changes
-git add CHANGELOG.md UPGRADE.md prompts/ docs/ templates/ packages/
-git commit -m "Add [feature name] (vX.Y.0)
-
-[Description]
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
-
-# 4. Commit version number updates
-git add .
-git commit -m "Update all version references to X.Y.0 throughout documentation
-
-- 00.SPEC_FRAMEWORK.md: [old] → X.Y.0
-- README.md: [old] → X.Y.0
-- CHANGELOG.md: Add version comparison links
-- All prompts updated to vX.Y.0"
-
-# 5. Create tag
-git tag -a vX.Y.0 -m "Version X.Y.0: [Brief description]
-
-New features:
-- [List]
-
-See CHANGELOG.md for details."
-
-# 6. Verify
-git log --oneline -5
-git tag -l "v4.*" | tail -3
-git status
-
-# 7. Push
-git push && git push origin vX.Y.0
+./scripts/release.sh 4.4.1           # actual release
+./scripts/release.sh 4.4.1 --dry-run # preview changes
 ```
 
-**If you need to retag:** `git tag -d vX.Y.0` then recreate and `git push --tags --force`
+**The script handles:**
+- Finding and updating all version references (package.json, prompts/README.md)
+- Checking for stale version strings
+- Committing version updates
+- Creating and pushing git tag
+- Creating GitHub release with changelog notes
+- Publishing to npm
+
+**If you need to retag:** `git tag -d vX.Y.Z` then recreate and `git push --tags --force`
 
 ---
 
