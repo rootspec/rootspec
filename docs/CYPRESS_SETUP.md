@@ -384,6 +384,28 @@ cypress run
 
 The filter is case-sensitive and matches any part of the path.
 
+**Symlinks for Cypress UI:**
+
+For clickable entries in the Cypress interactive UI, use symlinks with auto-detection:
+
+```bash
+# Create symlinks to your main test file
+cd cypress/e2e
+ln -s stories.cy.ts mvp.cy.ts
+ln -s stories.cy.ts onboarding.cy.ts
+```
+
+Then add mappings in the test file's `autoFilter` object:
+
+```typescript
+const autoFilter: Record<string, string> = {
+  'mvp.cy.ts': 'by_priority/MVP',
+  'onboarding.cy.ts': 'by_journey/ONBOARDING',
+};
+```
+
+Now clicking `mvp.cy.ts` in Cypress UI runs only MVP stories. The `--env stories=...` flag still works as an override.
+
 **Control output verbosity:**
 ```bash
 # Quiet mode (minimal output)

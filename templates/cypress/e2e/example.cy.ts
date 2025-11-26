@@ -1,17 +1,20 @@
 /**
  * Test Suite Runner
  *
- * USAGE: Use --env stories=<filter> to run specific YAML user story files.
+ * FILTERING OPTIONS:
  *
- * Examples:
- *   cypress run --env stories=by_priority/MVP
- *   cypress run --env stories=ONBOARDING
- *   cypress run                              # runs all stories
+ * 1. Command line: --env stories=<filter>
+ *      cypress run --env stories=by_priority/MVP
+ *      cypress run --env stories=ONBOARDING
+ *
+ * 2. Symlinks with auto-detection (for Cypress UI):
+ *      ln -s stories.cy.ts mvp.cy.ts
+ *      ln -s stories.cy.ts onboarding.cy.ts
+ *    Then add entries to `autoFilter` below.
+ *
+ * 3. No filter = run all stories
  *
  * The filter matches any path containing the string (case-sensitive).
- *
- * Only copy this file if you need exceptional customizations.
- * For most cases, a single test file with env filtering is sufficient.
  *
  * Test organization:
  * - Each story becomes a describe block
@@ -42,11 +45,22 @@ const rawFiles = import.meta.glob(
 ) as Record<string, string>;
 
 /**
- * Filter files based on --env stories=<filter>
- * Matches any path containing the filter string (case-sensitive).
- * No filter = run all stories.
+ * Auto-filter by spec filename (for symlink pattern).
+ * Create symlinks to this file and add mappings here:
+ *   ln -s stories.cy.ts mvp.cy.ts
+ *   ln -s stories.cy.ts onboarding.cy.ts
  */
-const storyFilter = Cypress.env('stories') as string | undefined;
+const autoFilter: Record<string, string> = {
+  // 'mvp.cy.ts': 'by_priority/MVP',
+  // 'onboarding.cy.ts': 'by_journey/ONBOARDING',
+};
+
+/**
+ * Filter priority: --env stories=<filter> > autoFilter > run all
+ */
+const storyFilter =
+  (Cypress.env('stories') as string | undefined) ?? autoFilter[Cypress.spec.name];
+
 const filteredFiles = storyFilter
   ? Object.fromEntries(
       Object.entries(rawFiles).filter(([path]) => path.includes(storyFilter))
