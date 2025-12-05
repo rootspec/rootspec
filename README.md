@@ -116,6 +116,8 @@ System Architecture (Level 4)
 Implementation & Tests (Level 5)
 ```
 
+**The seed metaphor:** Think of this framework file as a seed containing your entire specification in potential. Plant it, grow through AI conversation, harvest validated specs. Levels map to a tree: roots (philosophy) feed trunk (strategy) feed branches (patterns) feed leaves (systems) feed fruit (implementation). See [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md#the-seed-metaphor) for the full mental model.
+
 **Key benefits:**
 
 1. **Stable foundations** - Philosophy doesn't change when you adjust implementation
