@@ -24,7 +24,7 @@
 
 ---
 
-**Version 4.1.0**
+**Version 4.4.1**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -77,7 +77,7 @@ In an AI-driven world, **validation and proof are the real value generators**. C
 
 This matters because:
 
-**Non-deterministic execution requires proof.** AI systems can *claim* they implemented something, but given the non-deterministic nature of LLMs, we cannot trust claims alone. The proof is the most important part.
+**Non-deterministic execution requires proof.** AI systems can _claim_ they implemented something, but given the non-deterministic nature of LLMs, we cannot trust claims alone. The proof is the most important part.
 
 **Professional integrity demands it.** At professional, enterprise, and state-of-the-art levels, integrity matters as much as the product itself. Without proof, we cannot ship something that was built by AI. Full stop.
 
@@ -251,6 +251,7 @@ npx rootspec init --path ./docs/spec
 ```
 
 This creates:
+
 - `spec/00.SPEC_FRAMEWORK.md` - Framework definition (reference)
 - `.rootspecrc.json` - Configuration file tracking your setup
 
@@ -262,11 +263,13 @@ rootspec prompts init
 ```
 
 This command:
+
 - **Scans your project structure** (detects framework, source directories, config files)
 - **Generates a ready-to-use prompt** with your project context already filled in
 - **Outputs** a prompt you can paste directly into your AI assistant (Claude, ChatGPT, etc.)
 
 The AI will then:
+
 - Read `00.SPEC_FRAMEWORK.md` to understand the framework structure
 - Ask you questions level-by-level (WHY → WHAT → HOW → HOW MUCH)
 - Generate your complete specification files (01-05)
@@ -279,6 +282,7 @@ The AI will then:
 If you prefer not to use the CLI:
 
 1. Download the framework file:
+
    ```bash
    curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
    ```
@@ -335,12 +339,14 @@ rootspec prompts adopt
 ```
 
 **What the CLI automatically detects:**
+
 - **Framework/Stack**: Next.js, Nuxt, React, Vue, Angular, Express, Fastify, etc.
 - **Source directories**: `src/`, `lib/`, `app/`, `components/`, `pages/`, etc.
 - **Configuration files**: `tsconfig.json`, `package.json`, `vite.config.ts`, etc.
 - **Existing specification**: Detects if you have partial specs already
 
 **Example output:**
+
 ```
 🌳 Adopt RootSpec Framework
 
@@ -368,18 +374,21 @@ I have an existing Next.js project and want to adopt the RootSpec framework.
 The prompt will ask you to choose:
 
 **Specification-First (Recommended):**
+
 - Define ideal philosophy and architecture
 - Document what SHOULD exist
 - Create gap analysis vs. current state
 - Refactor incrementally toward spec
 
 **Reverse-Engineering (Pragmatic):**
+
 - Document current architecture as-is
 - Infer implicit design decisions
 - Extract retrospective philosophy
 - Validate spec matches reality
 
 The AI will then help you:
+
 - Map existing code to framework levels
 - Define Design Pillars that match your decisions
 - Create gap analysis (if Specification-First)
@@ -423,6 +432,7 @@ This framework is specifically designed for AI-assisted specification developmen
 5. AI reads framework and generates your spec files (01-05)
 
 **CLI Commands for Common Tasks:**
+
 - `rootspec prompts init` - Initialize new specification
 - `rootspec prompts adopt` - Adopt framework for existing project
 - `rootspec prompts validate` - Validate specification
@@ -614,11 +624,19 @@ When working in a directory containing these files, AI assistants will:
 - Validate against anti-patterns
 - Help create YAML user stories with test DSL
 
+**Important tip:** Instruct the AI assistant to _ask questions_. For example, when using Claude Code, add these instructions to your global CLAUDE.md.
+
+```
+Keep all responses, commit messages, and written text as clear and concise as possible. Sacrifice grammar for concision when necessary.
+
+When planning, always ask the user clarifying questions.
+```
+
 ---
 
 ## Version Information
 
-**Current Version:** 3.6.0
+**Current Version:** 4.4.1
 
 This framework follows [Semantic Versioning](https://semver.org/):
 
