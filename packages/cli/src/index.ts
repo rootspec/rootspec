@@ -5,6 +5,7 @@ import { initCommand } from './commands/init.js';
 import { cypressCommand } from './commands/cypress.js';
 import { validateCommand } from './commands/validate.js';
 import { promptsCommand } from './commands/prompts.js';
+import { deriveCommand } from './commands/derive.js';
 
 const program = new Command();
 
@@ -123,5 +124,36 @@ Examples:
   $ rootspec prompts review -o       # Open review prompt in browser
 `)
   .action(promptsCommand);
+
+program
+  .command('derive [name]')
+  .description('Derive specialized artifacts from specification levels')
+  .option('-o, --open', 'Open seed documentation in browser')
+  .addHelpText('after', `
+Description:
+  Generate specialized deliverables from your specification using derivation seeds.
+  Each seed transforms specific spec levels into external artifacts.
+
+Available Seeds:
+
+  Core Seeds:
+    technical-design  - Architecture diagrams and API specs from L4 Systems
+    ux-design         - Wireframes and user flows from L5 User Stories
+    brand-guidelines  - Voice/tone guide from L1 Design Pillars
+
+  Extended Seeds:
+    ui-design         - Visual specs from UX Design artifacts
+    analytics-plan    - Event taxonomy from L3 Interaction Architecture
+    config-schema     - JSON Schema from L5 Fine-Tuning parameters
+
+Examples:
+  $ rootspec derive                      # List all available seeds
+  $ rootspec derive technical-design     # Generate technical design prompt
+  $ rootspec derive ux-design            # Generate UX design prompt
+  $ rootspec derive ui-design            # Generate UI design prompt from UX
+  $ rootspec derive analytics-plan       # Generate analytics event taxonomy
+  $ rootspec derive config-schema        # Generate JSON Schema for config
+`)
+  .action(deriveCommand);
 
 program.parse();
