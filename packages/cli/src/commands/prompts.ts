@@ -7,6 +7,7 @@ import { createRequire } from 'module';
 import { exec } from 'child_process';
 import { getSpecDirectory, loadConfig } from '../utils/config.js';
 import { replaceTemplates } from '../utils/template.js';
+import { extractDesignPillars, extractStableTruths } from '../utils/extraction.js';
 
 // Get CLI version from package.json
 const require = createRequire(import.meta.url);
@@ -596,62 +597,6 @@ async function findSpecDirectory(): Promise<SpecInfo> {
   }
 
   return { found: false, dir: '.' };
-}
-
-async function extractDesignPillars(specDir: string): Promise<string[]> {
-  const cwd = process.cwd();
-  const l1Path = path.join(cwd, specDir, '01.FOUNDATIONAL_PHILOSOPHY.md');
-
-  if (!await fs.pathExists(l1Path)) {
-    return [];
-  }
-
-  try {
-    const content = await fs.readFile(l1Path, 'utf-8');
-    const pillars: string[] = [];
-
-    // Look for Design Pillars section and extract pillar names
-    const pillarSection = content.match(/##\s+Design Pillars[\s\S]*?(?=\n##\s|\n#\s|$)/i);
-    if (pillarSection) {
-      // Match markdown headers (### Pillar Name) within the section
-      const pillarMatches = pillarSection[0].matchAll(/###\s+(.+?)(?:\n|$)/g);
-      for (const match of pillarMatches) {
-        pillars.push(match[1].trim());
-      }
-    }
-
-    return pillars;
-  } catch (e) {
-    return [];
-  }
-}
-
-async function extractStableTruths(specDir: string): Promise<string[]> {
-  const cwd = process.cwd();
-  const l2Path = path.join(cwd, specDir, '02.STABLE_TRUTHS.md');
-
-  if (!await fs.pathExists(l2Path)) {
-    return [];
-  }
-
-  try {
-    const content = await fs.readFile(l2Path, 'utf-8');
-    const truths: string[] = [];
-
-    // Extract section headers (## Truth Name)
-    const truthMatches = content.matchAll(/##\s+(.+?)(?:\n|$)/g);
-    for (const match of truthMatches) {
-      const truth = match[1].trim();
-      // Skip common meta-sections
-      if (!truth.match(/^(Overview|Introduction|Summary)/i)) {
-        truths.push(truth);
-      }
-    }
-
-    return truths;
-  } catch (e) {
-    return [];
-  }
 }
 
 async function listSystems(specDir: string): Promise<string[]> {

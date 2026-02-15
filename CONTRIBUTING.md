@@ -28,9 +28,10 @@ This project adheres to a Code of Conduct that all contributors are expected to 
 
 ### Before You Start
 
-1. **Search existing issues** to avoid duplicates
-2. **Discuss major changes** in an issue before implementing
-3. **Follow the project philosophy**: Remember, philosophy guides implementation!
+1. **Check [KNOWN_ISSUES.md](KNOWN_ISSUES.md)** for known bugs and limitations
+2. **Search existing issues** to avoid duplicates
+3. **Discuss major changes** in an issue before implementing
+4. **Follow the project philosophy**: Remember, philosophy guides implementation!
 
 ## Development Setup
 
