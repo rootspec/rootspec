@@ -17,7 +17,7 @@ Please ensure you have Level 5 FINE_TUNING YAML files before deriving schema
 
 ## What I Need
 
-Derive **JSON Schema** from my Level 5 Fine-Tuning parameters.
+Extend **JSON Schema** from my Level 5 Fine-Tuning parameters.
 
 The output should include:
 1. **JSON Schema v7 definitions** - One schema per FINE_TUNING file
@@ -120,7 +120,7 @@ For each parameter, determine JSON Schema type:
 - Infer types from actual YAML values
 - Use `@constraints` type hints if present
 - Recurse for nested objects/arrays
-- No type invention (derive from data)
+- No type invention (extend from data)
 
 ### PHASE 3: EXTRACT VALIDATION RULES
 
@@ -689,4 +689,4 @@ Before delivering the JSON Schema documentation, verify:
 
 ---
 
-**Note:** This is schema derivation from FINE_TUNING YAML. Every schema element must trace to annotations or values in the YAML files. Validation rules come ONLY from `@constraints` annotations—don't add constraints that aren't documented. If the YAML lacks `@constraints`, the schema should only enforce type, not range or format.
+**Note:** This is schema extension from FINE_TUNING YAML. Every schema element must trace to annotations or values in the YAML files. Validation rules come ONLY from `@constraints` annotations—don't add constraints that aren't documented. If the YAML lacks `@constraints`, the schema should only enforce type, not range or format.

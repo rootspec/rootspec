@@ -25,12 +25,12 @@ Please ensure you have Level 3 specification before deriving analytics
 
 ## What I Need
 
-Derive an **Analytics Event Taxonomy** from my Level 3 Interaction Architecture.
+Extend an **Analytics Event Taxonomy** from my Level 3 Interaction Architecture.
 
 The output should include:
 1. **Event catalog** - All trackable events organized by interaction scale
 2. **Event naming conventions** - Consistent naming based on L3 pattern terminology
-3. **Event properties** - Parameters derived from loop states and conditions
+3. **Event properties** - Parameters extended from loop states and conditions
 4. **Journey milestones** - Key transition points across interaction scales
 5. **Edge case events** - Tracking for failure modes and error conditions
 
@@ -126,7 +126,7 @@ For each interaction loop, define event sequence:
 
 **Requirements:**
 - Event names use L3 pattern terminology (don't invent names)
-- Event properties derive from loop states and parameters
+- Event properties extend from loop states and parameters
 - Entry/action/exit events for complete loop tracking
 - Success and failure paths both tracked
 
@@ -139,7 +139,7 @@ Group events by time scale from L3:
 ```markdown
 ## Event Catalog
 
-**Source:** @spec_source Derived from 03.INTERACTION_ARCHITECTURE.md multi-scale architecture
+**Source:** @spec_source Extended from 03.INTERACTION_ARCHITECTURE.md multi-scale architecture
 
 ### Immediate Events (Seconds)
 **Patterns:** Single actions, instant feedback
@@ -241,7 +241,7 @@ Establish naming rules based on L3 patterns:
 - `priority`: mvp | post_mvp (from user stories)
 
 **Pattern-Specific Properties:**
-- Derived from L3 loop states
+- Extended from L3 loop states
 - Use snake_case
 - Match L3 terminology
 ```
@@ -250,7 +250,7 @@ Establish naming rules based on L3 patterns:
 - Naming convention uses L3 terminology
 - Rules are consistent and predictable
 - Standard properties defined
-- Pattern-specific properties derived from L3
+- Pattern-specific properties extended from L3
 
 ### PHASE 5: DEFINE EVENT PROPERTIES
 
@@ -261,7 +261,7 @@ For each event, specify properties from L3:
 ```markdown
 ## Event Properties
 
-**Source:** @spec_source Derived from loop states and parameters in 03.INTERACTION_ARCHITECTURE.md
+**Source:** @spec_source Extended from loop states and parameters in 03.INTERACTION_ARCHITECTURE.md
 
 ### Event: [event_name]
 
@@ -306,7 +306,7 @@ For each event, specify properties from L3:
 ```
 
 **Requirements:**
-- Properties derive from L3 loop states
+- Properties extend from L3 loop states
 - No invented properties (must trace to L3)
 - Types and requirements explicit
 - Example payload shows actual usage
@@ -320,7 +320,7 @@ Map key transition points across scales:
 ```markdown
 ## Journey Milestones
 
-**Source:** @spec_source Derived from multi-scale transitions in 03.INTERACTION_ARCHITECTURE.md
+**Source:** @spec_source Extended from multi-scale transitions in 03.INTERACTION_ARCHITECTURE.md
 
 ### Milestone: [Milestone Name]
 
@@ -354,7 +354,7 @@ Map key transition points across scales:
 ```
 
 **Requirements:**
-- Milestones derive from L3 scale transitions
+- Milestones extend from L3 scale transitions
 - Clearly mark scale boundaries
 - Properties capture transition context
 - Aligned with L3 journey definitions
@@ -368,7 +368,7 @@ Track failure modes from L3:
 ```markdown
 ## Edge Case Events
 
-**Source:** @spec_source Derived from failure modes in 03.INTERACTION_ARCHITECTURE.md
+**Source:** @spec_source Extended from failure modes in 03.INTERACTION_ARCHITECTURE.md
 
 ### Pattern: [L3 Pattern Name]
 
@@ -402,7 +402,7 @@ If L3 documents recovery patterns:
 ```
 
 **Requirements:**
-- Error events derive from L3 failure modes
+- Error events extend from L3 failure modes
 - Don't invent errors not in L3
 - Include recovery tracking if L3 documents it
 - Properties capture diagnostic context
@@ -502,7 +502,7 @@ Before delivering the Analytics Event Taxonomy, verify:
 
 - [ ] All L3 patterns have corresponding events
 - [ ] Event names use L3 terminology (not invented)
-- [ ] Properties derive from L3 loop states
+- [ ] Properties extend from L3 loop states
 - [ ] Events organized by L3 multi-scale architecture
 - [ ] Journey milestones mark scale transitions
 - [ ] Edge case events trace to L3 failure modes
@@ -515,4 +515,4 @@ Before delivering the Analytics Event Taxonomy, verify:
 
 ---
 
-**Note:** This is an event TAXONOMY (what to track), not a metrics definition (how to measure). Every event must derive from Level 3 Interaction Architecture. Don't invent events that aren't grounded in documented patterns. If tracking seems needed but L3 doesn't support it, note as a gap in the spec.
+**Note:** This is an event TAXONOMY (what to track), not a metrics definition (how to measure). Every event must extend from Level 3 Interaction Architecture. Don't invent events that aren't grounded in documented patterns. If tracking seems needed but L3 doesn't support it, note as a gap in the spec.

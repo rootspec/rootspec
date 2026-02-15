@@ -5,6 +5,38 @@ All notable changes to **RootSpec** (Hierarchical Specification Framework) will 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+#### Terminology: "Derive/Seeds" → "Extend/Extension Types"
+
+**Renamed CLI command and updated metaphor** - Better alignment with root system mental model and clearer DX.
+
+**Breaking Changes:**
+- **CLI command renamed:** `rootspec derive` → `rootspec extend`
+- **Prompt files renamed:** `derive-*.md` → `extend-*.md`
+- **Terminology updated:** "derivation seeds" → "extension types"
+
+**Improvements:**
+- Added dependency tracking (ui-design shows "requires ux-design first")
+- Clearer terminology throughout documentation
+- Removed confusing dual-use of "seed" metaphor
+
+**Migration:**
+- Update any scripts using `rootspec derive` to use `rootspec extend`
+- Update documentation references from "derivation" to "extension"
+- Prompt content remains functionally identical
+
+**Rationale:** The "seed" metaphor was strained—seeds don't produce other seeds.
+The new "root extensions" metaphor aligns with the existing root system metaphor
+(spec as roots, product as tree) and accurately captures how specialized artifacts
+extend from the specification foundation.
+
+### Removed
+
+- `docs/SEEDS_ROADMAP.md` - Content was aspirational roadmap; features are now implemented
+
 ## [4.4.1] - 2025-11-25
 
 ### Added
@@ -1228,7 +1260,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.4.1...HEAD
 [4.1.0]: https://github.com/rootspec/rootspec/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/rootspec/rootspec/compare/v3.6.0...v4.0.0
 [3.6.0]: https://github.com/rootspec/rootspec/compare/v3.5.2...v3.6.0
