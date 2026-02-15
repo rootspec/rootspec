@@ -42,6 +42,21 @@
 
 ---
 
+## ✅ Completed - v4.4.2 Improvements
+
+### Testing & Quality
+- [x] Comprehensive integration testing (TaskFlow spec, 44 minutes, 92/100 score)
+- [x] Fix Design Pillar extraction bug (only extracted 1 of 3 pillars)
+- [x] Create shared extraction utilities to eliminate code duplication
+- [x] Document known issues in KNOWN_ISSUES.md
+
+### Bug Fixes
+- [x] Fix regex pattern for Design Pillar extraction
+- [x] Consolidate duplicate extraction code between `prompts.ts` and `extend.ts`
+- [x] Improve extraction reliability with `Array.from()` for iterators
+
+---
+
 ## 📋 Pending - Post-Launch Tasks
 
 ### Week 2-3: Automation & Code Quality (Medium Priority)

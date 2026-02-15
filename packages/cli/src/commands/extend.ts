@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { getSpecDirectory } from '../utils/config.js';
 import { replaceTemplates } from '../utils/template.js';
+import { extractDesignPillars, extractInteractionPatterns } from '../utils/extraction.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -249,7 +250,7 @@ async function runBrandGuidelinesPrompt(): Promise<void> {
   console.log(chalk.green(`  ✓ Found specification in ${specDir}/`));
 
   // Extract design pillars
-  const designPillars = await extractDesignPillars(cwd, specDir);
+  const designPillars = await extractDesignPillars(specDir, cwd);
   if (designPillars.length > 0) {
     console.log(chalk.green(`  ✓ Found ${designPillars.length} Design Pillar(s): ${designPillars.join(', ')}`));
   } else {
@@ -348,34 +349,6 @@ async function extractJourneys(cwd: string, specDir: string, userStories: string
   return Array.from(journeys);
 }
 
-// Helper: Extract design pillars from Level 1
-async function extractDesignPillars(cwd: string, specDir: string): Promise<string[]> {
-  const l1Path = path.join(cwd, specDir, '01.FOUNDATIONAL_PHILOSOPHY.md');
-
-  if (!await fs.pathExists(l1Path)) {
-    return [];
-  }
-
-  const content = await fs.readFile(l1Path, 'utf-8');
-
-  // Find Design Pillars section and extract pillar names
-  const pillarsMatch = content.match(/##\s+Design Pillars\s+([\s\S]*?)(?=\n##|$)/i);
-
-  if (!pillarsMatch) {
-    return [];
-  }
-
-  const pillarsSection = pillarsMatch[1];
-  const pillarNames: string[] = [];
-
-  // Match ### headings for pillar names
-  const h3Matches = pillarsSection.match(/###\s+([^\n]+)/g);
-  if (h3Matches) {
-    pillarNames.push(...h3Matches.map(m => m.replace(/###\s+/, '').trim()));
-  }
-
-  return pillarNames;
-}
 
 // ============================================================================
 // Additional Extension Types: UI Design, Analytics Plan, Config Schema
@@ -451,7 +424,7 @@ async function runAnalyticsPlanPrompt(): Promise<void> {
   }
 
   // Extract interaction patterns
-  const interactionPatterns = await extractInteractionPatterns(cwd, specDir);
+  const interactionPatterns = await extractInteractionPatterns(specDir, cwd);
   if (interactionPatterns.length > 0) {
     console.log(chalk.green(`  ✓ Found ${interactionPatterns.length} interaction pattern(s): ${interactionPatterns.slice(0, 3).join(', ')}${interactionPatterns.length > 3 ? '...' : ''}`));
   } else {
@@ -540,39 +513,6 @@ async function findUXDesignDocument(cwd: string): Promise<string | null> {
   }
 
   return null;
-}
-
-// Helper: Extract interaction patterns from L3
-async function extractInteractionPatterns(cwd: string, specDir: string): Promise<string[]> {
-  const l3Path = path.join(cwd, specDir, '03.INTERACTION_ARCHITECTURE.md');
-
-  if (!await fs.pathExists(l3Path)) {
-    return [];
-  }
-
-  const content = await fs.readFile(l3Path, 'utf-8');
-  const patterns: string[] = [];
-
-  // Extract pattern names from:
-  // 1. Section headings (## Pattern Name, ### Pattern Name)
-  // 2. Loop names (often in bold or as table headers)
-
-  const headingMatches = content.match(/###?\s+([^\n]+)/g);
-  if (headingMatches) {
-    patterns.push(...headingMatches.map(m => m.replace(/###?\s+/, '').trim()));
-  }
-
-  // Also look for "Loop:" or "Pattern:" prefixed items
-  const loopMatches = content.match(/(?:Loop|Pattern):\s*([^\n]+)/gi);
-  if (loopMatches) {
-    patterns.push(...loopMatches.map(m => m.replace(/(?:Loop|Pattern):\s*/i, '').trim()));
-  }
-
-  // Deduplicate and filter out common headings
-  const filtered = [...new Set(patterns)]
-    .filter(p => !['Overview', 'Introduction', 'Summary', 'Interaction Architecture', 'Level 3'].includes(p));
-
-  return filtered;
 }
 
 // Helper: List Fine-Tuning files

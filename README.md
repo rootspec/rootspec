@@ -665,4 +665,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contributing
 
-[Add contribution guidelines here]
+We welcome contributions! Please see:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development guidelines and contribution process
+- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - Known bugs and limitations
+- [docs/ROADMAP.md](docs/ROADMAP.md) - Feature roadmap and priorities
+
+Found a bug? Check [KNOWN_ISSUES.md](KNOWN_ISSUES.md) first, then [file an issue](https://github.com/rootspec/rootspec/issues/new/choose).
