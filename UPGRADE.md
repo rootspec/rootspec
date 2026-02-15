@@ -4,6 +4,39 @@ Migration instructions for upgrading between RootSpec versions.
 
 ---
 
+## Upgrading to 4.5.0 from 4.4.x
+
+**Release Date:** 2026-02-15
+
+### What's New
+
+**New `rootspec extend` Command:**
+- Generate specialized artifacts from your specification
+- 6 extension types: technical-design, ux-design, brand-guidelines, ui-design, analytics-plan, config-schema
+- Auto-detects your spec context for ready-to-use prompts
+
+**Bug Fixes:**
+- Fixed Design Pillar extraction (now correctly extracts all pillars)
+- Created shared extraction utilities for better reliability
+
+### Action Required
+
+```bash
+npm install -g rootspec@4.5.0
+```
+
+### Breaking Changes
+
+None - this is a feature release with bug fixes.
+
+**Try the new extend command:**
+```bash
+rootspec extend                    # List available extension types
+rootspec extend brand-guidelines   # Generate brand guidelines prompt
+```
+
+---
+
 ## Upgrading to 4.4.0 from 4.3.x
 
 **Release Date:** 2025-11-25
