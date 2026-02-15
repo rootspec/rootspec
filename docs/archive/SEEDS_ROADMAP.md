@@ -1,5 +1,9 @@
 # Derivation Seeds Roadmap
 
+> **Note:** This document was a vision/roadmap for the derivation feature.
+> The feature is now implemented as "root extensions" (`rootspec extend`).
+> This file is archived for historical context.
+
 Vision document for expanding RootSpec's derivation capabilities.
 
 ---

@@ -116,7 +116,7 @@ System Architecture (Level 4)
 Implementation & Tests (Level 5)
 ```
 
-**The seed metaphor:** Think of this framework file as a seed containing your entire specification in potential. Plant it, grow through AI conversation, harvest validated specs. Levels map to a tree: roots (philosophy) feed trunk (strategy) feed branches (patterns) feed leaves (systems) feed fruit (implementation). See [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md#the-seed-metaphor) for the full mental model.
+**The root system metaphor:** Think of this framework file as a seed that grows into your specification root system. Plant it, grow through AI conversation, extend with specialized artifacts. Levels map to a tree: roots (philosophy) feed trunk (strategy) feed branches (patterns) feed leaves (systems) feed fruit (implementation). Root extensions let you derive technical designs, UX wireframes, brand guidelines, and more from your spec. See [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md#the-seed-metaphor) for the full mental model.
 
 **Key benefits:**
 
@@ -439,6 +439,15 @@ This framework is specifically designed for AI-assisted specification developmen
 - `rootspec prompts add-feature` - Add feature to spec
 - `rootspec prompts review` - Review feature against spec
 - `rootspec prompts` - See all available prompts
+
+**Root Extensions (Specialized Artifacts):**
+
+- `rootspec extend` - List available extension types
+- `rootspec extend technical-design` - Generate architecture docs from L4 Systems
+- `rootspec extend ux-design` - Generate wireframes from L5 User Stories
+- `rootspec extend brand-guidelines` - Generate brand voice from L1 Design Pillars
+
+Extensions transform your specification into specialized deliverables. Run `rootspec extend` to see all available types and their dependencies.
 
 **📚 Full prompt library:** See [prompts/](prompts/) directory for detailed prompt templates (auto-filled by CLI)
 

@@ -5,7 +5,7 @@ import { initCommand } from './commands/init.js';
 import { cypressCommand } from './commands/cypress.js';
 import { validateCommand } from './commands/validate.js';
 import { promptsCommand } from './commands/prompts.js';
-import { deriveCommand } from './commands/derive.js';
+import { extendCommand } from './commands/extend.js';
 
 const program = new Command();
 
@@ -126,34 +126,34 @@ Examples:
   .action(promptsCommand);
 
 program
-  .command('derive [name]')
-  .description('Derive specialized artifacts from specification levels')
-  .option('-o, --open', 'Open seed documentation in browser')
+  .command('extend [name]')
+  .description('Extend your specification with specialized artifacts')
+  .option('-o, --open', 'Open extension documentation in browser')
   .addHelpText('after', `
 Description:
-  Generate specialized deliverables from your specification using derivation seeds.
-  Each seed transforms specific spec levels into external artifacts.
+  Generate specialized deliverables from your specification using extension types.
+  Each extension type transforms specific spec levels into external artifacts.
 
-Available Seeds:
+Available Extension Types:
 
-  Core Seeds:
+  Core Extension Types:
     technical-design  - Architecture diagrams and API specs from L4 Systems
     ux-design         - Wireframes and user flows from L5 User Stories
     brand-guidelines  - Voice/tone guide from L1 Design Pillars
 
-  Extended Seeds:
-    ui-design         - Visual specs from UX Design artifacts
+  Additional Extension Types:
+    ui-design         - Visual specs from UX Design (requires ux-design first)
     analytics-plan    - Event taxonomy from L3 Interaction Architecture
     config-schema     - JSON Schema from L5 Fine-Tuning parameters
 
 Examples:
-  $ rootspec derive                      # List all available seeds
-  $ rootspec derive technical-design     # Generate technical design prompt
-  $ rootspec derive ux-design            # Generate UX design prompt
-  $ rootspec derive ui-design            # Generate UI design prompt from UX
-  $ rootspec derive analytics-plan       # Generate analytics event taxonomy
-  $ rootspec derive config-schema        # Generate JSON Schema for config
+  $ rootspec extend                      # List all available extension types
+  $ rootspec extend technical-design     # Generate technical design prompt
+  $ rootspec extend ux-design            # Generate UX design prompt
+  $ rootspec extend ui-design            # Generate UI design prompt from UX
+  $ rootspec extend analytics-plan       # Generate analytics event taxonomy
+  $ rootspec extend config-schema        # Generate JSON Schema for config
 `)
-  .action(deriveCommand);
+  .action(extendCommand);
 
 program.parse();

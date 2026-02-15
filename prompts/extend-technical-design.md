@@ -16,7 +16,7 @@ Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
 ## What I Need
 
-Derive a **Technical Design Document** from my Level 4 Systems specifications.
+Extend a **Technical Design Document** from my Level 4 Systems specifications.
 
 The output should include:
 1. **Architecture diagrams** - System interconnections (Mermaid syntax)
@@ -88,7 +88,7 @@ For each system that exposes APIs:
 Endpoint: POST /api/system-a/operation
 Source: @spec_source 04.SYSTEMS/SYSTEM_A.md#operations
 
-Description: [Derived from system responsibility]
+Description: [Extended from system responsibility]
 
 Request:
 {
@@ -106,7 +106,7 @@ Error Cases: [From system failure modes]
 
 ### PHASE 4: DATA MODELS
 
-Derive entity schemas from system documentation:
+Extend entity schemas from system documentation:
 
 **For each entity mentioned in systems:**
 
@@ -431,7 +431,7 @@ For areas where user said NO, document the decision and manual process.
 
 ## Traceability Requirements
 
-**Every derived element MUST:**
+**Every extended element MUST:**
 1. Include `@spec_source` comment with file path
 2. Reference specific section/line when possible
 3. Note alignment with L2 design strategies (if applicable)
@@ -556,7 +556,7 @@ Before delivering the Technical Design Document, verify:
 - [ ] Sequence diagrams match described flows
 - [ ] Every section has `@spec_source` annotations
 - [ ] Mermaid diagrams render correctly
-- [ ] No invented features (only derive from spec)
+- [ ] No invented features (only extend from spec)
 
 **Workflow Controls (Section 6):**
 - [ ] All 5 workflow areas addressed (dev server, branch, commit, changelog, release)
@@ -572,4 +572,4 @@ Before delivering the Technical Design Document, verify:
 
 ---
 
-**Note:** This is a derivation, not invention. Every design element must trace back to your Level 4 specifications. If something seems missing, note it as a gap in the spec rather than inventing new details.
+**Note:** This is a extension, not invention. Every design element must trace back to your Level 4 specifications. If something seems missing, note it as a gap in the spec rather than inventing new details.

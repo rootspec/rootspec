@@ -10,59 +10,61 @@ const __dirname = path.dirname(__filename);
 const FRAMEWORK_ROOT = path.resolve(__dirname, '..');
 const PROMPTS_DIR = path.join(FRAMEWORK_ROOT, 'prompts');
 
-interface DeriveOptions {
+interface ExtendOptions {
   open?: boolean;
 }
 
-interface SeedInfo {
+interface ExtensionTypeInfo {
   file: string;
   description: string;
   input: string;
   output: string;
+  requires?: string;
 }
 
-const SEEDS: Record<string, SeedInfo> = {
+const EXTENSION_TYPES: Record<string, ExtensionTypeInfo> = {
   'technical-design': {
-    file: 'derive-technical-design.md',
+    file: 'extend-technical-design.md',
     description: 'Technical Design Document from Level 4 Systems',
     input: 'L4 Systems',
     output: 'Architecture diagrams, API specs, data models',
   },
   'ux-design': {
-    file: 'derive-ux-design.md',
+    file: 'extend-ux-design.md',
     description: 'UX Design artifacts from Level 5 User Stories',
     input: 'L5 USER_STORIES',
     output: 'Wireframes, user flows, screen specs',
   },
   'brand-guidelines': {
-    file: 'derive-brand-guidelines.md',
+    file: 'extend-brand-guidelines.md',
     description: 'Brand Guidelines from Level 1 Design Pillars',
     input: 'L1 Design Pillars',
     output: 'Voice/tone guide, brand principles',
   },
   'ui-design': {
-    file: 'derive-ui-design.md',
+    file: 'extend-ui-design.md',
     description: 'UI Design specifications from UX Design artifacts',
     input: 'UX Design Document',
     output: 'Visual specs, component library design',
+    requires: 'ux-design',
   },
   'analytics-plan': {
-    file: 'derive-analytics-plan.md',
+    file: 'extend-analytics-plan.md',
     description: 'Analytics event taxonomy from Level 3 Interaction Architecture',
     input: 'L3 Interaction Patterns',
     output: 'Event catalog, tracking specifications',
   },
   'config-schema': {
-    file: 'derive-config-schema.md',
+    file: 'extend-config-schema.md',
     description: 'JSON Schema from Level 5 Fine-Tuning parameters',
     input: 'L5 FINE_TUNING',
     output: 'JSON Schema with validation rules',
   },
 };
 
-export async function deriveCommand(name?: string, options?: DeriveOptions): Promise<void> {
+export async function extendCommand(name?: string, options?: ExtendOptions): Promise<void> {
   try {
-    await runDeriveCommand(name, options);
+    await runExtendCommand(name, options);
   } catch (error) {
     if (error instanceof Error && error.name === 'ExitPromptError') {
       console.log(chalk.gray('\nCancelled.'));
@@ -72,30 +74,35 @@ export async function deriveCommand(name?: string, options?: DeriveOptions): Pro
   }
 }
 
-async function runDeriveCommand(name?: string, options?: DeriveOptions): Promise<void> {
-  // No name = list all seeds
+async function runExtendCommand(name?: string, options?: ExtendOptions): Promise<void> {
+  // No name = list all extension types
   if (!name) {
-    console.log(chalk.bold('\n🌱 Available Derivation Seeds\n'));
+    console.log(chalk.bold('\n🌿 Available Extension Types\n'));
 
-    for (const [key, info] of Object.entries(SEEDS)) {
+    for (const [key, info] of Object.entries(EXTENSION_TYPES)) {
       console.log(chalk.cyan(`  ${key.padEnd(20)}`), info.description);
       console.log(chalk.gray(`  ${' '.repeat(20)} Input:  ${info.input}`));
-      console.log(chalk.gray(`  ${' '.repeat(20)} Output: ${info.output}\n`));
+      console.log(chalk.gray(`  ${' '.repeat(20)} Output: ${info.output}`));
+
+      if (info.requires) {
+        console.log(chalk.yellow(`  ${' '.repeat(20)} Requires: ${info.requires} (run that first)`));
+      }
+      console.log();
     }
 
     console.log(chalk.gray('Usage:'));
-    console.log(chalk.gray('  rootspec derive <name>        Generate derivation prompt\n'));
+    console.log(chalk.gray('  rootspec extend <name>        Extend spec with specialized artifacts\n'));
     console.log(chalk.gray('Examples:'));
-    console.log(chalk.cyan('  rootspec derive technical-design'));
+    console.log(chalk.cyan('  rootspec extend technical-design'));
     console.log();
     return;
   }
 
-  // Validate seed exists
-  const seed = SEEDS[name];
-  if (!seed) {
-    console.log(chalk.red(`\n❌ Unknown seed: ${name}`));
-    console.log(chalk.gray(`\nAvailable seeds: ${Object.keys(SEEDS).join(', ')}\n`));
+  // Validate extension type exists
+  const extensionType = EXTENSION_TYPES[name];
+  if (!extensionType) {
+    console.log(chalk.red(`\n❌ Unknown extension type: ${name}`));
+    console.log(chalk.gray(`\nAvailable extension types: ${Object.keys(EXTENSION_TYPES).join(', ')}\n`));
     return;
   }
 
@@ -132,7 +139,7 @@ async function runDeriveCommand(name?: string, options?: DeriveOptions): Promise
 }
 
 async function runTechnicalDesignPrompt(): Promise<void> {
-  console.log(chalk.bold('\n🏗️  Derive Technical Design\n'));
+  console.log(chalk.bold('\n🏗️  Extend Technical Design\n'));
   console.log(chalk.gray('Analyzing your specification...\n'));
 
   // Find spec directory
@@ -160,7 +167,7 @@ async function runTechnicalDesignPrompt(): Promise<void> {
   console.log();
 
   // Load and fill template
-  const templatePath = path.join(PROMPTS_DIR, 'derive-technical-design.md');
+  const templatePath = path.join(PROMPTS_DIR, 'extend-technical-design.md');
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const filledPrompt = replaceTemplates(template, {
@@ -176,7 +183,7 @@ async function runTechnicalDesignPrompt(): Promise<void> {
 }
 
 async function runUXDesignPrompt(): Promise<void> {
-  console.log(chalk.bold('\n🎨 Derive UX Design\n'));
+  console.log(chalk.bold('\n🎨 Extend UX Design\n'));
   console.log(chalk.gray('Analyzing your specification...\n'));
 
   const cwd = process.cwd();
@@ -210,7 +217,7 @@ async function runUXDesignPrompt(): Promise<void> {
   console.log(chalk.gray('─'.repeat(70)));
   console.log();
 
-  const templatePath = path.join(PROMPTS_DIR, 'derive-ux-design.md');
+  const templatePath = path.join(PROMPTS_DIR, 'extend-ux-design.md');
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const filledPrompt = replaceTemplates(template, {
@@ -228,7 +235,7 @@ async function runUXDesignPrompt(): Promise<void> {
 }
 
 async function runBrandGuidelinesPrompt(): Promise<void> {
-  console.log(chalk.bold('\n✨ Derive Brand Guidelines\n'));
+  console.log(chalk.bold('\n✨ Extend Brand Guidelines\n'));
   console.log(chalk.gray('Analyzing your specification...\n'));
 
   const cwd = process.cwd();
@@ -254,7 +261,7 @@ async function runBrandGuidelinesPrompt(): Promise<void> {
   console.log(chalk.gray('─'.repeat(70)));
   console.log();
 
-  const templatePath = path.join(PROMPTS_DIR, 'derive-brand-guidelines.md');
+  const templatePath = path.join(PROMPTS_DIR, 'extend-brand-guidelines.md');
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const filledPrompt = replaceTemplates(template, {
@@ -371,11 +378,11 @@ async function extractDesignPillars(cwd: string, specDir: string): Promise<strin
 }
 
 // ============================================================================
-// Phase 3 Seeds: UI Design, Analytics Plan, Config Schema
+// Additional Extension Types: UI Design, Analytics Plan, Config Schema
 // ============================================================================
 
 async function runUIDesignPrompt(): Promise<void> {
-  console.log(chalk.bold('\n🎨 Derive UI Design\n'));
+  console.log(chalk.bold('\n🎨 Extend UI Design\n'));
   console.log(chalk.gray('Analyzing your specification...\n'));
 
   const cwd = process.cwd();
@@ -396,7 +403,7 @@ async function runUIDesignPrompt(): Promise<void> {
     console.log(chalk.green(`  ✓ Found UX Design document at ${uxDesignFile}`));
   } else {
     console.log(chalk.yellow('  ⚠️  No UX Design document found at conventional location'));
-    console.log(chalk.gray('     Run `rootspec derive ux-design` first'));
+    console.log(chalk.gray('     Run `rootspec extend ux-design` first'));
   }
 
   console.log();
@@ -404,7 +411,7 @@ async function runUIDesignPrompt(): Promise<void> {
   console.log(chalk.gray('─'.repeat(70)));
   console.log();
 
-  const templatePath = path.join(PROMPTS_DIR, 'derive-ui-design.md');
+  const templatePath = path.join(PROMPTS_DIR, 'extend-ui-design.md');
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const filledPrompt = replaceTemplates(template, {
@@ -420,7 +427,7 @@ async function runUIDesignPrompt(): Promise<void> {
 }
 
 async function runAnalyticsPlanPrompt(): Promise<void> {
-  console.log(chalk.bold('\n📊 Derive Analytics Plan\n'));
+  console.log(chalk.bold('\n📊 Extend Analytics Plan\n'));
   console.log(chalk.gray('Analyzing your specification...\n'));
 
   const cwd = process.cwd();
@@ -456,7 +463,7 @@ async function runAnalyticsPlanPrompt(): Promise<void> {
   console.log(chalk.gray('─'.repeat(70)));
   console.log();
 
-  const templatePath = path.join(PROMPTS_DIR, 'derive-analytics-plan.md');
+  const templatePath = path.join(PROMPTS_DIR, 'extend-analytics-plan.md');
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const filledPrompt = replaceTemplates(template, {
@@ -472,7 +479,7 @@ async function runAnalyticsPlanPrompt(): Promise<void> {
 }
 
 async function runConfigSchemaPrompt(): Promise<void> {
-  console.log(chalk.bold('\n📋 Derive Config Schema\n'));
+  console.log(chalk.bold('\n📋 Extend Config Schema\n'));
   console.log(chalk.gray('Analyzing your specification...\n'));
 
   const cwd = process.cwd();
@@ -498,7 +505,7 @@ async function runConfigSchemaPrompt(): Promise<void> {
   console.log(chalk.gray('─'.repeat(70)));
   console.log();
 
-  const templatePath = path.join(PROMPTS_DIR, 'derive-config-schema.md');
+  const templatePath = path.join(PROMPTS_DIR, 'extend-config-schema.md');
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const filledPrompt = replaceTemplates(template, {

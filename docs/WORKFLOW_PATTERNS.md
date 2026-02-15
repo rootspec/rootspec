@@ -2,7 +2,7 @@
 
 **Purpose:** Document proven workflow automation patterns from SpriteStory and RootSpec for reference when deriving technical design specifications.
 
-**Context:** When using `rootspec derive technical-design`, the AI recommends workflow controls based on these patterns. This document provides implementation insights for users who adopt these controls.
+**Context:** When using `rootspec extend technical-design`, the AI recommends workflow controls based on these patterns. This document provides implementation insights for users who adopt these controls.
 
 ---
 

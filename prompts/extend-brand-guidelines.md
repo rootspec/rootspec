@@ -16,7 +16,7 @@ Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
 ## What I Need
 
-Derive **Brand Guidelines** from my Level 1 Design Pillars.
+Extend **Brand Guidelines** from my Level 1 Design Pillars.
 
 The output should include:
 1. **Voice and tone principles** - How the brand communicates
@@ -79,7 +79,7 @@ For each Design Pillar, extract:
 ```
 
 **Requirements:**
-- Extract, don't invent (derive from pillar descriptions)
+- Extract, don't invent (extend from pillar descriptions)
 - Focus on HOW the pillar makes users FEEL
 - Translate technical/product language into brand language
 
@@ -92,7 +92,7 @@ Synthesize emotional qualities into brand voice:
 ```markdown
 ## Brand Voice
 
-**Source:** @spec_source Derived from all Design Pillars in 01.FOUNDATIONAL_PHILOSOPHY.md
+**Source:** @spec_source Extended from all Design Pillars in 01.FOUNDATIONAL_PHILOSOPHY.md
 
 ### Overall Voice
 
@@ -174,7 +174,7 @@ For each guideline, show practical application:
 ```markdown
 ### Example: [Guideline Name]
 
-**Source:** @spec_source Derived from pillar: [Pillar Name]
+**Source:** @spec_source Extended from pillar: [Pillar Name]
 
 #### ✅ On-Brand
 
@@ -222,7 +222,7 @@ Create traceability matrix:
 
 **Traceability Matrix:**
 
-| Guideline | Type | Derived From Pillar(s) | Key Feeling | Application Context |
+| Guideline | Type | Extended From Pillar(s) | Key Feeling | Application Context |
 |-----------|------|------------------------|-------------|---------------------|
 | Voice: [Trait] | Voice | [Pillar X] | [Emotion] | All communications |
 | Tone: Errors | Tone | [Pillar Y] | [Emotion] | Error handling |
@@ -311,7 +311,7 @@ Before delivering the Brand Guidelines, verify:
 - [ ] All Design Pillars are represented
 - [ ] Every guideline traces to specific pillar(s)
 - [ ] Emotional qualities extracted, not invented
-- [ ] Voice traits derive from pillar descriptions
+- [ ] Voice traits extend from pillar descriptions
 - [ ] Tone variations align with pillar goals
 - [ ] Examples clearly demonstrate on/off-brand
 - [ ] No generic brand advice (must be specific to these pillars)
@@ -321,4 +321,4 @@ Before delivering the Brand Guidelines, verify:
 
 ---
 
-**Note:** This is a derivation, not invention. Every brand guideline must trace back to your Design Pillars. If the pillars don't support a guideline, don't include it. Brand Guidelines should be unique to your product's specific pillars, not generic best practices.
+**Note:** This is a extension, not invention. Every brand guideline must trace back to your Design Pillars. If the pillars don't support a guideline, don't include it. Brand Guidelines should be unique to your product's specific pillars, not generic best practices.

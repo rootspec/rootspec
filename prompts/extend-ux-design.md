@@ -24,7 +24,7 @@ Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
 ## What I Need
 
-Derive a **UX Design Document** from my Level 5 User Stories.
+Extend a **UX Design Document** from my Level 5 User Stories.
 
 The output should include:
 1. **User journey maps** - Flow through the product by journey
@@ -112,7 +112,7 @@ For each unique screen identified:
 
 **Source:** @spec_source 05.IMPLEMENTATION/USER_STORIES/[file].yaml (lines [X-Y])
 
-**Purpose:** [Derived from story context]
+**Purpose:** [Extended from story context]
 
 **Layout Description:**
 - [Primary content area]
@@ -143,7 +143,7 @@ For each unique screen identified:
 ```
 
 **Requirements:**
-- Derive layout from test assertions
+- Extend layout from test assertions
 - List all interactive elements from test steps
 - Document data from `shouldContain` steps
 - Note different states if tested
@@ -294,16 +294,16 @@ Generate a single UX Design Document:
 Before delivering the UX Design Document, verify:
 
 - [ ] All user stories are represented
-- [ ] Every screen has specification derived from tests
+- [ ] Every screen has specification extended from tests
 - [ ] All journeys map to actual story sequences
 - [ ] Components identified from repetition (not invented)
 - [ ] Every artifact has `@spec_source` annotation
 - [ ] Mermaid diagrams render correctly
 - [ ] Traceability matrix is complete
-- [ ] No invented features (only derive from YAML)
+- [ ] No invented features (only extend from YAML)
 - [ ] Priority levels preserved from stories
 - [ ] Error flows documented where tested
 
 ---
 
-**Note:** This is a derivation, not invention. Every UX element must trace back to your Level 5 user stories. If a screen or flow seems needed but isn't tested, note it as a gap rather than inventing details.
+**Note:** This is a extension, not invention. Every UX element must trace back to your Level 5 user stories. If a screen or flow seems needed but isn't tested, note it as a gap rather than inventing details.
