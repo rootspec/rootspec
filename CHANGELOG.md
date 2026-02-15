@@ -7,35 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.5.0] - 2026-02-15
+
+### Added
+
+#### New `rootspec extend` Command
+
+**Generate specialized artifacts from your specification** using extension types that transform specific spec levels into external deliverables.
+
+**Available extension types:**
+- `technical-design` - Architecture diagrams and API specs from L4 Systems
+- `ux-design` - Wireframes and user flows from L5 User Stories
+- `brand-guidelines` - Voice/tone guide from L1 Design Pillars
+- `ui-design` - Visual specs from UX Design (requires ux-design first)
+- `analytics-plan` - Event taxonomy from L3 Interaction Architecture
+- `config-schema` - JSON Schema from L5 Fine-Tuning parameters
+
+**Features:**
+- Auto-detects your specification context (Design Pillars, Systems, etc.)
+- Generates ready-to-use prompts with your actual spec data
+- Dependency tracking (e.g., ui-design shows "requires ux-design first")
+- Six specialized prompt templates in `prompts/extend-*.md`
+
+**Usage:**
+```bash
+rootspec extend                    # List all available extension types
+rootspec extend technical-design   # Generate technical design prompt
+rootspec extend brand-guidelines   # Generate brand guidelines prompt
+```
+
+**Note:** This feature was developed under the working name "derive/seeds" but released as "extend/extension types" for better alignment with the root system mental model. The "extend" terminology more accurately captures how specialized artifacts extend from the specification foundation.
+
+#### KNOWN_ISSUES.md
+
+**Comprehensive bug tracking documentation** listing known issues, their status, and workarounds.
+
+### Fixed
+
+#### Design Pillar Extraction Bug
+
+**Critical fix**: `rootspec prompts add-feature` and `rootspec extend` commands now correctly extract all Design Pillars from `01.FOUNDATIONAL_PHILOSOPHY.md` instead of only extracting the first one.
+
+**Root causes fixed:**
+- Eliminated code duplication between `prompts.ts` and `extend.ts`
+- Fixed ESM import syntax (`import fs from 'fs-extra'` vs `import * as fs`)
+- Fixed regex pattern (greedy vs non-greedy matching)
+
+**Implementation:**
+- Created shared extraction utilities in `utils/extraction.ts`
+- Functions: `extractDesignPillars()`, `extractStableTruths()`, `extractInteractionPatterns()`
+- All extraction logic now centralized and tested
+
 ### Changed
 
-#### Terminology: "Derive/Seeds" → "Extend/Extension Types"
-
-**Renamed CLI command and updated metaphor** - Better alignment with root system mental model and clearer DX.
-
-**Breaking Changes:**
-- **CLI command renamed:** `rootspec derive` → `rootspec extend`
-- **Prompt files renamed:** `derive-*.md` → `extend-*.md`
-- **Terminology updated:** "derivation seeds" → "extension types"
-
-**Improvements:**
-- Added dependency tracking (ui-design shows "requires ux-design first")
-- Clearer terminology throughout documentation
-- Removed confusing dual-use of "seed" metaphor
-
-**Migration:**
-- Update any scripts using `rootspec derive` to use `rootspec extend`
-- Update documentation references from "derivation" to "extension"
-- Prompt content remains functionally identical
-
-**Rationale:** The "seed" metaphor was strained—seeds don't produce other seeds.
-The new "root extensions" metaphor aligns with the existing root system metaphor
-(spec as roots, product as tree) and accurately captures how specialized artifacts
-extend from the specification foundation.
-
-### Removed
-
-- `docs/SEEDS_ROADMAP.md` - Content was aspirational roadmap; features are now implemented
+- Updated ROADMAP.md with v4.4.2 completed section
+- Updated README.md and CONTRIBUTING.md with links to KNOWN_ISSUES.md
 
 ## [4.4.1] - 2025-11-25
 

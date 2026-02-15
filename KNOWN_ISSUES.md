@@ -3,7 +3,7 @@
 This document tracks known bugs and limitations discovered during testing and development.
 For feature requests and roadmap items, see [docs/ROADMAP.md](docs/ROADMAP.md).
 
-**Last Updated:** 2026-02-14
+**Last Updated:** 2026-02-15
 
 ---
 
@@ -11,7 +11,7 @@ For feature requests and roadmap items, see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ### ✅ Design Pillar Extraction Bug [FIXED]
 
-**Status:** Fixed in v4.4.2
+**Status:** Fixed in v4.5.0
 **Discovered:** Integration testing (2026-02-14)
 **Impact:** HIGH - Users got incomplete context in prompts
 

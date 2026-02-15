@@ -42,7 +42,13 @@
 
 ---
 
-## ✅ Completed - v4.4.2 Improvements
+## ✅ Completed - v4.5.0 Release (2026-02-15)
+
+### New Features
+- [x] New `rootspec extend` command with 6 extension types
+- [x] Extension type prompts: technical-design, ux-design, brand-guidelines, ui-design, analytics-plan, config-schema
+- [x] Auto-detection of spec context in extension prompts
+- [x] Dependency tracking for extension types
 
 ### Testing & Quality
 - [x] Comprehensive integration testing (TaskFlow spec, 44 minutes, 92/100 score)
@@ -54,6 +60,7 @@
 - [x] Fix regex pattern for Design Pillar extraction
 - [x] Consolidate duplicate extraction code between `prompts.ts` and `extend.ts`
 - [x] Improve extraction reliability with `Array.from()` for iterators
+- [x] Fix ESM import syntax for fs-extra
 
 ---
 
