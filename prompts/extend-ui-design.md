@@ -1,4 +1,4 @@
-I have a complete specification following RootSpec v4.4.1.
+I have a complete specification following RootSpec v4.5.0.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
@@ -386,7 +386,7 @@ Generate a single UI Design Specification:
 ```markdown
 # UI Design Specification
 
-**Generated from:** RootSpec v4.4.1 specification
+**Generated from:** RootSpec v4.5.0 specification
 **Generated on:** [Date]
 **Source:** DERIVED_ARTIFACTS/ux-design.md + {{SPEC_DIR}}/01.FOUNDATIONAL_PHILOSOPHY.md
 

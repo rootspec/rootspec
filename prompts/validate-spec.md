@@ -1,5 +1,5 @@
 I have an existing specification and want to validate that it properly
-follows RootSpec v4.4.1.
+follows RootSpec v4.5.0.
 
 ## My Specification Files
 
