@@ -45,6 +45,13 @@ Please read my specification files and check:
 - No implementation details
 - Pillars focus on FEELINGS not FEATURES
 
+**Market Context Sections (if present):**
+- [ ] Competitors listed before Mission/Design Pillars
+- [ ] Table Stakes are features, not implementation details
+- [ ] Pain Points focus on problems, not solutions
+- [ ] Influences reference external sources only
+- [ ] All four sections use lightweight list format
+
 **Level 2 (Stable Truths) Validation:**
 - Contains design philosophies and strategies
 - No references to L3-5 systems or implementation
