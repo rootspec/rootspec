@@ -1,4 +1,4 @@
-I have a complete specification following RootSpec v4.5.0.
+I have a complete specification following RootSpec v4.5.1.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
@@ -451,7 +451,7 @@ Generate a single Technical Design Document with:
 ```markdown
 # Technical Design Document
 
-**Generated from:** RootSpec v4.5.0 specification
+**Generated from:** RootSpec v4.5.1 specification
 **Generated on:** [Date]
 **Source:** {{SPEC_DIR}}/04.SYSTEMS/
 
