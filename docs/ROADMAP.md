@@ -1,7 +1,7 @@
 # RootSpec Roadmap
 
-**Status**: v4.4.1 published to npm ✅
-**Last Updated**: 2025-11-25
+**Status**: v4.6.0 published to npm ✅
+**Last Updated**: 2026-02-16
 
 ---
 
@@ -64,6 +64,20 @@
 
 ---
 
+## ✅ Completed - v4.6.0 Release (2026-02-16)
+
+### New Features
+- [x] Optional Market Context sections in Level 1 (Foundational Philosophy)
+  - Competitors — Similar products in market
+  - Table Stakes — Expected baseline features
+  - Pain Points — Problems with existing solutions
+  - Influences — Inspiring products/patterns
+- [x] Updated all prompts with market context discovery questions
+- [x] Added market context validation checks
+- [x] Enhanced framework documentation with examples
+
+---
+
 ## 📋 Pending - Post-Launch Tasks
 
 ### Week 2-3: Automation & Code Quality (Medium Priority)
@@ -83,9 +97,11 @@
   - Node.js matrix testing (18, 20, 22)
 
 - [ ] Create `.github/workflows/publish.yml`
-  - Auto-publish to npm on version tags
-  - Triggered by `v*` tags
+  - Auto-publish to npm on version tags OR manual workflow_dispatch trigger
+  - Triggered by `v*` tags or manual button in Actions tab
   - Requires NPM_TOKEN secret
+  - Handles 2FA by requiring OTP as workflow input for manual triggers
+  - Alternative: Keep fully manual publish (current workflow)
 
 **Code Quality Tools:**
 - [ ] Set up ESLint in `packages/cli/`
@@ -102,6 +118,13 @@
   - Install Husky + lint-staged
   - Auto-format on commit
   - Run linter before commit
+
+**Release Tooling:**
+- [ ] Fix `scripts/release.sh` dry-run verification bug
+  - Issue: Dry-run mode doesn't actually update files, so verification step fails when checking if versions were updated
+  - Symptom: "Error: package.json version not updated correctly" during --dry-run
+  - Fix: Skip verification step in dry-run mode OR perform verification differently
+  - Also consider: Better handling of already-updated versions (detect if version already matches target)
 
 ### Week 3-4: Testing Infrastructure (Medium Priority)
 
@@ -150,7 +173,53 @@
   - CLI/library specification
   - Demonstrates technical product spec
 
-### Week 4+: Documentation & Polish (Low Priority)
+### Week 4+: Local Web UI (High Priority)
+
+**Browser-Based Interface:**
+- [ ] Create local web server for RootSpec interaction
+  - Run via `rootspec serve` command
+  - Localhost web UI (e.g., http://localhost:3000)
+  - No authentication (local-only, trusted environment)
+
+**Core Features:**
+- [ ] Specification viewer
+  - Browse all levels (L1-L5) in structured UI
+  - Syntax highlighting for YAML user stories
+  - Collapsible sections for easy navigation
+  - Visual hierarchy representation
+
+- [ ] Specification editor
+  - Edit markdown files directly in browser
+  - Real-time preview
+  - Validation on save
+  - Auto-save drafts
+
+- [ ] AI prompt integration
+  - Generate prompts with one click (replace manual CLI commands)
+  - Pre-filled context from current spec
+  - Copy to clipboard or open in AI chat
+  - Prompt history and favorites
+
+- [ ] Validation dashboard
+  - Run `rootspec validate` checks
+  - Visual report with pass/fail indicators
+  - Reference hierarchy graph
+  - Jump to issues in editor
+
+**Technical Stack (TBD):**
+- Backend: Express/Fastify server in TypeScript
+- Frontend: React/Vue/Svelte (keep lightweight)
+- Bundler: Vite for fast dev experience
+- File watching: chokidar for live updates
+- Packaging: Include in main CLI package
+
+**Benefits:**
+- More accessible for non-CLI users
+- Faster iteration on specs
+- Better visualization of hierarchy
+- Integrated AI workflow
+
+### Week 5+: Documentation & Polish (Low Priority)
 
 **Documentation:**
 - [ ] Merge Quick Start guide into README
