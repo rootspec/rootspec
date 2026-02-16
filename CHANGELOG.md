@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.5.1] - 2026-02-15
+
+### Fixed
+
+- **Version mismatch in 00.SPEC_FRAMEWORK.md**: Updated framework definition file from 4.1.0 to 4.5.0 to match actual release version
+- **Release script enhancement**: Added automatic updating of 00.SPEC_FRAMEWORK.md version and date in future releases to prevent version drift
+
 ## [4.5.0] - 2026-02-15
 
 ### Added
@@ -1286,7 +1293,10 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
 
 ---
 
-[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.4.1...HEAD
+[Unreleased]: https://github.com/rootspec/rootspec/compare/v4.5.1...HEAD
+[4.5.1]: https://github.com/rootspec/rootspec/compare/v4.5.0...v4.5.1
+[4.5.0]: https://github.com/rootspec/rootspec/compare/v4.4.1...v4.5.0
+[4.4.1]: https://github.com/rootspec/rootspec/compare/v4.4.0...v4.4.1
 [4.1.0]: https://github.com/rootspec/rootspec/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/rootspec/rootspec/compare/v3.6.0...v4.0.0
 [3.6.0]: https://github.com/rootspec/rootspec/compare/v3.5.2...v3.6.0
