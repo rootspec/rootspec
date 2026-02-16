@@ -1,4 +1,4 @@
-I have copied 00.SPEC_FRAMEWORK.md (RootSpec v4.5.1)
+I have copied 00.SPEC_FRAMEWORK.md (RootSpec v4.6.0)
 into my project directory.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
