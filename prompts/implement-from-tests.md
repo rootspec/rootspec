@@ -1,4 +1,4 @@
-I have a complete specification following RootSpec v4.5.0,
+I have a complete specification following RootSpec v4.5.1,
 with YAML user stories in 05.IMPLEMENTATION/USER_STORIES/.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure and test DSL.
