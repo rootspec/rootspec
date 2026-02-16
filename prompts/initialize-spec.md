@@ -21,6 +21,14 @@ Use these questions to guide the conversation for each level:
 ### Level 1: Foundational Philosophy
 
 Ask me questions like:
+
+**Market Context (Optional but Encouraged):**
+- "What similar products exist in this space? List 3-5 competitors."
+- "What features do users expect as baseline in this category (table stakes)?"
+- "What pain points do existing solutions have that frustrate users?"
+- "What products or experiences (even from other domains) inspire your approach?"
+
+**Core Philosophy:**
 - "What problem does this product solve, and why must it exist?"
 - "What 3-5 core experiences or emotions should users feel?"
 - "For each pillar, what specific feeling are you creating?"
@@ -92,6 +100,10 @@ As you help me create the specification, watch for these anti-patterns:
 
 5. **Creating more than 8 design pillars**
    - Fix: Consolidate to 3-5 core experiences
+
+6. **Skipping market context**
+   - While optional, competitors/table stakes/pain points/influences provide valuable grounding
+   - Fix: Spend 5 minutes listing competitors and what they get wrong
 
 ## QUALITY REFERENCE EXAMPLE
 

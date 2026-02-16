@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### Optional Market Context Sections in Level 1
+
+**New conceptual sections** for Level 1 (Foundational Philosophy) that provide strategic market context:
+
+- **Competitors** — Similar products in the market
+- **Table Stakes** — Core features users expect in this category
+- **Pain Points** — Problems with existing solutions that this product solves
+- **Influences** — Products or vibes from other media that inspire the approach
+
+**Key characteristics:**
+- Optional but encouraged (not required for all projects)
+- Appear before Mission/Design Pillars to inform philosophical foundations
+- Lightweight format (simple lists and bullets)
+- Living documents that evolve as market changes
+- Four separate sections with equal prominence
+
+**Files updated:**
+- `00.SPEC_FRAMEWORK.md` — Added documentation, examples, and validation guidance
+- `prompts/initialize-spec.md` — Added discovery questions for market context
+- `prompts/adopt-framework-existing.md` — Added market context to analysis workflow
+- `prompts/validate-spec.md` — Added optional validation checks
+
+**Usage:** When creating a new spec, AI assistants will now ask about competitors, table stakes, pain points, and influences before diving into Mission and Design Pillars. This grounds the philosophical foundation in market reality.
+
 ## [4.5.1] - 2026-02-15
 
 ### Fixed
