@@ -103,6 +103,18 @@ else
   echo "[DRY RUN] Update version references in README.md to v$VERSION"
 fi
 
+echo "Updating 00.SPEC_FRAMEWORK.md..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  # Update version number
+  sed -i '' -E 's/\*\*Version:\*\* [0-9]+\.[0-9]+\.[0-9]+/**Version:** '"$VERSION"'/' 00.SPEC_FRAMEWORK.md
+  # Update last updated date to current date in YYYY-MM-DD format
+  CURRENT_DATE=$(date +%Y-%m-%d)
+  sed -i '' -E 's/\*\*Last Updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}/**Last Updated:** '"$CURRENT_DATE"'/' 00.SPEC_FRAMEWORK.md
+else
+  echo "[DRY RUN] Update version in 00.SPEC_FRAMEWORK.md to $VERSION"
+  echo "[DRY RUN] Update last updated date to current date"
+fi
+
 echo ""
 echo "Step 2: Verify version updates"
 echo "-------------------------------"
@@ -135,7 +147,7 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add packages/cli/package.json prompts/ README.md"
+run "git add packages/cli/package.json prompts/ README.md 00.SPEC_FRAMEWORK.md"
 run "git commit -m 'Release v$VERSION
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
