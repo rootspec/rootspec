@@ -1,4 +1,4 @@
-I have a complete specification following RootSpec v4.6.0.
+I have a complete specification following RootSpec v4.6.1.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
@@ -595,7 +595,7 @@ Generate JSON Schema files and documentation:
 ```markdown
 # JSON Schema Documentation
 
-**Generated from:** RootSpec v4.6.0 specification
+**Generated from:** RootSpec v4.6.1 specification
 **Generated on:** [Date]
 **Source:** {{SPEC_DIR}}/05.IMPLEMENTATION/FINE_TUNING/
 
