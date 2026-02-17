@@ -82,6 +82,38 @@ Ask me:
 
 Create user stories in YAML format with test specifications and identify numeric parameters.
 
+## L5 COVERAGE REQUIREMENTS
+
+Before finalizing Level 5, cross-reference your stories against L3 and L4 to verify:
+
+### Screen Coverage
+- [ ] Every screen/view named in L3 (INTERACTION_ARCHITECTURE) has at least one user story that `visit`s it
+
+### CRUD Coverage
+For each entity defined in L4 systems that supports mutation:
+- [ ] Create: at least one story creates the entity
+- [ ] Update/complete: at least one story modifies the entity, OR updating is explicitly out of scope
+- [ ] Delete: at least one story removes the entity, OR deletion is explicitly out of scope
+
+### Navigation Coverage
+- [ ] At least one story tests the transition between each main view (not just `visit` in isolation)
+- OR document that navigation is tested implicitly via routing (note as assumption)
+
+### Variant Coverage
+For each selector, type field, or enumerated option defined in L3/L4:
+- [ ] All variants are tested (not just the default or first)
+- OR out-of-scope variants are listed with their deferral justification
+
+### Boundary Coverage
+For each time-based window, threshold, or limit defined in L3:
+- [ ] A corresponding FINE_TUNING parameter exists in L5 with `@rationale`
+- OR the boundary is explicitly marked as a UX decision deferred to implementation
+
+### Auth/Session Coverage
+- [ ] Authentication is tested explicitly, OR documented as a seeded assumption (`loginAs` pattern) in the spec narrative, OR the app is documented as not requiring authentication
+
+If any item is unchecked, add the missing stories/parameters before calling L5 complete.
+
 ## COMMON MISTAKES TO AVOID
 
 As you help me create the specification, watch for these anti-patterns:

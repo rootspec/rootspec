@@ -143,6 +143,12 @@ After drafting changes, verify:
 - [ ] All changes flow downward (no upward references added)
 - [ ] Placeholders used in L1-4, actual values only in L5
 - [ ] User stories created with test DSL
+- [ ] L5 coverage requirements satisfied:
+  - All screens from L3 visited in at least one story
+  - All CRUD operations covered for affected entities
+  - All variants of type/selector fields tested
+  - Boundary conditions have fine-tuning parameters
+  - Auth assumptions documented if not explicitly tested
 - [ ] Cross-references updated in affected systems
 - [ ] SYSTEMS_OVERVIEW.md updated if new system added
 

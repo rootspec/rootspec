@@ -301,9 +301,10 @@ Before delivering the UX Design Document, verify:
 - [ ] Mermaid diagrams render correctly
 - [ ] Traceability matrix is complete
 - [ ] No invented features (only extend from YAML)
+- [ ] No gaps identified — if gaps exist, stop and complete L5 before delivering this document
 - [ ] Priority levels preserved from stories
 - [ ] Error flows documented where tested
 
 ---
 
-**Note:** This is a extension, not invention. Every UX element must trace back to your Level 5 user stories. If a screen or flow seems needed but isn't tested, note it as a gap rather than inventing details.
+**Note:** This is an extension, not invention. Every UX element must trace back to your Level 5 user stories. If you identify gaps (implied flows with no test coverage), **stop and resolve them before continuing** — gaps indicate L5 stories are incomplete. Use `rootspec prompts add-feature` to add missing stories, then re-run this extension. A complete spec should produce a gap-free UX document.
