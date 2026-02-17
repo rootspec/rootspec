@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.6.1] - 2026-02-17
+
+### Fixed
+
+- **L5 coverage gaps caught too late**: Added L5 Coverage Requirements checklist to `prompts/initialize-spec.md` and `prompts/add-feature.md` so screen, CRUD, navigation, variant, boundary, and auth coverage gaps are caught during authoring — not discovered when running `extend-ux-design`
+- **extend-ux-design gaps treated as expected output**: Hardened `prompts/extend-ux-design.md` to block on gaps rather than note them; gaps now indicate incomplete L5 stories and require resolution before the extension can proceed
+
 ### Added
 
 #### Optional Market Context Sections in Level 1
