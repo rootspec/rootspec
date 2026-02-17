@@ -80,6 +80,16 @@
 
 ## 📋 Pending - Post-Launch Tasks
 
+### Framework Features (High Priority)
+
+- [ ] Add User Personas as optional Level 1 section
+  - Another method of framing and thinking about a product alongside market context
+  - Who the product is for (name, role, goals, frustrations, context)
+  - Lightweight format — 2-5 personas max, focus on what matters for design decisions
+  - Informs Design Pillars (who are we creating these experiences for?)
+  - Distinct from anti-goals ("not for") — personas describe who IS the user
+  - Example: "Maya, 32, freelance designer — needs to stay focused without rigid schedules"
+
 ### Week 2-3: Automation & Code Quality (Medium Priority)
 
 **GitHub Automation:**
