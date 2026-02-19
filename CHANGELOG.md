@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.6.2] - 2026-02-18
+
+### Fixed
+
+- **`{{#IF_NOT}}` template blocks not evaluated**: Template engine only handled `{{#IF}}` — negative conditionals passed through raw. Added `{{#IF_NOT VAR}}...{{/IF_NOT}}` support so `extend ui-design` no longer shows the "no UX Design found" warning when the file exists
+- **`extend ux-design` output location not specified**: Prompt now explicitly instructs the AI to write output to `DERIVED_ARTIFACTS/ux-design.md`, which is required for `extend ui-design` to find it
+
 ## [4.6.1] - 2026-02-17
 
 ### Fixed
