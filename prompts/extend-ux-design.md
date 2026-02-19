@@ -239,6 +239,8 @@ Create traceability matrix linking UX artifacts to source:
 
 ## Output Format
 
+Write the UX Design Document to `{{SPEC_DIR}}/DERIVED_ARTIFACTS/ux-design.md` (create the directory if it doesn't exist). This location is required — other extensions (`extend ui-design`) depend on finding it there.
+
 Generate a single UX Design Document:
 
 ```markdown

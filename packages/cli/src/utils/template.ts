@@ -27,6 +27,15 @@ export function replaceTemplates(template: string, data: TemplateData): string {
     return value ? content : '';
   });
 
+  // Process negative conditionals: {{#IF_NOT VAR}}...{{/IF_NOT}}
+  result = result.replace(/\{\{#IF_NOT\s+(\w+)\}\}([\s\S]*?)\{\{\/IF_NOT\}\}/g, (_, varName, content) => {
+    const value = data[varName];
+    if (Array.isArray(value)) {
+      return value.length === 0 ? content : '';
+    }
+    return value ? '' : content;
+  });
+
   // Process lists: {{#EACH VAR}}{{ITEM}}{{/EACH}}
   result = result.replace(/\{\{#EACH\s+(\w+)\}\}([\s\S]*?)\{\{\/EACH\}\}/g, (_, varName, itemTemplate) => {
     const items = data[varName];
