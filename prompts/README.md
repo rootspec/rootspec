@@ -1,6 +1,6 @@
 # AI Assistant Prompt Library
 
-**Context-aware prompt templates for RootSpec v4.6.1**
+**Context-aware prompt templates for RootSpec v4.6.2**
 
 These are **template files** that are automatically filled by the RootSpec CLI with your project's actual context (framework, directories, files, etc.). The CLI scans your codebase and generates ready-to-use prompts that you can paste directly into your AI assistant.
 
@@ -238,7 +238,7 @@ The AI will check for hierarchy violations, missing sections, and anti-patterns.
 
 ## Version Compatibility
 
-These templates are designed for **RootSpec v4.6.1**.
+These templates are designed for **RootSpec v4.6.2**.
 
 For earlier versions without CLI support:
 - v3.x - Use manual workflow (download framework, edit prompts by hand)

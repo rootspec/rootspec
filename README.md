@@ -489,7 +489,7 @@ Follow framework rules: hierarchy, placeholders in L1-4, no upward references.
 **Quick prompt:**
 
 ```
-I have a spec using framework v[OLD_VERSION]. I've updated to v4.6.1.
+I have a spec using framework v[OLD_VERSION]. I've updated to v4.6.2.
 
 Read CHANGELOG.md and help me migrate:
 1. Identify breaking changes
@@ -511,7 +511,7 @@ Read CHANGELOG.md and help me migrate:
 **Quick prompt:**
 
 ```
-Validate my specification against framework v4.6.1:
+Validate my specification against framework v4.6.2:
 
 Check:
 - Reference hierarchy (no upward references)
