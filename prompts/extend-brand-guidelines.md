@@ -235,6 +235,8 @@ Create traceability matrix:
 
 ## Output Format
 
+Write the Brand Guidelines Document to `{{SPEC_DIR}}/DERIVED_ARTIFACTS/brand-guidelines.md` (create the directory if it doesn't exist).
+
 Generate a single Brand Guidelines Document:
 
 ```markdown

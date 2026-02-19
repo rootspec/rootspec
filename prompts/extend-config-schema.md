@@ -590,6 +590,8 @@ Link schema fields to spec sources:
 
 ## Output Format
 
+Write the Config Schema Document to `{{SPEC_DIR}}/DERIVED_ARTIFACTS/config-schema.md` (create the directory if it doesn't exist).
+
 Generate JSON Schema files and documentation:
 
 ```markdown

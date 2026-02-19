@@ -427,6 +427,8 @@ Link events back to L3 patterns:
 
 ## Output Format
 
+Write the Analytics Plan Document to `{{SPEC_DIR}}/DERIVED_ARTIFACTS/analytics-plan.md` (create the directory if it doesn't exist).
+
 Generate a single Analytics Event Taxonomy document:
 
 ```markdown

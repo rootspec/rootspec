@@ -381,6 +381,8 @@ Link UI specs back to sources:
 
 ## Output Format
 
+Write the UI Design Specification to `{{SPEC_DIR}}/DERIVED_ARTIFACTS/ui-design.md` (create the directory if it doesn't exist).
+
 Generate a single UI Design Specification:
 
 ```markdown

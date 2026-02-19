@@ -446,6 +446,8 @@ For areas where user said NO, document the decision and manual process.
 
 ## Output Format
 
+Write the Technical Design Document to `{{SPEC_DIR}}/DERIVED_ARTIFACTS/technical-design.md` (create the directory if it doesn't exist).
+
 Generate a single Technical Design Document with:
 
 ```markdown
