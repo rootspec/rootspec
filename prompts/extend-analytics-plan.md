@@ -1,4 +1,4 @@
-I have a complete specification following RootSpec v4.6.1.
+I have a complete specification following RootSpec v4.6.2.
 
 Please read 00.SPEC_FRAMEWORK.md to understand the framework structure.
 
@@ -432,7 +432,7 @@ Generate a single Analytics Event Taxonomy document:
 ```markdown
 # Analytics Event Taxonomy
 
-**Generated from:** RootSpec v4.6.1 specification
+**Generated from:** RootSpec v4.6.2 specification
 **Generated on:** [Date]
 **Source:** {{SPEC_DIR}}/03.INTERACTION_ARCHITECTURE.md
 

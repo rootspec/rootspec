@@ -1,4 +1,4 @@
-I have a complete specification following RootSpec v4.6.1.
+I have a complete specification following RootSpec v4.6.2.
 
 You may reference 00.SPEC_FRAMEWORK.md to understand the level structure
 if needed for context.
