@@ -88,6 +88,20 @@ else
   echo "[DRY RUN] Update version in packages/cli/package.json to $VERSION"
 fi
 
+echo "Updating packages/cypress/package.json..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  sed -i '' -E 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' packages/cypress/package.json
+else
+  echo "[DRY RUN] Update version in packages/cypress/package.json to $VERSION"
+fi
+
+echo "Updating packages/*/src/index.ts version strings..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  find packages -name "index.ts" -exec sed -i '' -E "s/\.version\('[0-9]+\.[0-9]+\.[0-9]+'\)/.version('$VERSION')/" {} \;
+else
+  echo "[DRY RUN] Update .version() in packages/*/src/index.ts to $VERSION"
+fi
+
 echo "Updating prompts/*.md..."
 if [ "$DRY_RUN" != "--dry-run" ]; then
   find prompts -name "*.md" -exec sed -i '' -E 's/v[0-9]+\.[0-9]+\.[0-9]+/v'"$VERSION"'/g' {} \;
@@ -119,9 +133,15 @@ echo ""
 echo "Step 2: Verify version updates"
 echo "-------------------------------"
 UPDATED_PKG_VERSION=$(grep '"version"' packages/cli/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
-echo "package.json version: $UPDATED_PKG_VERSION"
+echo "packages/cli version: $UPDATED_PKG_VERSION"
 if [ "$UPDATED_PKG_VERSION" != "$VERSION" ]; then
-  echo "Error: package.json version not updated correctly"
+  echo "Error: packages/cli/package.json version not updated correctly"
+  exit 1
+fi
+UPDATED_CYPRESS_VERSION=$(grep '"version"' packages/cypress/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
+echo "packages/cypress version: $UPDATED_CYPRESS_VERSION"
+if [ "$UPDATED_CYPRESS_VERSION" != "$VERSION" ]; then
+  echo "Error: packages/cypress/package.json version not updated correctly"
   exit 1
 fi
 echo "Version updates verified."
@@ -147,7 +167,7 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add packages/cli/package.json prompts/ README.md 00.SPEC_FRAMEWORK.md"
+run "git add packages/cli/package.json packages/cypress/package.json packages/cli/src/index.ts packages/cypress/src/index.ts prompts/ README.md 00.SPEC_FRAMEWORK.md"
 run "git commit -m 'Release v$VERSION
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
@@ -181,6 +201,7 @@ run "gh release create v$VERSION --title 'v$VERSION' --notes '$RELEASE_NOTES'"
 echo ""
 echo "Step 8: Publish to npm"
 echo "----------------------"
+run "cd packages/cypress && npm publish"
 run "cd packages/cli && npm publish"
 
 echo ""
@@ -190,4 +211,5 @@ echo "================================================"
 echo ""
 echo "Verify:"
 echo "  - GitHub: https://github.com/rootspec/rootspec/releases/tag/v$VERSION"
-echo "  - npm: https://www.npmjs.com/package/rootspec"
+echo "  - npm (CLI): https://www.npmjs.com/package/rootspec"
+echo "  - npm (Cypress): https://www.npmjs.com/package/@rootspec/cypress"

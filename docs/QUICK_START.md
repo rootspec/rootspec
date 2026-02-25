@@ -210,12 +210,12 @@ The generated prompt will ask you to choose:
 ### 3. Review Examples (1 hour)
 
 **YAML user stories:**
-- [`templates/USER_STORIES/by_priority/MVP.example.yaml`](../templates/USER_STORIES/by_priority/MVP.example.yaml)
-- [`templates/USER_STORIES/by_journey/ONBOARDING.example.yaml`](../templates/USER_STORIES/by_journey/ONBOARDING.example.yaml)
-- [`templates/USER_STORIES/by_system/TASK_SYSTEM.example.yaml`](../templates/USER_STORIES/by_system/TASK_SYSTEM.example.yaml)
+- [`packages/cypress/templates/USER_STORIES/by_priority/MVP.example.yaml`](../packages/cypress/templates/USER_STORIES/by_priority/MVP.example.yaml)
+- [`packages/cypress/templates/USER_STORIES/by_journey/ONBOARDING.example.yaml`](../packages/cypress/templates/USER_STORIES/by_journey/ONBOARDING.example.yaml)
+- [`packages/cypress/templates/USER_STORIES/by_system/TASK_SYSTEM.example.yaml`](../packages/cypress/templates/USER_STORIES/by_system/TASK_SYSTEM.example.yaml)
 
 **Complete YAML format:**
-- [`templates/USER_STORIES/USER_STORIES_OVERVIEW.md`](../templates/USER_STORIES/USER_STORIES_OVERVIEW.md)
+- [`packages/cypress/templates/USER_STORIES/USER_STORIES_OVERVIEW.md`](../packages/cypress/templates/USER_STORIES/USER_STORIES_OVERVIEW.md)
 
 ### 4. Try It Out (2-4 hours)
 
@@ -415,7 +415,7 @@ curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWO
 
 **For learning:**
 1. Read `README.md` and `00.SPEC_FRAMEWORK.md`
-2. Review example YAML files in `templates/`
+2. Review example YAML files in `packages/cypress/templates/USER_STORIES/`
 3. Try on small project or feature
 
 ---

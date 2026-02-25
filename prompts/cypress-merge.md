@@ -13,13 +13,11 @@ Please read these files:
 ## RootSpec Templates
 
 Please fetch and read ALL of these template files:
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress.config.ts
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress/support/e2e.ts
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress/support/schema.ts
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress/support/steps.ts
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress/e2e/by_priority.cy.ts
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress/e2e/by_journey.cy.ts
-- https://raw.githubusercontent.com/rootspec/rootspec/main/templates/cypress/e2e/by_system.cy.ts
+- https://raw.githubusercontent.com/rootspec/rootspec/main/packages/cypress/templates/cypress.config.ts
+- https://raw.githubusercontent.com/rootspec/rootspec/main/packages/cypress/templates/cypress/support/e2e.ts
+- https://raw.githubusercontent.com/rootspec/rootspec/main/packages/cypress/templates/cypress/support/schema.ts
+- https://raw.githubusercontent.com/rootspec/rootspec/main/packages/cypress/templates/cypress/support/steps.ts
+- https://raw.githubusercontent.com/rootspec/rootspec/main/packages/cypress/templates/cypress/e2e/example.cy.ts
 
 ## What I Need
 

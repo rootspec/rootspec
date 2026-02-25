@@ -68,14 +68,18 @@ rootspec/
 ├── CHANGELOG.md              # Version history
 ├── CLAUDE.md                 # AI assistant guidance
 ├── packages/
-│   └── cli/                  # CLI package
+│   ├── cli/                  # CLI package (rootspec)
+│   │   ├── src/              # TypeScript source
+│   │   │   ├── commands/     # CLI commands
+│   │   │   └── utils/        # Utilities
+│   │   ├── dist/             # Compiled output
+│   │   └── package.json      # Package config
+│   └── cypress/              # Cypress harness package (@rootspec/cypress)
 │       ├── src/              # TypeScript source
-│       │   ├── commands/     # CLI commands
-│       │   └── utils/        # Utilities
+│       ├── templates/        # Cypress templates + USER_STORIES examples
 │       ├── dist/             # Compiled output
 │       └── package.json      # Package config
 ├── prompts/                  # AI prompt templates
-├── templates/                # Cypress templates
 └── docs/                     # Documentation
 ```
 

@@ -6,7 +6,7 @@ Brief guidance for Claude Code when working in this repository.
 
 **Are you in the framework repository?**
 - This repo contains the framework definition only
-- Files: `00.SPEC_FRAMEWORK.md`, `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `templates/`, `prompts/`
+- Files: `00.SPEC_FRAMEWORK.md`, `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `prompts/`, `packages/`
 - Does NOT contain user specification files (01-05)
 - Purpose: Maintain the framework itself
 
@@ -89,7 +89,7 @@ This is a **Specification Framework Repository** - a hierarchical design documen
 - `00.SPEC_FRAMEWORK.md` - Complete framework definition (users copy this to their projects)
 - `README.md` - Human-focused introduction and philosophy
 - `prompts/` - Detailed AI assistant prompts for all use cases
-- `templates/` - Cypress test templates for YAML user stories
+- `packages/cypress/` - `@rootspec/cypress` package with Cypress test harness templates
 
 **Users create their own specification files (01-05)** following the framework definition.
 
@@ -214,12 +214,12 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 ```
 
 **The script handles:**
-- Finding and updating all version references (package.json, prompts/README.md)
+- Finding and updating all version references (both `packages/cli/package.json` and `packages/cypress/package.json`, prompts/README.md)
 - Checking for stale version strings
 - Committing version updates
 - Creating and pushing git tag
 - Creating GitHub release with changelog notes
-- Publishing to npm
+- Publishing both `rootspec` (CLI) and `@rootspec/cypress` to npm
 
 **If you need to retag:** `git tag -d vX.Y.Z` then recreate and `git push --tags --force`
 

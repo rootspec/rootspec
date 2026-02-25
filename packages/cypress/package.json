@@ -1,27 +1,24 @@
 {
-  "name": "rootspec",
+  "name": "@rootspec/cypress",
   "version": "4.6.2",
-  "description": "Hierarchical Specification Framework - Philosophy guides implementation",
+  "description": "Cypress test harness for RootSpec - YAML spec-driven e2e testing",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "rootspec": "dist/index.js"
+    "rootspec-cypress": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js && npm run copy-assets && npm run clean-stale",
-    "clean-stale": "node -e \"const fs=require('fs-extra');fs.removeSync('dist/templates')\"",
-    "copy-assets": "node -e \"const fs=require('fs-extra');fs.copySync('../../00.SPEC_FRAMEWORK.md','dist/00.SPEC_FRAMEWORK.md');fs.copySync('../../UPGRADE.md','dist/UPGRADE.md');fs.copySync('../../prompts','dist/prompts')\"",
+    "build": "tsc && chmod +x dist/index.js && npm run copy-assets",
+    "copy-assets": "node -e \"const fs=require('fs-extra');fs.copySync('templates','dist/templates')\"",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "specification",
-    "framework",
-    "architecture",
-    "design",
-    "documentation",
+    "rootspec",
     "cypress",
-    "testing"
+    "testing",
+    "specification",
+    "e2e"
   ],
   "author": "Corky Brown",
   "license": "MIT",
@@ -48,6 +45,7 @@
     "node": ">=18.0.0"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ]
 }

@@ -413,7 +413,7 @@ The AI will then help you:
 
 1. **Read [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md)** - Complete framework structure and rules
 2. **Read [CLAUDE.md](CLAUDE.md)** - AI assistant quick reference
-3. **Review [templates/USER_STORIES/](templates/USER_STORIES/)** - See YAML examples
+3. **Review [packages/cypress/templates/USER_STORIES/](packages/cypress/templates/USER_STORIES/)** - See YAML examples
 4. **Check [CHANGELOG.md](CHANGELOG.md)** - Version history and evolution
 5. **Try [docs/QUICK_START.md](docs/QUICK_START.md)** - Fast-track guides for both scenarios
 

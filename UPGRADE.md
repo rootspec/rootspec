@@ -176,7 +176,7 @@ None - existing test files continue to work.
 
 - `rootspec cypress` command no longer automatically copies example user stories to `templates/` directory
 - New `--with-examples` flag added to opt-in to example copying
-- Examples now referenced in `node_modules/rootspec/dist/templates/USER_STORIES/` by default
+- Examples now referenced in `node_modules/@rootspec/cypress/templates/USER_STORIES/` by default
 
 ### Action Required
 
@@ -193,7 +193,7 @@ If you previously relied on examples being copied automatically:
 
 2. **Option B:** Copy examples manually when needed:
    ```bash
-   cp -r node_modules/rootspec/dist/templates/USER_STORIES/* spec/05.IMPLEMENTATION/USER_STORIES/
+   cp -r node_modules/@rootspec/cypress/templates/USER_STORIES/* spec/05.IMPLEMENTATION/USER_STORIES/
    ```
 
 ### Breaking Changes

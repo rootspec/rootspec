@@ -91,14 +91,11 @@ Next steps:
 If you need to customize the setup or don't have the CLI:
 
 ```bash
-# Clone or download the rootspec repository first
-git clone https://github.com/rootspec/rootspec.git
+# Install @rootspec/cypress directly
+npm install --save-dev @rootspec/cypress
 
-# Copy Cypress configuration
-cp rootspec/templates/cypress.config.ts ./
-
-# Copy Cypress support files and test generators
-cp -r rootspec/templates/cypress ./
+# Run the init command
+npx rootspec-cypress init
 ```
 
 **Resulting structure:**
@@ -309,7 +306,7 @@ Copy an example YAML file and customize it:
 
 ```bash
 # Copy example
-cp path/to/rootspec/templates/USER_STORIES/by_priority/MVP.example.yaml \
+cp node_modules/@rootspec/cypress/templates/USER_STORIES/by_priority/MVP.example.yaml \
    05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
 
 # Or create from scratch
@@ -567,7 +564,7 @@ The test generator looks for YAML files matching the directory structure.
 - Required fields: `user_stories`, `id`, `title`, `acceptance_criteria`
 - Each acceptance criterion needs: `id`, `given`, `when`, `then`
 
-See `templates/USER_STORIES/USER_STORIES_OVERVIEW.md` for complete format specification.
+See `node_modules/@rootspec/cypress/templates/USER_STORIES/USER_STORIES_OVERVIEW.md` for complete format specification.
 
 ---
 
@@ -622,7 +619,7 @@ Or configure `baseUrl` in `cypress.config.ts` to point to your running app.
 4. **Integrate CI** - Add `npm run test:e2e` to your CI pipeline
 
 **Resources:**
-- Full YAML format spec: `templates/USER_STORIES/USER_STORIES_OVERVIEW.md`
+- Full YAML format spec: `node_modules/@rootspec/cypress/templates/USER_STORIES/USER_STORIES_OVERVIEW.md`
 - Extension examples: `cypress/support/steps.ts`
 - Framework reference: `00.SPEC_FRAMEWORK.md` (lines 338-583)
 
