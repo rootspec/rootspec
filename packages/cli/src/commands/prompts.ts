@@ -64,6 +64,11 @@ const PROMPTS: Record<string, PromptInfo> = {
     description: 'Migrate specification to a newer framework version',
     generated: true,  // Prompts for old version
   },
+  'restart': {
+    file: 'restart-spec.md',
+    description: 'Reinterpret or start over an existing RootSpec specification',
+    generated: true,  // Reads existing spec to fill context
+  },
   'generate-docs': {
     file: 'generate-docs.md',
     description: 'Generate PRD, TDD, or backlog from specification',
@@ -158,6 +163,9 @@ async function runPromptsCommand(name?: string, options?: PromptsOptions): Promi
       return;
     } else if (name === 'migrate') {
       await runMigratePrompt();
+      return;
+    } else if (name === 'restart') {
+      await runRestartPrompt();
       return;
     } else if (name === 'generate-docs') {
       await runGenerateDocsPrompt();
@@ -350,6 +358,9 @@ async function getAdoptionApproach(): Promise<string> {
   if (configDir) {
     const fullPath = path.join(cwd, configDir, '01.FOUNDATIONAL_PHILOSOPHY.md');
     if (await fs.pathExists(fullPath)) {
+      console.log(chalk.yellow('\n  💡 Existing RootSpec specification detected.'));
+      console.log(chalk.gray('     If you want to reinterpret or rebuild your spec, consider:'));
+      console.log(chalk.cyan('     rootspec prompts restart\n'));
       return 'Specification-First (update existing spec to match ideal state, then plan migration)';
     }
   }
@@ -358,6 +369,9 @@ async function getAdoptionApproach(): Promise<string> {
   for (const specDir of ['./spec', './docs/spec', '.']) {
     const fullPath = path.join(cwd, specDir, '01.FOUNDATIONAL_PHILOSOPHY.md');
     if (await fs.pathExists(fullPath)) {
+      console.log(chalk.yellow('\n  💡 Existing RootSpec specification detected.'));
+      console.log(chalk.gray('     If you want to reinterpret or rebuild your spec, consider:'));
+      console.log(chalk.cyan('     rootspec prompts restart\n'));
       return 'Specification-First (update existing spec to match ideal state, then plan migration)';
     }
   }
@@ -773,6 +787,69 @@ async function runMigratePrompt(): Promise<void> {
   });
 
   console.log(filledPrompt);
+  console.log();
+  console.log(chalk.gray('─'.repeat(60)));
+  console.log();
+}
+
+/**
+ * Interactive prompt for restart
+ * Reads existing spec to generate contextualized reinterpretation prompt
+ */
+async function runRestartPrompt(): Promise<void> {
+  console.log(chalk.bold('\n🔁 Restart RootSpec Specification\n'));
+  console.log(chalk.gray('Reading your existing specification...\n'));
+
+  // Find spec directory
+  const specInfo = await findSpecDirectory();
+  if (!specInfo.found) {
+    console.log(chalk.yellow('  ⚠️  No existing specification found.'));
+    console.log(chalk.gray('     Use `rootspec prompts init` for a new project.'));
+    console.log(chalk.gray('     Use `rootspec prompts adopt` for an existing codebase without a spec.'));
+    console.log();
+    return;
+  }
+
+  console.log(chalk.green(`  ✓ Found specification in ${specInfo.dir}/`));
+
+  // Extract design pillars from Level 1
+  const designPillars = await extractDesignPillars(specInfo.dir);
+  if (designPillars.length > 0) {
+    console.log(chalk.green(`  ✓ Found ${designPillars.length} design pillars`));
+  } else {
+    console.log(chalk.gray('  - No design pillars detected (will read spec directly)'));
+  }
+
+  // List systems from Level 4
+  const systems = await listSystems(specInfo.dir);
+  if (systems.length > 0) {
+    console.log(chalk.green(`  ✓ Found ${systems.length} systems`));
+  }
+
+  // Detect framework version
+  const versions = await detectAllVersions(specInfo.dir);
+  const frameworkVersion = versions.framework || versions.config || `v${CLI_VERSION}`;
+
+  console.log();
+  console.log(chalk.green('✅ Prompt ready! Copy and paste into your AI assistant:\n'));
+  console.log(chalk.gray('─'.repeat(60)));
+  console.log();
+
+  // Read and fill template
+  const templatePath = path.join(PROMPTS_DIR, 'restart-spec.md');
+  const template = await fs.readFile(templatePath, 'utf-8');
+
+  const filledPrompt = replaceTemplates(template, {
+    SPEC_DIR: specInfo.dir,
+    FRAMEWORK_VERSION: frameworkVersion,
+    EXISTING_PILLARS: designPillars,
+    NO_EXISTING_PILLARS: designPillars.length === 0,
+    EXISTING_SYSTEMS: systems,
+    NO_EXISTING_SYSTEMS: systems.length === 0,
+  });
+
+  console.log(filledPrompt);
+
   console.log();
   console.log(chalk.gray('─'.repeat(60)));
   console.log();

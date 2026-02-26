@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Fast-track guides for getting started with RootSpec v4.3.
+Fast-track guides for getting started with RootSpec v4.6.2.
 
 ---
 
@@ -181,6 +181,61 @@ The generated prompt will ask you to choose:
 
 ---
 
+## 🔁 Already Using RootSpec
+
+**Scenario:** You have an existing RootSpec specification and want to update or reinterpret it
+
+### Migrate (Version Upgrade)
+
+Use when the **framework format changed** — new required sections, renamed files, or updated YAML annotations.
+
+```bash
+# Detects your current version and generates a migration plan
+rootspec prompts migrate
+```
+
+The CLI will:
+1. Detect your current framework version from `00.SPEC_FRAMEWORK.md`, `.rootspecrc.json`, or `package.json`
+2. Show the migration path (current → latest)
+3. Generate a prompt that walks you through each change
+
+**Time estimate:** 1-2 hours for minor versions, 3-4 hours for major versions
+
+### Restart (Reinterpret)
+
+Use when your **product direction has drifted** from the spec — the original pillars no longer feel true, or you want to rethink the philosophy with real product experience behind you.
+
+```bash
+# Reads existing spec and guides level-by-level reinterpretation
+rootspec prompts restart
+```
+
+The CLI will:
+1. Read your existing spec files
+2. Extract current Design Pillars and systems
+3. Generate a prompt that asks "what still rings true?" for each level
+
+**Time estimate:** 2-6 hours depending on how much has changed
+
+### Decision Tree
+
+```
+My spec exists but needs updating...
+
+  Has the framework FORMAT changed?
+  (new sections, renamed files, updated YAML annotations)
+  → rootspec prompts migrate
+
+  Has the product DIRECTION changed?
+  (pillars feel wrong, philosophy has drifted, major rethink needed)
+  → rootspec prompts restart
+
+  Both?
+  → migrate first (get on latest format), then restart
+```
+
+---
+
 ## 📚 Learning the Framework
 
 **First time using the framework? Start here:**
@@ -252,7 +307,8 @@ rootspec cypress                 # Add Cypress templates
 rootspec prompts                 # List all available prompts
 
 rootspec prompts init            # New project specification
-rootspec prompts adopt           # Existing project adoption
+rootspec prompts adopt           # Existing project adoption (no spec yet)
+rootspec prompts restart         # Reinterpret existing specification
 rootspec prompts validate        # Validate specification
 rootspec prompts add-feature     # Add feature to spec
 rootspec prompts review          # Review implementation
@@ -379,6 +435,7 @@ curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWO
 | [`review-feature.md`](../prompts/review-feature.md) | Validate implementation vs. spec | 15-30 min |
 | [`generate-docs.md`](../prompts/generate-docs.md) | Create PRDs, TDDs from spec | 30-60 min |
 | [`migrate-spec.md`](../prompts/migrate-spec.md) | Upgrade framework version | 1-2 hours |
+| [`restart-spec.md`](../prompts/restart-spec.md) | Reinterpret or rebuild existing spec | 2-6 hours |
 | [`tips-and-best-practices.md`](../prompts/tips-and-best-practices.md) | Quick commands and troubleshooting | As needed |
 
 ---
@@ -407,11 +464,15 @@ curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWO
 3. Implement iteratively → `docs/IMPLEMENTATION_WORKFLOW.md` or `prompts/implement-from-tests.md`
 4. Use Design Pillars as decision filter
 
-**For existing projects:**
+**For existing projects (no spec):**
 1. Choose approach (Specification-First vs. Reverse-Engineering)
-2. Generate specification → `prompts/adopt-framework-existing.md`
+2. Generate specification → `rootspec prompts adopt`
 3. Establish as single source of truth
 4. Gradual migration over 3-6 months
+
+**For existing RootSpec users:**
+1. Format update needed → `rootspec prompts migrate`
+2. Philosophy drifted → `rootspec prompts restart`
 
 **For learning:**
 1. Read `README.md` and `00.SPEC_FRAMEWORK.md`

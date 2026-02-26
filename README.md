@@ -24,7 +24,7 @@
 
 ---
 
-**Version 4.4.1**
+**Version 4.6.2**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -407,7 +407,30 @@ The AI will then help you:
 
 ---
 
-### Path 3: Learning the Framework
+### Path 3: Already Using RootSpec
+
+**You have an existing RootSpec specification**
+
+```bash
+# Upgrade to a newer framework version (structural/format changes)
+rootspec prompts migrate
+
+# Reinterpret: keep lessons learned, rebuild spec fresh
+rootspec prompts restart
+```
+
+**When to use which:**
+
+- **Migrate** — the framework format changed (new required sections, renamed files, new YAML annotations). The spec content is still correct; the structure needs updating.
+- **Restart** — your product direction has drifted from the spec, the original pillars no longer feel true, or you want to rethink the philosophy with experience behind you.
+
+`rootspec prompts restart` reads your existing spec files, surfaces what still rings true, and guides you through a level-by-level reinterpretation.
+
+**See [docs/QUICK_START.md](docs/QUICK_START.md) for detailed workflows.**
+
+---
+
+### Path 4: Learning the Framework
 
 **Understanding the framework before committing**
 
@@ -645,7 +668,7 @@ When planning, always ask the user clarifying questions.
 
 ## Version Information
 
-**Current Version:** 4.4.1
+**Current Version:** 4.6.2
 
 This framework follows [Semantic Versioning](https://semver.org/):
 

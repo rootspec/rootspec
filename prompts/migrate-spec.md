@@ -30,6 +30,60 @@ Use the appropriate strategy based on version change:
 
 ## VERSION-SPECIFIC MIGRATION PATHS
 
+### Migrating from v4.x → v4.y (Minor Version)
+
+**Strategy:** Incremental additions — format is stable, only new features/sections added
+
+**Common changes between minor versions:**
+- New optional sections in spec files (add where missing)
+- New template variables in prompts (update `.rootspecrc.json` if needed)
+- New CLI commands (no spec file changes required)
+- New YAML annotation types in Level 5 (add to existing stories as needed)
+
+**Migration steps:**
+1. Read CHANGELOG.md for the specific version range
+2. Run `rootspec prompts validate` to identify missing sections
+3. Add any new optional sections to existing spec files
+4. Update `00.SPEC_FRAMEWORK.md` by running `rootspec init` (overwrites framework file only)
+5. Update `.rootspecrc.json` version field if present
+
+### Migrating from v3.x → v4.0 (CLI & YAML Structure)
+
+**Major changes:**
+- New CLI (`rootspec` command) replaces manual workflow
+- `.rootspecrc.json` configuration file introduced
+- `05.IMPLEMENTATION/USER_STORIES/` reorganized into `by_priority/`, `by_journey/`, `by_system/` subdirectories
+- New `extend` command for generating derived artifacts
+- `@spec_source` annotation now required in YAML user stories (was optional)
+- YAML user stories must now include `@journey` and `@systems` annotations
+
+**Migration steps:**
+
+1. **Install CLI:** `npm install -g rootspec`
+
+2. **Initialize config:** `rootspec init` (will detect existing spec and create `.rootspecrc.json`)
+
+3. **Reorganize USER_STORIES:**
+   ```
+   # Old structure:
+   05.IMPLEMENTATION/USER_STORIES/*.yaml
+
+   # New structure:
+   05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
+   05.IMPLEMENTATION/USER_STORIES/by_journey/ONBOARDING.yaml
+   05.IMPLEMENTATION/USER_STORIES/by_system/[SYSTEM_NAME].yaml
+   ```
+   Move existing YAML files into the appropriate subdirectory. You may need to split a single file into multiple by-system or by-journey files.
+
+4. **Add missing annotations** to each YAML user story:
+   - `@spec_source` — which spec section this story validates (e.g., `03.INTERACTION_ARCHITECTURE#section`)
+   - `@journey` — user journey this story belongs to (e.g., `ONBOARDING`, `CORE_LOOP`)
+   - `@systems` — which L4 systems are involved (e.g., `[AUTH_SYSTEM, USER_SYSTEM]`)
+
+5. **Update Cypress templates:** Run `rootspec cypress` to install updated templates
+
+6. **Validate:** Run `rootspec prompts validate` to confirm compliance
+
 ### Migrating from v2.x → v3.0 (YAML User Stories)
 
 **Major changes:**

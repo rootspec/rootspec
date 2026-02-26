@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
 import { initCommand } from './commands/init.js';
 import { cypressCommand } from './commands/cypress.js';
 import { validateCommand } from './commands/validate.js';
 import { promptsCommand } from './commands/prompts.js';
 import { extendCommand } from './commands/extend.js';
 
+const require = createRequire(import.meta.url);
+const CLI_VERSION = require('../package.json').version;
+
 const program = new Command();
 
 program
   .name('rootspec')
   .description('RootSpec - Hierarchical Specification Framework')
-  .version('4.3.0')
+  .version(CLI_VERSION)
   .addHelpText('before', `
 ╭───────────────────────────────────────────────────────────╮
 │  RootSpec - Hierarchical Specification Framework         │
@@ -36,7 +41,9 @@ About:
 Quick Start:
   $ rootspec init              Initialize RootSpec in your project
   $ rootspec prompts           List all available AI workflow prompts
-  $ rootspec prompts init      Get AI prompt to create your specification
+  $ rootspec prompts init      New project: create your specification
+  $ rootspec prompts adopt     Existing project: adopt the framework
+  $ rootspec prompts restart   Already using RootSpec: reinterpret or start fresh
 
 Documentation:
   https://github.com/rootspec/rootspec
@@ -107,7 +114,8 @@ Description:
 
 Available Prompts:
   init          - Create specification for new project
-  adopt         - Adopt framework for existing project
+  adopt         - Adopt framework for existing project (no spec yet)
+  restart       - Reinterpret or start over an existing specification
   add-feature   - Add new feature to specification
   review        - Review feature against specification
   validate      - Validate specification compliance
