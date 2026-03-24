@@ -95,6 +95,20 @@ else
   echo "[DRY RUN] Update version references in README.md to v$VERSION"
 fi
 
+echo "Updating .claude-plugin/plugin.json..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  sed -i '' -E 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' .claude-plugin/plugin.json
+else
+  echo "[DRY RUN] Update version in .claude-plugin/plugin.json to $VERSION"
+fi
+
+echo "Updating .claude-plugin/marketplace.json..."
+if [ "$DRY_RUN" != "--dry-run" ]; then
+  sed -i '' -E 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' .claude-plugin/marketplace.json
+else
+  echo "[DRY RUN] Update version in .claude-plugin/marketplace.json to $VERSION"
+fi
+
 echo ""
 echo "Step 2: Verify version updates"
 echo "-------------------------------"
@@ -102,6 +116,12 @@ UPDATED_VERSION=$(grep -oE 'Version:\*\* [0-9]+\.[0-9]+\.[0-9]+' 00.SPEC_FRAMEWO
 echo "Framework version: $UPDATED_VERSION"
 if [ "$DRY_RUN" != "--dry-run" ] && [ "$UPDATED_VERSION" != "$VERSION" ]; then
   echo "Error: 00.SPEC_FRAMEWORK.md version not updated correctly"
+  exit 1
+fi
+UPDATED_PLUGIN_VERSION=$(grep -oE '"version": "[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json | head -1 | sed 's/"version": "//' | sed 's/"//')
+echo "Plugin version: $UPDATED_PLUGIN_VERSION"
+if [ "$DRY_RUN" != "--dry-run" ] && [ "$UPDATED_PLUGIN_VERSION" != "$VERSION" ]; then
+  echo "Error: .claude-plugin/plugin.json version not updated correctly"
   exit 1
 fi
 echo "Version updates verified."
@@ -127,7 +147,7 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add 00.SPEC_FRAMEWORK.md README.md"
+run "git add 00.SPEC_FRAMEWORK.md README.md .claude-plugin/plugin.json .claude-plugin/marketplace.json"
 run "git commit -m 'Release v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."

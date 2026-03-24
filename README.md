@@ -11,98 +11,154 @@
 
 <p align="center">
   <a href="CHANGELOG.md">Changelog</a> •
-  <a href="docs/QUICK_START.md">Quick Start</a> •
-  <a href="prompts/">Prompts</a>
+  <a href="skills/">Skills</a> •
+  <a href="00.SPEC_FRAMEWORK.md">Framework</a>
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/rootspec"><img src="https://img.shields.io/npm/v/rootspec.svg?style=flat-square" alt="npm version"></a>
-  <a href="https://www.npmjs.com/package/rootspec"><img src="https://img.shields.io/npm/dm/rootspec.svg?style=flat-square" alt="npm downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT"></a>
   <a href="https://github.com/rootspec/rootspec"><img src="https://img.shields.io/github/stars/rootspec/rootspec?style=flat-square" alt="GitHub stars"></a>
 </p>
 
 ---
 
-**Version 4.6.2**
+**Version v5.0.0**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
-**AI-First Design:** Built for AI assistants to help you create, maintain, and validate comprehensive product specifications.
+**AI-First Design:** Built as Claude Code skills that interview you, create your spec, validate it, and drive test-first implementation.
 
-## Overview
+## Quick Start
 
-This repository contains a complete hierarchical specification framework designed to maintain architectural coherence across software projects. The framework enforces strict separation of concerns across five levels, from philosophical foundations to implementation details.
+Install the plugin:
 
-**Core Principle:** Each concern lives at exactly one level (single source of truth). Changes flow downward through abstraction layers while foundational documents remain stable.
+```
+/plugin marketplace add rootspec/rootspec
+/plugin install rootspec
+```
 
-**AI-Assisted Workflow:** This framework shines when used with AI assistants like Claude Code, which can guide you through the specification process, validate hierarchy rules, and ensure consistency across levels.
+Then:
+
+```
+/rs-init my productivity app for remote teams
+```
+
+The skill auto-detects your project state (greenfield, existing code, or existing spec) and interviews you level by level to create your specification.
+
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `/rs-init [product desc]` | Create, adopt, or reinterpret a spec |
+| `/rs-level <1-5> [change]` | Edit any spec level by number |
+| `/rs-feature [description]` | Add feature with impact analysis across all levels |
+| `/rs-review [target]` | Review feature/code against spec alignment |
+| `/rs-validate` | Validate spec: hierarchy, content quality, coverage |
+| `/rs-implement [story ID]` | Implement from YAML user stories (test-driven) |
+| `/rs-docs [type]` | Generate PRD, TDD, backlog, pillar matrix, API docs |
+| `/rs-extend <type>` | Derive artifact: tdd, ux, ui, brand, analytics, config |
+| `/rs-update` | Update framework + migrate spec to latest version |
+| `/rs-cypress` | Install/merge Cypress test templates |
+| `/rs-help` | Show skills, tips, best practices |
 
 ## The Five Levels
 
-| Level                           | Purpose                              | Key Question                                          | References                   |
-| ------------------------------- | ------------------------------------ | ----------------------------------------------------- | ---------------------------- |
-| **1: Foundational Philosophy**  | WHY & WHAT EXPERIENCE                | "What problem must we solve? What should users feel?" | External only                |
-| **2: Stable Truths**            | Design strategies & commitments      | "What approach will we take?"                         | L1 + External                |
-| **3: Interaction Architecture** | HOW users and product interact       | "What's the behavioral pattern?"                      | L1-2 + External              |
-| **4: Systems**                  | Implementation architecture          | "How do we build this?"                               | L1-3 + Sibling L4 + External |
-| **5: Implementation**           | Validation (YAML + Cypress) & tuning | "Does it work? What values?"                          | All levels + External        |
+| Level | Purpose | Key Question | References |
+|-------|---------|-------------|------------|
+| **1: Foundational Philosophy** | WHY & WHAT EXPERIENCE | "What problem must we solve? What should users feel?" | External only |
+| **2: Stable Truths** | Design strategies & commitments | "What approach will we take?" | L1 + External |
+| **3: Interaction Architecture** | HOW users and product interact | "What's the behavioral pattern?" | L1-2 + External |
+| **4: Systems** | Implementation architecture | "How do we build this?" | L1-3 + Sibling L4 + External |
+| **5: Implementation** | Validation (YAML + Cypress) & tuning | "Does it work? What values?" | All levels + External |
 
 ### Reference Rules
 
-**CRITICAL**: Each level has strict reference constraints to maintain architectural integrity:
+Each level can only reference higher levels, never lower. This prevents circular dependencies and keeps philosophy stable when implementation changes.
 
-1. **Level 1** can only reference external resources
-2. **Level 2** can reference Level 1 + external resources
-3. **Level 3** can reference Levels 1-2 + external resources
-4. **Level 4** can reference Levels 1-3 + sibling Level 4 docs + external resources
-5. **Level 5** can reference all levels + external resources
+## How It Works
 
-**Never reference lower levels from higher levels** (e.g., don't reference Level 4 Systems from Level 3 Interaction Architecture).
+### 1. Interview-Driven Spec Creation
 
-## Key Features
+Skills guide you through a conversational interview, one question at a time. They challenge anti-patterns (features masquerading as feelings, hardcoded numbers in the wrong level) and help you build a spec that's structurally sound.
 
-- **Strict Reference Hierarchy**: Higher levels cannot reference lower levels, preventing circular dependencies
-- **Single Source of Truth**: Each concern lives at exactly one level
-- **Dependency Inversion**: Philosophy drives implementation, not the reverse
-- **Scalable Architecture**: Systems remain loosely coupled while maintaining clear interaction patterns
-- **Future-Proof Design**: Stable upper levels protect against constant churn in implementation details
-- **Automated Testing**: User stories in YAML format automatically generate Cypress end-to-end tests
+```
+/rs-init meal planning app for busy families
+
+> No existing spec. Let's build from the ground up.
+> What 3-5 similar products exist? What do they get wrong?
+```
+
+### 2. Cascading Changes
+
+When you edit a level, the skill offers to review downstream levels:
+
+```
+/rs-level 2 add a new trade-off
+
+> Level 2 updated. Changes may affect levels 3-5.
+> 1. Review next level → /rs-level 3
+> 2. Skip
+> 3. Show what might need changing (read-only)
+```
+
+### 3. Parallel Validation
+
+`/rs-validate` launches sub-agents to check hierarchy, content quality, and coverage simultaneously:
+
+```
+/rs-validate
+
+> Score: 72/100
+> FAIL  L2:45 references "INVENTORY_SYSTEM" (L4 concept)
+> WARN  L3:78 "500ms" should be placeholder [brief duration]
+> Fix with /rs-level 2 for the hierarchy violation.
+```
+
+### 4. Test-Driven Implementation
+
+YAML user stories auto-generate Cypress E2E tests. The test ledger tracks pass/fail history per acceptance criterion.
+
+```
+/rs-cypress          # Install test templates
+/rs-implement        # Implement from stories, one at a time
+```
+
+## Project Structure (After Setup)
+
+```
+your-project/
+├── 00.SPEC_FRAMEWORK.md           # Framework definition (reference)
+├── 01.FOUNDATIONAL_PHILOSOPHY.md  # L1: WHY & WHAT EXPERIENCE
+├── 02.STABLE_TRUTHS.md            # L2: Design strategies
+├── 03.INTERACTION_ARCHITECTURE.md # L3: Interaction patterns
+├── 04.SYSTEMS/                    # L4: System specs
+│   ├── SYSTEMS_OVERVIEW.md
+│   └── [YOUR_SYSTEMS].md
+├── 05.IMPLEMENTATION/             # L5: User stories + parameters
+│   ├── USER_STORIES/              # YAML → Cypress tests
+│   └── FINE_TUNING/               # Numeric parameter YAML
+├── test-ledger.json               # Test pass/fail tracking
+└── DERIVED_ARTIFACTS/             # Generated docs (from /rs-extend)
+```
 
 ## Why This Framework?
 
-### Philosophy: Validation in an AI-Driven World
+### Validation in an AI-Driven World
 
-In an AI-driven world, **validation and proof are the real value generators**. Code, specifications, and even ideas can be trivially generated by AI systems. The true value—and the real challenge—lies in **review, validation, and proof** of what was built.
+AI can generate code and specs trivially. The real value is **validation and proof**.
 
-This matters because:
+This framework provides proof through:
+1. **Top-down goal fulfillment** — start with Design Pillars (the "why")
+2. **Strategic clarity** — determine "what" fulfills the philosophy
+3. **Behavioral patterns** — define "how" users interact
+4. **System architecture** — figure out what systems are needed
+5. **User validation** — executable tests that prove it works
 
-**Non-deterministic execution requires proof.** AI systems can _claim_ they implemented something, but given the non-deterministic nature of LLMs, we cannot trust claims alone. The proof is the most important part.
+Every detail traces back to a user need, which traces to a Design Pillar, which serves the mission. The framework transforms AI-generated code from "unverifiable claims" into "proven implementations."
 
-**Professional integrity demands it.** At professional, enterprise, and state-of-the-art levels, integrity matters as much as the product itself. Without proof, we cannot ship something that was built by AI. Full stop.
+### Philosophy
 
-**This framework is designed to provide that proof** through:
-
-1. **Top-down goal fulfillment** - Start with first principles and Design Pillars that give us "Why" (otherwise there's no point)
-2. **Strategic clarity** - Determine "What" we need to build to fulfill that philosophy
-3. **Behavioral patterns** - Define "How" users and product interact at a high level
-4. **System architecture** - Figure out the Systems that comprise the product
-5. **User validation** - Implement those systems from the user's perspective (stories that become executable tests)
-
-**Implementation details only matter insofar as they fulfill our needs.** We stay pragmatic—performance is a need, over-engineering is not. The framework keeps us honest: every detail must trace back to a user need, which must trace back to a Design Pillar, which must serve the mission.
-
-In this way, the framework transforms AI-generated code from "unverifiable claims" into "proven implementations."
-
-### Philosophy & Motivation
-
-Traditional specification approaches often suffer from **circular dependencies** and **implementation-driven design**:
-
-- **Bottom-up specifications** start with features, leading to incoherent user experiences
-- **Implementation-first thinking** couples architecture to implementation details
-- **Spec drift** occurs when documentation doesn't match actual product philosophy
-- **Feature creep** happens without clear decision filters
-
-**This framework solves these problems through dependency inversion:**
+Traditional spec approaches suffer from circular dependencies and implementation-driven design. This framework solves it through dependency inversion:
 
 ```
 Philosophy (Level 1)
@@ -116,582 +172,28 @@ System Architecture (Level 4)
 Implementation & Tests (Level 5)
 ```
 
-**The root system metaphor:** Think of this framework file as a seed that grows into your specification root system. Plant it, grow through AI conversation, extend with specialized artifacts. Levels map to a tree: roots (philosophy) feed trunk (strategy) feed branches (patterns) feed leaves (systems) feed fruit (implementation). Root extensions let you derive technical designs, UX wireframes, brand guidelines, and more from your spec. See [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md#the-seed-metaphor) for the full mental model.
-
 **Key benefits:**
+- Stable foundations — philosophy doesn't change when you adjust implementation
+- Clear decision-making — Design Pillars filter feature requests
+- Living documentation — YAML user stories auto-generate tests
+- Team alignment — shared understanding from "why" to "how much"
 
-1. **Stable foundations** - Philosophy doesn't change when you adjust implementation
-2. **Clear decision-making** - Design Pillars filter feature requests
-3. **Architectural integrity** - High-level policy guides low-level details
-4. **Living documentation** - YAML user stories auto-generate tests
-5. **Team alignment** - Shared understanding from "why" to "how much"
+### When to Use
 
-**Trade-offs:**
+**Good for:** Complex products, long-lived systems, team collaboration, AI-assisted development
 
-- **More upfront structure** vs. "just start coding"
-- **Disciplined hierarchy** vs. flexible documentation
-- **Best for:** Complex products, long-lived systems, team collaboration
-- **Not ideal for:** Throwaway prototypes, single-developer experiments
-
-### When to Use This Framework
-
-**Use this framework when:**
-
-- Building complex products with multiple interconnected systems
-- Working with teams that need aligned understanding
-- Creating long-lived systems that will evolve over years
-- You need to maintain coherent user experience across features
-- Specifications need to guide both human and AI implementation
-
-**Example domains:**
-
-- SaaS platforms (project management, CRM, analytics)
-- Games (RPGs, strategy games, simulation)
-- Education tools (learning platforms, course management)
-- Healthcare applications (patient portals, clinical systems)
-- Financial services (trading platforms, banking apps)
-
-**Don't use this framework when:**
-
-- Building a quick MVP to test market fit (use lighter docs)
-- Throwaway prototype or proof-of-concept
-- Project has no clear philosophical foundation yet
-- Team prefers pure agile/emergent design
-
-### How This Compares to Other Approaches
-
-#### vs. Traditional PRDs (Product Requirements Documents)
-
-**Traditional PRD:**
-
-- Lists features and requirements
-- Often implementation-first
-- Philosophy emerges from features (if at all)
-- Updates lag behind implementation
-
-**This Framework:**
-
-- Starts with philosophy and experience
-- Features must support Design Pillars
-- Implementation guided by stable truths
-- Specifications drive implementation
-
-#### vs. User Stories Only
-
-**User Stories Only:**
-
-- Good for capturing user needs
-- Lacks architectural coherence
-- No philosophical foundation
-- Features can contradict each other
-
-**This Framework:**
-
-- User stories validate system implementations (Level 5)
-- Backed by system architecture (Level 4)
-- Guided by interaction patterns (Level 3)
-- Aligned with philosophical foundations (Levels 1-2)
-
-#### vs. Code-as-Specification
-
-**Code-as-Spec:**
-
-- Implementation IS the specification
-- No separation of concerns
-- Philosophy implicit in code
-- Hard to validate alignment
-
-**This Framework:**
-
-- Specification guides code
-- Clear separation: why/what/how/how-much
-- Philosophy explicit and stable
-- Easy to validate implementation against spec
-
-## Installation
-
-RootSpec v4.0+ includes a CLI that automates framework setup and prompt generation.
-
-### Using npm (Recommended)
-
-```bash
-# Install globally
-npm install -g rootspec
-
-# Or use directly with npx (no installation)
-npx rootspec init
-```
-
-### Manual Installation (Alternative)
-
-If you prefer not to use npm or need offline access, you can manually download the framework:
-
-```bash
-curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
-```
-
-**Note:** The CLI provides additional commands for generating AI prompts with auto-detected project context, Cypress test setup, and specification validation. See `rootspec --help` for all commands.
-
-## Getting Started
-
-Choose your path based on your project stage:
-
-### Path 1: New Project (Greenfield)
-
-**Starting from scratch with a new product concept**
-
-**Step 1: Initialize RootSpec in your project**
-
-```bash
-# Initialize with CLI (creates spec/ directory and copies framework)
-npx rootspec init
-
-# Or specify custom path
-npx rootspec init --path ./docs/spec
-```
-
-This creates:
-
-- `spec/00.SPEC_FRAMEWORK.md` - Framework definition (reference)
-- `.rootspecrc.json` - Configuration file tracking your setup
-
-**Step 2: Generate your specification with AI**
-
-```bash
-# Generate AI prompt for new project
-rootspec prompts init
-```
-
-This command:
-
-- **Scans your project structure** (detects framework, source directories, config files)
-- **Generates a ready-to-use prompt** with your project context already filled in
-- **Outputs** a prompt you can paste directly into your AI assistant (Claude, ChatGPT, etc.)
-
-The AI will then:
-
-- Read `00.SPEC_FRAMEWORK.md` to understand the framework structure
-- Ask you questions level-by-level (WHY → WHAT → HOW → HOW MUCH)
-- Generate your complete specification files (01-05)
-
-**Time estimate:** 2-4 hours for initial draft
-
-<details>
-<summary><strong>Alternative: Manual workflow (without CLI)</strong></summary>
-
-If you prefer not to use the CLI:
-
-1. Download the framework file:
-
-   ```bash
-   curl -O https://raw.githubusercontent.com/rootspec/rootspec/main/00.SPEC_FRAMEWORK.md
-   ```
-
-2. Read and copy the prompt from **[prompts/initialize-spec.md](prompts/initialize-spec.md)**, manually filling in your project details
-
-3. Paste into your AI assistant
-
-</details>
-
-**Step 3: Your project structure becomes:**
-
-```
-your-project/
-├── 00.SPEC_FRAMEWORK.md           # Framework definition (reference, read-only)
-├── 01.FOUNDATIONAL_PHILOSOPHY.md  # Generated: Your WHY & WHAT EXPERIENCE
-├── 02.STABLE_TRUTHS.md            # Generated: Your design strategies
-├── 03.INTERACTION_ARCHITECTURE.md # Generated: Your interaction patterns
-├── 04.SYSTEMS/                    # Generated: Your system specs
-│   ├── SYSTEMS_OVERVIEW.md
-│   └── [YOUR_SYSTEMS].md
-└── 05.IMPLEMENTATION/             # Generated: User stories (YAML→Cypress) & parameters
-    ├── USER_STORIES/              # YAML files with auto-generated Cypress tests
-    └── FINE_TUNING/               # Numeric parameter YAML files
-```
-
-**Step 4: (Optional) Set up automated testing**
-
-See **[docs/CYPRESS_SETUP.md](docs/CYPRESS_SETUP.md)** for complete Cypress integration guide.
-
-Your YAML user stories will automatically generate end-to-end tests.
-
----
-
-### Path 2: Existing Project (Brownfield)
-
-**Applying the framework to an existing codebase or product**
-
-**Step 1: Initialize RootSpec in your existing project**
-
-```bash
-# Navigate to your project root
-cd your-existing-project/
-
-# Initialize RootSpec
-npx rootspec init
-```
-
-**Step 2: Generate specification with AI (auto-detects your codebase)**
-
-```bash
-# Generate adoption prompt with auto-detected context
-rootspec prompts adopt
-```
-
-**What the CLI automatically detects:**
-
-- **Framework/Stack**: Next.js, Nuxt, React, Vue, Angular, Express, Fastify, etc.
-- **Source directories**: `src/`, `lib/`, `app/`, `components/`, `pages/`, etc.
-- **Configuration files**: `tsconfig.json`, `package.json`, `vite.config.ts`, etc.
-- **Existing specification**: Detects if you have partial specs already
-
-**Example output:**
-
-```
-🌳 Adopt RootSpec Framework
-
-Analyzing your existing codebase...
-
-  ✓ Found src/
-  ✓ Found components/
-  ✓ Detected framework: Next.js
-  ✓ Found config files: tsconfig.json, package.json, next.config.js
-
-✅ Prompt ready! Copy and paste into your AI assistant:
-
-I have an existing Next.js project and want to adopt the RootSpec framework.
-
-**Source directories:**
-- src/
-- components/
-
-**Framework/Stack:** Next.js
-...
-```
-
-**Step 3: Choose your approach**
-
-The prompt will ask you to choose:
-
-**Specification-First (Recommended):**
-
-- Define ideal philosophy and architecture
-- Document what SHOULD exist
-- Create gap analysis vs. current state
-- Refactor incrementally toward spec
-
-**Reverse-Engineering (Pragmatic):**
-
-- Document current architecture as-is
-- Infer implicit design decisions
-- Extract retrospective philosophy
-- Validate spec matches reality
-
-The AI will then help you:
-
-- Map existing code to framework levels
-- Define Design Pillars that match your decisions
-- Create gap analysis (if Specification-First)
-- Document current state accurately (if Reverse-Engineering)
-
-**Time estimate:** 4-8 hours depending on codebase size
-
-**Step 4: Establish as single source of truth**
-
-- Use Design Pillars to filter roadmap
-- Reference spec in PRs and planning
-- Gradual migration over 3-6 months (if Specification-First)
-- Ongoing maintenance (if Reverse-Engineering)
-
-**See [docs/QUICK_START.md](docs/QUICK_START.md) for detailed workflows.**
-
----
-
-### Path 3: Already Using RootSpec
-
-**You have an existing RootSpec specification**
-
-```bash
-# Upgrade to a newer framework version (structural/format changes)
-rootspec prompts migrate
-
-# Reinterpret: keep lessons learned, rebuild spec fresh
-rootspec prompts restart
-```
-
-**When to use which:**
-
-- **Migrate** — the framework format changed (new required sections, renamed files, new YAML annotations). The spec content is still correct; the structure needs updating.
-- **Restart** — your product direction has drifted from the spec, the original pillars no longer feel true, or you want to rethink the philosophy with experience behind you.
-
-`rootspec prompts restart` reads your existing spec files, surfaces what still rings true, and guides you through a level-by-level reinterpretation.
-
-**See [docs/QUICK_START.md](docs/QUICK_START.md) for detailed workflows.**
-
----
-
-### Path 4: Learning the Framework
-
-**Understanding the framework before committing**
-
-1. **Read [00.SPEC_FRAMEWORK.md](00.SPEC_FRAMEWORK.md)** - Complete framework structure and rules
-2. **Read [CLAUDE.md](CLAUDE.md)** - AI assistant quick reference
-3. **Review [packages/cypress/templates/USER_STORIES/](packages/cypress/templates/USER_STORIES/)** - See YAML examples
-4. **Check [CHANGELOG.md](CHANGELOG.md)** - Version history and evolution
-5. **Try [docs/QUICK_START.md](docs/QUICK_START.md)** - Fast-track guides for both scenarios
-
-**Time investment:** 1-2 hours to understand, 2-8 hours to create your first spec
-
-## Working with AI Assistants
-
-This framework is specifically designed for AI-assisted specification development. Use the prompts below with AI assistants (Claude, GPT-4, etc.) to create and maintain your specifications.
-
-**Quick workflow with CLI (v4.0+):**
-
-1. Run `npx rootspec init` to set up the framework
-2. Run `rootspec prompts <command>` to generate context-aware prompts
-3. CLI **auto-scans your project** (framework, directories, files) and fills in placeholders
-4. Copy the generated prompt and paste into your AI assistant
-5. AI reads framework and generates your spec files (01-05)
-
-**CLI Commands for Common Tasks:**
-
-- `rootspec prompts init` - Initialize new specification
-- `rootspec prompts adopt` - Adopt framework for existing project
-- `rootspec prompts validate` - Validate specification
-- `rootspec prompts add-feature` - Add feature to spec
-- `rootspec prompts review` - Review feature against spec
-- `rootspec prompts` - See all available prompts
-
-**Root Extensions (Specialized Artifacts):**
-
-- `rootspec extend` - List available extension types
-- `rootspec extend technical-design` - Generate architecture docs from L4 Systems
-- `rootspec extend ux-design` - Generate wireframes from L5 User Stories
-- `rootspec extend brand-guidelines` - Generate brand voice from L1 Design Pillars
-
-Extensions transform your specification into specialized deliverables. Run `rootspec extend` to see all available types and their dependencies.
-
-**📚 Full prompt library:** See [prompts/](prompts/) directory for detailed prompt templates (auto-filled by CLI)
-
-**💡 Note:** The prompts below are simplified quick versions. Use the CLI commands for auto-contextualized prompts, or see [prompts/](prompts/) for detailed template files.
-
----
-
-<details>
-<summary>🚀 <strong>Initialize a New Specification</strong></summary>
-
-<br/>
-
-**Quick prompt:**
-
-```
-I have copied 00.SPEC_FRAMEWORK.md to my project.
-
-My product idea: [Brief description]
-
-Help me create my specification by asking questions about:
-1. Level 1: Mission, 3-5 Design Pillars, inviolable principles
-2. Level 2: Design strategies and commitments
-3. Level 3: Interaction patterns
-4. Level 4: System architecture
-5. Level 5: User stories (YAML) and parameters
-
-Follow framework rules: hierarchy, placeholders in L1-4, no upward references.
-```
-
-**📖 Detailed prompt:** [prompts/initialize-spec.md](prompts/initialize-spec.md)
-
-</details>
-
-<details>
-<summary>🔄 <strong>Migrate Specification to Newer Version</strong></summary>
-
-<br/>
-
-**Quick prompt:**
-
-```
-I have a spec using framework v[OLD_VERSION]. I've updated to v5.0.0.
-
-Read CHANGELOG.md and help me migrate:
-1. Identify breaking changes
-2. Rename files if needed
-3. Convert user stories to YAML (if from v2.x)
-4. Update all cross-references
-5. Validate against new framework rules
-```
-
-**📖 Detailed prompt:** [prompts/migrate-spec.md](prompts/migrate-spec.md)
-
-</details>
-
-<details>
-<summary>✅ <strong>Validate an Existing Specification</strong></summary>
-
-<br/>
-
-**Quick prompt:**
-
-```
-Validate my specification against framework v5.0.0:
-
-Check:
-- Reference hierarchy (no upward references)
-- No numeric values in L1-4 (placeholders only)
-- Design Pillars are emotional, not features
-- User stories have test DSL
-- All required sections present
-
-Report violations with file:line and suggested fixes.
-```
-
-**📖 Detailed prompt:** [prompts/validate-spec.md](prompts/validate-spec.md)
-
-</details>
-
-<details>
-<summary>🔍 <strong>Add Feature to Existing Specification</strong></summary>
-
-<br/>
-
-**Quick prompt:**
-
-```
-I want to add a new feature: [Description]
-
-Help me:
-1. Check which Design Pillar(s) it supports
-2. Determine which levels need updates
-3. Draft changes for each affected level
-4. Ensure changes flow downward only
-5. Create user stories and tests (L5)
-```
-
-**📖 Detailed prompt:** [prompts/add-feature.md](prompts/add-feature.md)
-
-</details>
-
-<details>
-<summary>📊 <strong>Generate Documentation from Spec</strong></summary>
-
-<br/>
-
-**Quick prompt:**
-
-```
-Generate from my specification:
-- PRD (Product Requirements Document)
-- TDD (Technical Design Document)
-- User Story Backlog
-- Design Pillar Validation Matrix
-
-Maintain traceability to spec levels.
-```
-
-**📖 Detailed prompt:** [prompts/generate-docs.md](prompts/generate-docs.md)
-
-</details>
-
-<details>
-<summary>🎯 <strong>Review Feature Against Specification</strong></summary>
-
-<br/>
-
-**Quick prompt:**
-
-```
-Review this feature/implementation: [Description or code]
-
-Check alignment with:
-1. L1: Design Pillars and principles
-2. L2: Design strategies
-3. L3: Interaction patterns
-4. L4: System boundaries
-5. L5: Parameters
-
-Verdict: ✅ Approved / ⚠️ Needs Changes / ❌ Violates Spec
-```
-
-**📖 Detailed prompt:** [prompts/review-feature.md](prompts/review-feature.md)
-
-</details>
-
----
-
-### Tips for Best Results
-
-**When working with AI assistants:**
-
-1. **Be specific** - Provide context about your domain and constraints
-2. **Answer thoroughly** - AI uses your answers to generate better specs
-3. **Iterate** - Refine AI-generated content based on your expertise
-4. **Validate frequently** - Use the validation prompt regularly
-5. **Question suggestions** - If something feels wrong, speak up
-
-**Common commands:**
-
-- `"Check if this violates any hierarchy rules"`
-- `"Generate 3 user stories for [SYSTEM] in YAML format"`
-- `"Does this feature support at least one Design Pillar?"`
-- `"Rewrite this without referencing Level 4 systems"`
-
-**For more tips:** See [prompts/tips-and-best-practices.md](prompts/tips-and-best-practices.md)
-
----
-
-### Framework-Aware AI Assistants
-
-This framework includes guidance files that AI assistants automatically read:
-
-- **CLAUDE.md** - Brief quick reference for Claude Code
-- **00.SPEC_FRAMEWORK.md** - Complete framework specification
-- **prompts/** - Detailed prompts for all use cases
-
-When working in a directory containing these files, AI assistants will:
-
-- Understand the five-level hierarchy
-- Enforce reference rules
-- Guide you through level-by-level specification
-- Validate against anti-patterns
-- Help create YAML user stories with test DSL
-
-**Important tip:** Instruct the AI assistant to _ask questions_. For example, when using Claude Code, add these instructions to your global CLAUDE.md.
-
-```
-Keep all responses, commit messages, and written text as clear and concise as possible. Sacrifice grammar for concision when necessary.
-
-When planning, always ask the user clarifying questions.
-```
-
----
+**Not ideal for:** Throwaway prototypes, single-developer experiments
 
 ## Version Information
 
-**Current Version:** 4.6.2
+**Current Version:** v5.0.0
 
-This framework follows [Semantic Versioning](https://semver.org/):
-
-- **Major versions** (2.0.0) include breaking changes requiring migration
-- **Minor versions** (2.1.0) add features while maintaining compatibility
-- **Patch versions** (2.0.1) fix bugs and clarify documentation
-
-See [CHANGELOG.md](CHANGELOG.md) for:
-
-- Complete version history
-- Migration guides for major version upgrades
-- Detailed list of changes in each release
+See [CHANGELOG.md](CHANGELOG.md) for version history and migration guides.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
 ## Contributing
 
-We welcome contributions! Please see:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Development guidelines and contribution process
-- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - Known bugs and limitations
-- [docs/ROADMAP.md](docs/ROADMAP.md) - Feature roadmap and priorities
-
-Found a bug? Check [KNOWN_ISSUES.md](KNOWN_ISSUES.md) first, then [file an issue](https://github.com/rootspec/rootspec/issues/new/choose).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Found a bug? [File an issue](https://github.com/rootspec/rootspec/issues/new/choose).

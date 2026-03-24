@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.1] - 2026-03-24
+
+### Fixed
+
+- **Release script missing plugin files**: `release.sh` now updates version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+- **README still referenced CLI**: Rewrote README for skills-based interface — installation via plugin marketplace, skill reference table, workflow examples
+
+### Added
+
+- **Plugin packaging**: `.claude-plugin/plugin.json` and `marketplace.json` for Claude Code and Cursor marketplace distribution
+- **SKILL.md convention**: Renamed skill files from `rs-*.md` to `SKILL.md` per plugin spec
+
 ## [5.0.0] - 2026-03-24
 
 ### Breaking Changes
