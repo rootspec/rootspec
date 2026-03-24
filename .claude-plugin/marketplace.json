@@ -1,0 +1,14 @@
+{
+  "name": "rootspec",
+  "owner": {
+    "name": "RootSpec"
+  },
+  "plugins": [
+    {
+      "name": "rootspec",
+      "source": ".",
+      "description": "11 skills for creating, validating, and implementing product specs — interview-driven with parallel validation and Cypress test generation",
+      "version": "5.0.0"
+    }
+  ]
+}

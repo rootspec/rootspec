@@ -1,0 +1,8 @@
+{
+  "name": "rootspec",
+  "description": "Hierarchical product specification framework — interview-driven spec creation, validation, and test-driven implementation",
+  "version": "5.0.0",
+  "author": {
+    "name": "RootSpec"
+  }
+}

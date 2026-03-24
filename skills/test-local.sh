@@ -36,8 +36,11 @@ for skill_dir in "$ROOTSPEC_DIR"/skills/rs-*/; do
 done
 
 # Install skills into .claude/skills/ (symlinks to source for live editing)
-for skill_file in "$ROOTSPEC_DIR"/skills/rs-*/rs-*.md; do
-  skill_name=$(basename "$skill_file" .md)
+for skill_dir in "$ROOTSPEC_DIR"/skills/rs-*/; do
+  [[ "$(basename "$skill_dir")" == "rs-shared" ]] && continue
+  skill_name=$(basename "$skill_dir")
+  skill_file="$skill_dir/SKILL.md"
+  [[ -f "$skill_file" ]] || continue
   mkdir -p "$TEST_DIR/.claude/skills/$skill_name"
   ln -sfn "$skill_file" "$TEST_DIR/.claude/skills/$skill_name/SKILL.md"
 done
