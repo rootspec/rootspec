@@ -5,54 +5,46 @@ Brief guidance for Claude Code when working in this repository.
 ## Quick Context Check
 
 **Are you in the framework repository?**
-- This repo contains the framework definition only
-- Files: `00.SPEC_FRAMEWORK.md`, `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `prompts/`, `packages/`
+- This repo contains the framework definition + skills
+- Files: `00.SPEC_FRAMEWORK.md`, `skills/`, `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `packages/`
 - Does NOT contain user specification files (01-05)
-- Purpose: Maintain the framework itself
+- Purpose: Maintain the framework and skills
 
 **Are you in a user's project?**
-- User has copied `00.SPEC_FRAMEWORK.md` to their project
-- User has created their specs: `01.FOUNDATIONAL_PHILOSOPHY.md`, `02.STABLE_TRUTHS.md`, etc.
+- User has installed the RootSpec plugin (skills available as `/rs-*`)
+- User has or is creating specs: `01.FOUNDATIONAL_PHILOSOPHY.md`, `02.STABLE_TRUTHS.md`, etc.
 - **Read the user's `00.SPEC_FRAMEWORK.md` first** for complete framework rules
 - Purpose: Create/maintain/validate their product specification
 
 ---
 
-## CLI-Aware Workflows (v4.0+)
+## Skills-Based Interface (v5.0+)
 
-**RootSpec v4.0+** includes a CLI that auto-generates prompts with project context.
+RootSpec uses Claude Code skills for all specification workflows. Users invoke skills with `/rs-*` commands.
 
-### Using the CLI
+### Available Skills
 
-When you see prompt references like `prompts/initialize-spec.md` in this guide:
-- **Preferred**: User runs `rootspec prompts <name>` to get auto-filled prompt
-- **Manual**: User reads template file directly (contains `{{PLACEHOLDERS}}`)
+| Skill | Description |
+|-------|-------------|
+| `/rs-init [product desc]` | Create, adopt, or reinterpret a spec — auto-detects project state |
+| `/rs-level <1-5> [change]` | Edit any spec level by number |
+| `/rs-feature [description]` | Add a feature with impact analysis across all levels |
+| `/rs-review [target]` | Review feature or code against spec alignment |
+| `/rs-validate` | Validate spec: hierarchy, content quality, coverage |
+| `/rs-implement [story ID]` | Implement from YAML user stories (test-driven) |
+| `/rs-docs [type]` | Generate PRD, TDD, backlog, pillar matrix, API docs |
+| `/rs-extend <type>` | Derive artifact: tdd, ux, ui, brand, analytics, config |
+| `/rs-update` | Update framework + migrate spec to latest version |
+| `/rs-cypress` | Install/merge Cypress test templates |
+| `/rs-help` | Show available skills, tips, best practices |
 
-### What the CLI Does
-
-The CLI automatically scans the user's codebase to fill in:
-- **Framework detection**: Next.js, Nuxt, React, Vue, Angular, Express, Fastify, etc.
-- **Source directories**: `src/`, `lib/`, `app/`, `components/`, `pages/`, etc.
-- **Configuration files**: `tsconfig.json`, `package.json`, build configs, etc.
-- **Specification directory**: Location from `.rootspecrc.json` or scanning
-
-### CLI Commands for Common Tasks
-
-- `rootspec init` - Initialize framework in project
-- `rootspec prompts init` - New project prompt (auto-scanned)
-- `rootspec prompts adopt` - Existing project prompt (auto-scanned)
-- `rootspec prompts validate` - Validation prompt (scans spec files)
-- `rootspec prompts add-feature` - Add feature prompt (scans spec)
-- `rootspec prompts review` - Review feature prompt (scans spec)
-- `rootspec cypress` - Install Cypress templates
-- `rootspec validate` - Run validation checks
-
-### When to Mention CLI
+### When to Suggest Skills
 
 If user asks about:
-- "How do I start?" → Suggest `rootspec init` + `rootspec prompts <name>`
-- "How do I use prompts?" → Mention CLI auto-fills context
-- "Can I do this manually?" → Yes, prompts/ files are templates
+- "How do I start?" → `/rs-init`
+- "How do I add a feature?" → `/rs-feature`
+- "Is my spec valid?" → `/rs-validate`
+- "How do I implement from stories?" → `/rs-implement`
 
 ---
 
@@ -60,36 +52,28 @@ If user asks about:
 
 **Is this a NEW project (greenfield)?**
 - Starting from scratch with new product concept
-- No existing codebase or minimal implementation
-- Use `rootspec prompts init` (or manually read `prompts/initialize-spec.md`)
+- Use `/rs-init my product description`
 - Generate specs level-by-level: L1 → L2 → L3 → L4 → L5
-- Work top-down from philosophy to implementation
 
 **Is this an EXISTING project (brownfield)?**
 - Has existing codebase or partially-built product
-- Applying framework retroactively
-- Use `rootspec prompts adopt` (or manually read `prompts/adopt-framework-existing.md`)
-- **Choose approach:**
-  - **Specification-First (recommended):** Define ideal state, create gap analysis, refactor toward spec
-  - **Reverse-Engineering:** Document current state, infer philosophy from implementation
-- Handle technical debt and migration planning
+- Use `/rs-init my existing product description`
+- Skill auto-detects code and adapts questions
 
-**Key differences in approach:**
-- Greenfield: Philosophy guides implementation (design first)
-- Brownfield Spec-First: Define ideal, plan migration, refactor incrementally
-- Brownfield Reverse-Eng: Extract philosophy from code, document as-is
+**Is this an existing spec needing refresh?**
+- Use `/rs-init` — skill detects existing spec and offers reinterpret path
 
 ---
 
 ## Repository Purpose
 
-This is a **Specification Framework Repository** - a hierarchical design document system template for software projects.
+This is a **Specification Framework Repository** — a hierarchical design document system for software projects.
 
 **This repository provides:**
-- `00.SPEC_FRAMEWORK.md` - Complete framework definition (users copy this to their projects)
-- `README.md` - Human-focused introduction and philosophy
-- `prompts/` - Detailed AI assistant prompts for all use cases
-- `packages/cypress/` - `@rootspec/cypress` package with Cypress test harness templates
+- `00.SPEC_FRAMEWORK.md` — Complete framework definition
+- `skills/` — Claude Code skills for all specification workflows
+- `README.md` — Human-focused introduction and philosophy
+- `packages/cypress/` — `@rootspec/cypress` package with Cypress test harness templates
 
 **Users create their own specification files (01-05)** following the framework definition.
 
@@ -113,11 +97,11 @@ This is a **Specification Framework Repository** - a hierarchical design documen
 
 When modifying specifications:
 
-1. **Maintain hierarchy** - Changes in lower levels shouldn't require changes in higher levels
-2. **Preserve philosophy** - Changes must align with Level 1
-3. **Design pillar alignment** - Features must support at least one design pillar
-4. **Use placeholders at Levels 1-4** - Actual numbers belong in Level 5 only
-5. **Follow reference rules** - Never violate hierarchical reference constraints
+1. **Maintain hierarchy** — Changes in lower levels shouldn't require changes in higher levels
+2. **Preserve philosophy** — Changes must align with Level 1
+3. **Design pillar alignment** — Features must support at least one design pillar
+4. **Use placeholders at Levels 1-4** — Actual numbers belong in Level 5 only
+5. **Follow reference rules** — Never violate hierarchical reference constraints
 
 ### Working with Level 5 USER_STORIES (YAML)
 
@@ -146,55 +130,38 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 
 ### Creating a New Spec
 
-1. Run `rootspec init` to initialize framework
-2. Run `rootspec prompts init` to generate context-aware prompt (or read `prompts/initialize-spec.md`)
-3. Paste generated prompt into AI assistant
-4. Follow AI Assistant Guidance section in 00.SPEC (after line 771)
-5. Work level-by-level: L1 → L2 → L3 → L4 → L5
+1. `/rs-init my product description`
+2. Skill auto-detects project state (greenfield/brownfield/existing spec)
+3. Interview process walks through each level
+4. Work level-by-level: L1 → L2 → L3 → L4 → L5
 
 ### Validating a Spec
 
-1. Run `rootspec validate` for automated checks
-2. Run `rootspec prompts validate` for detailed AI validation (or read `prompts/validate-spec.md`)
-3. Check reference hierarchy (L1→external, L2→L1+external, etc.)
-4. Verify no numeric values in L1-4 (placeholders only)
-5. Ensure Design Pillars focus on feelings, not features
+1. `/rs-validate` — parallel checks: hierarchy, content, coverage
+2. Fix issues with `/rs-level <N>` for the violating level
 
 ### Modifying a Spec
 
 1. Identify appropriate level (WHY=L1, WHAT=L2, HOW conceptual=L3, HOW implemented=L4, HOW MUCH=L5)
-2. Make changes at that level
-3. Propagate downward (never upward)
-4. Verify no new reference violations
-5. Use `rootspec prompts add-feature` for AI guidance (or read `prompts/add-feature.md`)
+2. `/rs-level <N> what you want to change`
+3. Skill handles interview, drafting, and cascade prompt
+
+### Adding a Feature
+
+1. `/rs-feature description of the feature`
+2. Skill runs impact analysis across all levels
+3. Walks through each impacted level with developer
 
 ### Implementing from Tests
 
-**Use when:** Implementing application iteratively from YAML user stories (spec-first development)
+1. `/rs-cypress` to set up test templates (if needed)
+2. `/rs-implement` to start test-driven implementation from YAML stories
+3. Work MVP stories first, then SECONDARY, then ADVANCED
 
-**For AI assistance:**
-1. Use `rootspec prompts implement` (or read `prompts/implement-from-tests.md`)
-2. **Phase 1:** Analyze all YAML tests, identify global setup needs
-3. **Phase 2:** Implement global setup (auth, DB reset, seed data)
-4. **Phase 3:** Iterate through MVP tests, implement one at a time
+### Updating Framework Version
 
-**For human developers:**
-- See `docs/IMPLEMENTATION_WORKFLOW.md` for detailed guide
-- Decision tree: Extend DSL → Modify app → Create fixtures
-- Commit after each passing test
-- Work MVP first, then POST_MVP
-
-**Key patterns:**
-- Global setup: `beforeEach` with database reset in `cypress/support/e2e.ts`
-- Auth: `loginAs` task in `cypress.config.ts` + localStorage/cookies
-- Seed data: `seedItem` task for on-demand test data
-- DSL extension: Add steps to `cypress/support/steps.ts` + schema
-
-### Migrating Spec Versions
-
-1. Read `CHANGELOG.md` for breaking changes
-2. Use prompt from `prompts/migrate-spec.md`
-3. Follow migration guide for specific version (e.g., v2.x → v3.0)
+1. `/rs-update` — auto-detects version mismatch
+2. Walks through breaking changes and new features
 
 ### Releasing a New Framework Version
 
@@ -214,12 +181,11 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 ```
 
 **The script handles:**
-- Finding and updating all version references (both `packages/cli/package.json` and `packages/cypress/package.json`, prompts/README.md)
+- Finding and updating all version references
 - Checking for stale version strings
 - Committing version updates
 - Creating and pushing git tag
 - Creating GitHub release with changelog notes
-- Publishing both `rootspec` (CLI) and `@rootspec/cypress` to npm
 
 **If you need to retag:** `git tag -d vX.Y.Z` then recreate and `git push --tags --force`
 
@@ -229,14 +195,14 @@ Fine-tuning parameters use comment-annotated YAML with `@annotation: value` meta
 
 **When working with a user's specification:**
 
-1. User's `00.SPEC_FRAMEWORK.md` - Framework reference
-2. User's `01.FOUNDATIONAL_PHILOSOPHY.md` - WHY & WHAT EXPERIENCE (mission, design pillars)
-3. User's `02.STABLE_TRUTHS.md` - WHAT strategies
-4. User's `03.INTERACTION_ARCHITECTURE.md` - HOW (behavioral loops)
-5. User's `04.SYSTEMS/SYSTEMS_OVERVIEW.md` - System interconnections
+1. User's `00.SPEC_FRAMEWORK.md` — Framework reference
+2. User's `01.FOUNDATIONAL_PHILOSOPHY.md` — WHY & WHAT EXPERIENCE (mission, design pillars)
+3. User's `02.STABLE_TRUTHS.md` — WHAT strategies
+4. User's `03.INTERACTION_ARCHITECTURE.md` — HOW (behavioral loops)
+5. User's `04.SYSTEMS/SYSTEMS_OVERVIEW.md` — System interconnections
 6. Specific system docs in user's `04.SYSTEMS/` as needed
-7. User's `05.IMPLEMENTATION/USER_STORIES/` - User validation stories (YAML with Cypress tests)
-8. User's `05.IMPLEMENTATION/FINE_TUNING/` - Numeric parameter values (YAML)
+7. User's `05.IMPLEMENTATION/USER_STORIES/` — User validation stories (YAML with Cypress tests)
+8. User's `05.IMPLEMENTATION/FINE_TUNING/` — Numeric parameter values (YAML)
 
 ---
 
@@ -251,16 +217,12 @@ Design Pillars are 3-5 core experiences or emotions that define what the product
 - Specific enough to guide decisions
 - Typically 3-5 pillars
 
-**See 00.SPEC_FRAMEWORK.md** Level 1 examples for complete structure and good/bad examples.
-
 ### YAML Formats (Level 5)
 
 Both USER_STORIES and FINE_TUNING use comment-annotated YAML:
 - YAML structure contains values only
 - Metadata in comments with `@annotation: value` syntax
 - Maintains traceability via `@spec_source` references
-
-**See 00.SPEC_FRAMEWORK.md** sections marked with HTML comments for complete details.
 
 ---
 
@@ -278,9 +240,9 @@ Both USER_STORIES and FINE_TUNING use comment-annotated YAML:
 
 ---
 
-For detailed prompts and guidance, see:
-- `prompts/` directory for all use cases
-- `prompts/implement-from-tests.md` for iterative implementation workflow (AI)
+For detailed guidance, see:
+- `skills/` directory for all skill definitions
+- `skills/README.md` for skill index and quick start
 - `docs/IMPLEMENTATION_WORKFLOW.md` for implementation guide (humans)
 - `00.SPEC_FRAMEWORK.md` for complete framework specification
 - `README.md` for human-focused introduction and philosophy
