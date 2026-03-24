@@ -9,9 +9,9 @@ set -e
 #   -y           Auto-confirm all prompts
 #
 # Examples:
-#   ./scripts/release.sh 4.4.1
-#   ./scripts/release.sh 4.5.0 --dry-run
-#   ./scripts/release.sh 4.4.1 -y
+#   ./scripts/release.sh 5.0.0
+#   ./scripts/release.sh 5.1.0 --dry-run
+#   ./scripts/release.sh 5.0.1 -y
 
 VERSION=$1
 shift || true
@@ -28,18 +28,18 @@ done
 
 if [ -z "$VERSION" ]; then
   echo "Usage: ./scripts/release.sh <version> [--dry-run] [-y]"
-  echo "Example: ./scripts/release.sh 4.4.1"
+  echo "Example: ./scripts/release.sh 5.0.0"
   exit 1
 fi
 
 # Validate version format
 if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Error: Version must be in format X.Y.Z (e.g., 4.4.1)"
+  echo "Error: Version must be in format X.Y.Z (e.g., 5.0.0)"
   exit 1
 fi
 
-# Get current version from package.json
-CURRENT_VERSION=$(grep '"version"' packages/cli/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
+# Get current version from framework file
+CURRENT_VERSION=$(grep -oE 'Version:\*\* [0-9]+\.[0-9]+\.[0-9]+' 00.SPEC_FRAMEWORK.md | head -1 | sed 's/Version:\*\* //')
 
 echo "================================================"
 echo "RootSpec Release Script"
@@ -78,36 +78,14 @@ echo ""
 echo "Step 1: Update version references"
 echo "----------------------------------"
 
-# Files to update with their version patterns
-# package.json uses "version": "X.Y.Z"
-# README.md uses vX.Y.Z
-echo "Updating packages/cli/package.json..."
+echo "Updating 00.SPEC_FRAMEWORK.md..."
 if [ "$DRY_RUN" != "--dry-run" ]; then
-  sed -i '' -E 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' packages/cli/package.json
+  sed -i '' -E 's/\*\*Version:\*\* [0-9]+\.[0-9]+\.[0-9]+/**Version:** '"$VERSION"'/' 00.SPEC_FRAMEWORK.md
+  CURRENT_DATE=$(date +%Y-%m-%d)
+  sed -i '' -E 's/\*\*Last Updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}/**Last Updated:** '"$CURRENT_DATE"'/' 00.SPEC_FRAMEWORK.md
 else
-  echo "[DRY RUN] Update version in packages/cli/package.json to $VERSION"
-fi
-
-echo "Updating packages/cypress/package.json..."
-if [ "$DRY_RUN" != "--dry-run" ]; then
-  sed -i '' -E 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' packages/cypress/package.json
-else
-  echo "[DRY RUN] Update version in packages/cypress/package.json to $VERSION"
-fi
-
-echo "Updating packages/*/src/index.ts version strings..."
-if [ "$DRY_RUN" != "--dry-run" ]; then
-  find packages -name "index.ts" -exec sed -i '' -E "s/\.version\('[0-9]+\.[0-9]+\.[0-9]+'\)/.version('$VERSION')/" {} \;
-else
-  echo "[DRY RUN] Update .version() in packages/*/src/index.ts to $VERSION"
-fi
-
-echo "Updating prompts/*.md..."
-if [ "$DRY_RUN" != "--dry-run" ]; then
-  find prompts -name "*.md" -exec sed -i '' -E 's/v[0-9]+\.[0-9]+\.[0-9]+/v'"$VERSION"'/g' {} \;
-else
-  echo "[DRY RUN] Update version references in prompts/*.md to v$VERSION"
-  grep -r "v[0-9]\+\.[0-9]\+\.[0-9]\+" prompts/ --include="*.md" | head -5
+  echo "[DRY RUN] Update version in 00.SPEC_FRAMEWORK.md to $VERSION"
+  echo "[DRY RUN] Update last updated date to current date"
 fi
 
 echo "Updating README.md..."
@@ -117,31 +95,13 @@ else
   echo "[DRY RUN] Update version references in README.md to v$VERSION"
 fi
 
-echo "Updating 00.SPEC_FRAMEWORK.md..."
-if [ "$DRY_RUN" != "--dry-run" ]; then
-  # Update version number
-  sed -i '' -E 's/\*\*Version:\*\* [0-9]+\.[0-9]+\.[0-9]+/**Version:** '"$VERSION"'/' 00.SPEC_FRAMEWORK.md
-  # Update last updated date to current date in YYYY-MM-DD format
-  CURRENT_DATE=$(date +%Y-%m-%d)
-  sed -i '' -E 's/\*\*Last Updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}/**Last Updated:** '"$CURRENT_DATE"'/' 00.SPEC_FRAMEWORK.md
-else
-  echo "[DRY RUN] Update version in 00.SPEC_FRAMEWORK.md to $VERSION"
-  echo "[DRY RUN] Update last updated date to current date"
-fi
-
 echo ""
 echo "Step 2: Verify version updates"
 echo "-------------------------------"
-UPDATED_PKG_VERSION=$(grep '"version"' packages/cli/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
-echo "packages/cli version: $UPDATED_PKG_VERSION"
-if [ "$UPDATED_PKG_VERSION" != "$VERSION" ]; then
-  echo "Error: packages/cli/package.json version not updated correctly"
-  exit 1
-fi
-UPDATED_CYPRESS_VERSION=$(grep '"version"' packages/cypress/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
-echo "packages/cypress version: $UPDATED_CYPRESS_VERSION"
-if [ "$UPDATED_CYPRESS_VERSION" != "$VERSION" ]; then
-  echo "Error: packages/cypress/package.json version not updated correctly"
+UPDATED_VERSION=$(grep -oE 'Version:\*\* [0-9]+\.[0-9]+\.[0-9]+' 00.SPEC_FRAMEWORK.md | head -1 | sed 's/Version:\*\* //')
+echo "Framework version: $UPDATED_VERSION"
+if [ "$DRY_RUN" != "--dry-run" ] && [ "$UPDATED_VERSION" != "$VERSION" ]; then
+  echo "Error: 00.SPEC_FRAMEWORK.md version not updated correctly"
   exit 1
 fi
 echo "Version updates verified."
@@ -167,12 +127,10 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add packages/cli/package.json packages/cypress/package.json packages/cli/src/index.ts packages/cypress/src/index.ts prompts/ README.md 00.SPEC_FRAMEWORK.md"
+run "git add 00.SPEC_FRAMEWORK.md README.md"
 run "git commit -m 'Release v$VERSION
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>'" || echo "Nothing new to commit."
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."
 
 echo ""
 echo "Step 5: Create git tag"
@@ -199,17 +157,9 @@ fi
 run "gh release create v$VERSION --title 'v$VERSION' --notes '$RELEASE_NOTES'"
 
 echo ""
-echo "Step 8: Publish to npm"
-echo "----------------------"
-run "cd packages/cypress && npm publish"
-run "cd packages/cli && npm publish"
-
-echo ""
 echo "================================================"
 echo "Release v$VERSION complete!"
 echo "================================================"
 echo ""
 echo "Verify:"
 echo "  - GitHub: https://github.com/rootspec/rootspec/releases/tag/v$VERSION"
-echo "  - npm (CLI): https://www.npmjs.com/package/rootspec"
-echo "  - npm (Cypress): https://www.npmjs.com/package/@rootspec/cypress"

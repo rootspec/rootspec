@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-03-24
+
+### Breaking Changes
+
+- **CLI removed** — `rootspec` CLI command and `packages/cli/` no longer exist
+- **Prompts removed** — `prompts/` directory no longer exists
+- **`@rootspec/cypress` package removed** — Cypress templates now bundled with `rs-cypress` skill
+
+### Added
+
+#### Skills-Based Architecture
+
+Replaced the CLI + copy-paste prompt workflow with 11 Claude Code skills:
+
+| Skill | Purpose |
+|-------|---------|
+| `/rs-init [desc]` | Create, adopt, or reinterpret spec (auto-detects project state) |
+| `/rs-level <1-5> [change]` | Edit any spec level by number |
+| `/rs-feature [desc]` | Add feature with impact analysis across all levels |
+| `/rs-review [target]` | Review feature/code against spec alignment |
+| `/rs-validate` | Parallel validation: hierarchy, content, coverage |
+| `/rs-implement [story]` | Test-driven implementation from YAML user stories |
+| `/rs-docs [type]` | Generate PRD, TDD, backlog, pillar matrix, API docs |
+| `/rs-extend <type>` | Derive artifact: tdd, ux, ui, brand, analytics, config |
+| `/rs-update` | Update framework + migrate spec to latest version |
+| `/rs-cypress` | Install/merge Cypress test templates |
+| `/rs-help` | Show skills, tips, best practices |
+
+#### Shared Infrastructure
+
+- 9 shared bash scripts for spec scanning and extraction (`skills/rs-shared/scripts/`)
+- 6 shared fragments: framework rules, interview protocol, cascade protocol, anti-patterns, L5 YAML format, L5 test DSL reference
+- Deterministic validation scoring with explicit severity rules
+
+#### Cypress Template Upgrades
+
+Templates now include production-tested patterns:
+
+- **Test ledger** — `test-ledger.json` tracks pass/fail history per acceptance criterion
+- **Runtime test state** — isolated `testState` object reset between tests
+- **Skip/only filtering** — at story and AC level with correct precedence
+- **Narrative logging** — human-readable given/when/then in test output
+- **Auth session injection** — inject auth via `onBeforeLoad` localStorage
+- **Uncaught exception handling** — prevents app errors from stalling tests
+
+### Migration from 4.x
+
+1. Install the RootSpec plugin (skills become available as `/rs-*`)
+2. Run `/rs-update` to sync framework file
+3. Run `/rs-validate` to check compliance
+4. No spec file changes needed — all 01-05 files are compatible
+
 ## [4.6.2] - 2026-02-18
 
 ### Fixed
