@@ -35,6 +35,8 @@ Prompt for the agent:
 
 2. HARDCODED NUMERICS in L1-L4: Any specific number with a unit (e.g., '500ms', '5 minutes', '100 points', '2 seconds'). Placeholders like '[brief duration]' are fine.
 
+3. DUPLICATE STORY IDS in L5: Run `bash skills/rs-validate/scripts/check-duplicate-ids.sh <spec-dir>` and report any duplicates found.
+
 For each finding, report: file, line number, the exact violating text. Do NOT assign severity — just report facts."
 
 ### Agent 2: Content Quality Check
@@ -105,6 +107,7 @@ After all 3 agents return findings, YOU apply the severity rules below. These ru
 - L4 systems lack defined boundaries/responsibilities
 - L1 has fewer than 2 or more than 8 Design Pillars
 - L1 pillar describes a feature instead of a feeling
+- Duplicate story ID (same ID appears twice in one file or across files in same view directory)
 
 **WARNING (deduct 5 points each):**
 - Hardcoded numeric value in L1-L4

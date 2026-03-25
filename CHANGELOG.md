@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-03-24
+
+### Added
+
+- **Duplicate story ID check in `rs-validate`**: New `check-duplicate-ids.sh` script detects cross-file and intra-file duplicate `US-*` IDs in L5 USER_STORIES. Supports both flat and view-directory layouts. Classified as Critical severity (-10 points).
+
 ## [5.0.1] - 2026-03-24
 
 ### Fixed
