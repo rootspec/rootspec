@@ -78,11 +78,13 @@ echo ""
 echo "Step 1: Update version references"
 echo "----------------------------------"
 
-echo "Updating 00.SPEC_FRAMEWORK.md..."
+# Edit the real file, not the root symlink (sed -i replaces symlinks on macOS)
+SPEC_FRAMEWORK="skills/rs-shared/00.SPEC_FRAMEWORK.md"
+echo "Updating $SPEC_FRAMEWORK..."
 if [ "$DRY_RUN" != "--dry-run" ]; then
-  sed -i '' -E 's/\*\*Version:\*\* [0-9]+\.[0-9]+\.[0-9]+/**Version:** '"$VERSION"'/' 00.SPEC_FRAMEWORK.md
+  sed -i '' -E 's/\*\*Version:\*\* [0-9]+\.[0-9]+\.[0-9]+/**Version:** '"$VERSION"'/' "$SPEC_FRAMEWORK"
   CURRENT_DATE=$(date +%Y-%m-%d)
-  sed -i '' -E 's/\*\*Last Updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}/**Last Updated:** '"$CURRENT_DATE"'/' 00.SPEC_FRAMEWORK.md
+  sed -i '' -E 's/\*\*Last Updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}/**Last Updated:** '"$CURRENT_DATE"'/' "$SPEC_FRAMEWORK"
 else
   echo "[DRY RUN] Update version in 00.SPEC_FRAMEWORK.md to $VERSION"
   echo "[DRY RUN] Update last updated date to current date"
@@ -147,7 +149,9 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add 00.SPEC_FRAMEWORK.md README.md .claude-plugin/plugin.json .claude-plugin/marketplace.json"
+run "git add 00.SPEC_FRAMEWORK.md skills/rs-shared/00.SPEC_FRAMEWORK.md README.md .claude-plugin/plugin.json .claude-plugin/marketplace.json"
+# Note: 00.SPEC_FRAMEWORK.md is a symlink to skills/rs-shared/00.SPEC_FRAMEWORK.md
+# Both must be staged so git tracks the symlink and the real file
 run "git commit -m 'Release v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."

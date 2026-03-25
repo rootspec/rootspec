@@ -16,6 +16,9 @@ This skill contains shared resources for all RootSpec skills. Do not invoke dire
 - `scripts/list-l5-stories.sh` — List L5 user story files
 - `scripts/list-l5-fine-tuning.sh` — List L5 fine-tuning files
 
+## Bundled Files
+- `00.SPEC_FRAMEWORK.md` — Latest framework reference (used by rs-update to replace outdated copies)
+
 ## Fragments
 - `fragments/framework-rules.md` — Reference hierarchy and placeholder rules
 - `fragments/interview-protocol.md` — Interview methodology

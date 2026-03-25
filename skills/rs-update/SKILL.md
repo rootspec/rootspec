@@ -19,7 +19,7 @@ If STATUS=no_spec, inform: "No specification found. Run `/rs-init` to create one
 
 The scan output includes VERSION (the version in the user's `00.SPEC_FRAMEWORK.md`).
 
-Also read the plugin's bundled `00.SPEC_FRAMEWORK.md` to get the LATEST version. Compare:
+Also read the plugin's bundled `../rs-shared/00.SPEC_FRAMEWORK.md` to get the LATEST version. Compare:
 
 - If versions match: "Your spec is up to date (version X)."
 - If versions differ: proceed with migration.
@@ -56,7 +56,7 @@ Files that need updating:
 
 ### Step 1: Update Framework File
 
-Replace the user's `00.SPEC_FRAMEWORK.md` with the latest version from the plugin.
+Replace the user's `00.SPEC_FRAMEWORK.md` with the latest version from `../rs-shared/00.SPEC_FRAMEWORK.md`.
 
 ### Step 2: Handle Breaking Changes
 
