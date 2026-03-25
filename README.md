@@ -22,7 +22,7 @@
 
 ---
 
-**Version v5.2.0**
+**Version v5.2.1**
 
 A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
 
@@ -186,7 +186,7 @@ Implementation & Tests (Level 5)
 
 ## Version Information
 
-**Current Version:** v5.2.0
+**Current Version:** v5.2.1
 
 See [CHANGELOG.md](CHANGELOG.md) for version history and migration guides.
 
