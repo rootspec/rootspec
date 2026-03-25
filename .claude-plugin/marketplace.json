@@ -8,7 +8,7 @@
       "name": "rootspec",
       "source": ".",
       "description": "11 skills for creating, validating, and implementing product specs — interview-driven with parallel validation and Cypress test generation",
-      "version": "5.1.0"
+      "version": "5.2.0"
     }
   ]
 }
