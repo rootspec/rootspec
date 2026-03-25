@@ -25,6 +25,8 @@ Report current pillars and systems to the developer.
 
 If the developer provided a feature description as a parameter, use it as context and skip asking "what feature do you want to add?"
 
+If the feature description references a code path (file or directory), this is likely an **existing implementation** that needs spec coverage (e.g., from `/rs-review inverse`). Read the code at that path first, then pre-fill interview answers from what the code does. Present pre-filled answers for confirmation rather than asking open-ended questions. The developer corrects or approves, then proceed as normal.
+
 Otherwise ask: "What feature do you want to add?"
 
 ### Step 1: Pillar Alignment Check

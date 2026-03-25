@@ -29,7 +29,7 @@ RootSpec uses Claude Code skills for all specification workflows. Users invoke s
 | `/rs-init [product desc]` | Create, adopt, or reinterpret a spec — auto-detects project state |
 | `/rs-level <1-5> [change]` | Edit any spec level by number |
 | `/rs-feature [description]` | Add a feature with impact analysis across all levels |
-| `/rs-review [target]` | Review feature or code against spec alignment |
+| `/rs-review [target]` | Review feature-to-spec alignment, or `inverse` to find unspecced code |
 | `/rs-validate` | Validate spec: hierarchy, content quality, coverage |
 | `/rs-implement [story ID]` | Implement from YAML user stories (test-driven) |
 | `/rs-docs [type]` | Generate PRD, TDD, backlog, pillar matrix, API docs |

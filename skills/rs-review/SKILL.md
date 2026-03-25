@@ -1,9 +1,12 @@
 ---
 name: rs-review
-description: Review a feature or code implementation against your RootSpec specification
+description: Review feature-to-spec alignment, or scan code to find unspecced behaviors
 ---
 
-You are reviewing a feature or code implementation against the developer's RootSpec specification. This skill checks alignment at every level and delivers a verdict.
+You are reviewing alignment between code and specification. This skill has two modes:
+
+- **Review mode** (default): Check a feature/implementation against spec. Delivers a verdict.
+- **Inverse mode** (`inverse`): Scan code to find user-visible behaviors not covered by spec. Produces a gap report.
 
 ## Phase 1: Context
 
@@ -17,6 +20,14 @@ bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>
 ```
 
 If STATUS=no_spec, inform: "No specification found. Run `/rs-init` to create one first."
+
+### Mode Detection
+
+If the developer's argument starts with `inverse`:
+- Extract the optional path after `inverse` (e.g., `inverse app/components/` → scope to `app/components/`)
+- **Skip to Phase 2G** (inverse mode)
+
+Otherwise, continue with review mode:
 
 If the developer provided a target as a parameter (feature description, PR number, code path), use it as context.
 
@@ -101,3 +112,90 @@ Based on verdict:
 - **Approved**: "Feature aligns with spec. Proceed with implementation."
 - **Needs Changes**: List specific changes needed, reference which spec levels are misaligned. Suggest `/rs-level <N>` if spec updates are warranted.
 - **Violates Spec**: Explain the fundamental conflict. If the developer wants to proceed anyway, suggest `/rs-feature` to properly integrate the concept into the spec.
+
+---
+
+## Inverse Mode: Find Unspecced Code
+
+### Phase 2G: Build Feature Catalog
+
+Discover source directories:
+
+```bash
+bash skills/rs-shared/scripts/scan-project.sh .
+```
+
+If the developer provided a path after `inverse`, scope to that path only. Otherwise use all SOURCE_DIRS from scan-project.
+
+Launch 2 Explore sub-agents in parallel:
+
+#### Agent A: Code Scan
+
+Agent prompt: "Read source files in [scope]. For each file, extract user-visible features — behaviors that users can see, interact with, or that affect their experience. For each feature report:
+- Feature name
+- User-visible behavior (1-2 sentences)
+- Parent system affinity (best guess based on the feature's domain)
+- Code location (file path)
+
+Group features by system affinity. Catalog pure internal plumbing (utility helpers, type definitions, internal adapters) separately — these are not gaps but should be listed for transparency.
+
+Do NOT read spec files — only read code."
+
+#### Agent B: Spec Inventory
+
+Agent prompt: "Read the L3 (03.INTERACTION_ARCHITECTURE.md) and L4 (04.SYSTEMS/) spec files only (do NOT read 00.SPEC_FRAMEWORK.md). Build an inventory of what the spec covers:
+- List every screen/view/page from L3
+- List every interaction pattern from L3
+- List every L4 system and its documented responsibilities/features
+- List every entity and its documented operations
+
+Output a structured checklist per system."
+
+### Phase 3G: Cross-Reference & Classify
+
+Compare the code feature catalog (Agent A) against the spec inventory (Agent B). Classify each unmatched feature:
+
+- **Unspecced system** — code implements a system with no L4 spec file at all
+- **Unspecced feature** — parent system is specced but this feature is not mentioned
+- **Partially specced** — spec mentions the concept but implementation goes beyond it (extra states, modes, behaviors)
+
+Apply the "user-visible behavior" test: if users can see or interact with it, it's a gap. Internal plumbing is excluded.
+
+### Phase 4G: Gap Report & Next Steps
+
+Present the report:
+
+```
+## Spec Gap Report
+
+### Scan Scope
+[Full codebase | specific path]
+
+### Summary
+- X unspecced systems
+- Y unspecced features within specced systems
+- Z partially specced features
+
+### Unspecced Systems
+| # | System | Code Location | User-Visible Behavior |
+|---|--------|---------------|----------------------|
+
+### Unspecced Features
+| # | Feature | Parent System | Code Location | Behavior |
+|---|---------|---------------|---------------|----------|
+
+### Partially Specced
+| # | Feature | Spec Section | Code Location | What's unspecced |
+|---|---------|--------------|---------------|-----------------|
+
+### Excluded (Implementation Details)
+[Brief list of internal plumbing excluded from gap analysis]
+```
+
+For each gap, include a suggested `/rs-feature` command with the code path and behavior summary:
+
+```
+Suggested: /rs-feature <feature description> — see <code path>
+```
+
+This lets the developer hand off directly to `/rs-feature`, which will read the existing code and confirm intent before writing spec.

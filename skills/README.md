@@ -9,7 +9,7 @@ Claude Code skills for the [RootSpec](https://github.com/rootspec/rootspec) spec
 | `/rs-init [product desc]` | Create, adopt, or reinterpret a spec — auto-detects project state |
 | `/rs-level <1-5> [change]` | Edit any spec level by number |
 | `/rs-feature [description]` | Add a feature with impact analysis across all levels |
-| `/rs-review [target]` | Review feature or code against spec alignment |
+| `/rs-review [target]` | Review feature-to-spec alignment, or `inverse` to find unspecced code |
 | `/rs-validate` | Validate spec: hierarchy, content quality, coverage |
 | `/rs-implement [story ID]` | Implement from YAML user stories (test-driven) |
 | `/rs-docs [type]` | Generate PRDs, TDDs, architectural docs |
@@ -41,7 +41,7 @@ skills/
   rs-init/           Create/adopt/reinterpret spec
   rs-level/          Edit spec level 1-5
   rs-feature/        Add feature across levels
-  rs-review/         Review against spec
+  rs-review/         Review against spec (+ inverse mode)
   rs-validate/       Parallel spec validation
   rs-implement/      Implement from user stories
   rs-docs/           Generate documentation

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-03-24
+
+### Added
+
+- **Inverse mode in `rs-review`**: `/rs-review inverse [path]` scans code to find user-visible behaviors not covered by the spec. Produces a gap report with pre-formed `/rs-feature` commands for each gap.
+- **Code-aware interview in `rs-feature`**: When a feature description includes a code path (e.g., from an inverse review), reads the code first and pre-fills interview answers for confirmation.
+
 ## [5.1.0] - 2026-03-24
 
 ### Added
