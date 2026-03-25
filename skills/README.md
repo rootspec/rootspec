@@ -37,7 +37,7 @@ Each skill follows a 4-phase pattern:
 
 ```
 skills/
-  rs-shared/         Shared scripts and fragments
+  rs-shared/         Shared scripts and fragments (required dependency — installed alongside other skills)
   rs-init/           Create/adopt/reinterpret spec
   rs-level/          Edit spec level 1-5
   rs-feature/        Add feature across levels

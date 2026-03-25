@@ -3,8 +3,7 @@
 # Usage: bash skills/test-local.sh [test-project-dir]
 #
 # Creates a test project with:
-# - .claude/skills/ populated with all rs-* skills
-# - skills/rs-shared/ scripts and fragments (referenced by skills)
+# - .claude/skills/ populated with all rs-* skills (including rs-shared)
 # - A sample 00.SPEC_FRAMEWORK.md
 # - A sample partial spec (L1 only) for testing validation/editing
 
@@ -19,30 +18,13 @@ echo
 
 # Create test project
 mkdir -p "$TEST_DIR/.claude/skills"
-mkdir -p "$TEST_DIR/skills/rs-shared"
 
-# Symlink shared scripts and fragments (so edits in source are reflected)
-ln -sfn "$ROOTSPEC_DIR/skills/rs-shared/scripts" "$TEST_DIR/skills/rs-shared/scripts"
-ln -sfn "$ROOTSPEC_DIR/skills/rs-shared/fragments" "$TEST_DIR/skills/rs-shared/fragments"
-ln -sfn "$ROOTSPEC_DIR/skills/rs-shared/README.md" "$TEST_DIR/skills/rs-shared/README.md"
-
-# Symlink skill-specific scripts
+# Install all skills into .claude/skills/ (symlinks to source for live editing)
+# This mirrors the layout created by `npx skills add rootspec/rootspec`
 for skill_dir in "$ROOTSPEC_DIR"/skills/rs-*/; do
   skill_name=$(basename "$skill_dir")
-  if [[ -d "$skill_dir/scripts" ]]; then
-    mkdir -p "$TEST_DIR/skills/$skill_name"
-    ln -sfn "$skill_dir/scripts" "$TEST_DIR/skills/$skill_name/scripts"
-  fi
-done
-
-# Install skills into .claude/skills/ (symlinks to source for live editing)
-for skill_dir in "$ROOTSPEC_DIR"/skills/rs-*/; do
-  [[ "$(basename "$skill_dir")" == "rs-shared" ]] && continue
-  skill_name=$(basename "$skill_dir")
-  skill_file="$skill_dir/SKILL.md"
-  [[ -f "$skill_file" ]] || continue
-  mkdir -p "$TEST_DIR/.claude/skills/$skill_name"
-  ln -sfn "$skill_file" "$TEST_DIR/.claude/skills/$skill_name/SKILL.md"
+  [[ -f "$skill_dir/SKILL.md" ]] || continue
+  ln -sfn "$skill_dir" "$TEST_DIR/.claude/skills/$skill_name"
 done
 
 # Copy framework file

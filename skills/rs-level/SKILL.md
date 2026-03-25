@@ -16,29 +16,29 @@ If no level number is provided, ask: "Which level do you want to edit? (1-5)"
 Run context scripts:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/scan-spec.sh .
 ```
 
 Then run the level-specific extraction script:
 
 | Level | Script |
 |-------|--------|
-| 1 | `bash skills/rs-shared/scripts/extract-l1-pillars.sh <spec-dir>` |
-| 2 | `bash skills/rs-shared/scripts/extract-l2-truths.sh <spec-dir>` |
-| 3 | `bash skills/rs-shared/scripts/extract-l3-patterns.sh <spec-dir>` |
-| 4 | `bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>` |
-| 5 | `bash skills/rs-shared/scripts/list-l5-stories.sh <spec-dir>` and `bash skills/rs-shared/scripts/list-l5-fine-tuning.sh <spec-dir>` |
+| 1 | `bash ../rs-shared/scripts/extract-l1-pillars.sh <spec-dir>` |
+| 2 | `bash ../rs-shared/scripts/extract-l2-truths.sh <spec-dir>` |
+| 3 | `bash ../rs-shared/scripts/extract-l3-patterns.sh <spec-dir>` |
+| 4 | `bash ../rs-shared/scripts/list-l4-systems.sh <spec-dir>` |
+| 5 | `bash ../rs-shared/scripts/list-l5-stories.sh <spec-dir>` and `bash ../rs-shared/scripts/list-l5-fine-tuning.sh <spec-dir>` |
 
 Read the existing file(s) for the target level. If the file doesn't exist, you're creating it from scratch.
 
-Read `skills/rs-shared/fragments/framework-rules.md` for reference hierarchy and placeholder rules.
+Read `../rs-shared/fragments/framework-rules.md` for reference hierarchy and placeholder rules.
 
 Report current state to the developer before proceeding.
 
 ## Phase 2: Interview
 
-Read `skills/rs-shared/fragments/interview-protocol.md` for interview guidelines.
-Read `skills/rs-shared/fragments/anti-patterns.md` for level-specific anti-patterns.
+Read `../rs-shared/fragments/interview-protocol.md` for interview guidelines.
+Read `../rs-shared/fragments/anti-patterns.md` for level-specific anti-patterns.
 
 If the developer provided a change description, skip the "what do you want to change?" question and begin with deeper questions about the change.
 
@@ -110,8 +110,8 @@ For new systems: create both the system file AND update `SYSTEMS_OVERVIEW.md`.
 
 ### Level 5: Implementation
 
-Read `skills/rs-shared/fragments/l5-yaml-format.md` for YAML syntax rules, story structure, and fine-tuning format.
-Read `skills/rs-shared/fragments/l5-test-dsl.md` for test DSL step reference and extension patterns.
+Read `../rs-shared/fragments/l5-yaml-format.md` for YAML syntax rules, story structure, and fine-tuning format.
+Read `../rs-shared/fragments/l5-test-dsl.md` for test DSL step reference and extension patterns.
 
 Interview questions:
 
@@ -139,7 +139,7 @@ For Level 5: organize user stories in the appropriate subdirectory (`by_priority
 
 ## Phase 4: Cascade
 
-Read `skills/rs-shared/fragments/cascade-protocol.md`.
+Read `../rs-shared/fragments/cascade-protocol.md`.
 
 After writing changes, present the cascade prompt:
 

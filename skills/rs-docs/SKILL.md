@@ -10,10 +10,10 @@ You are helping a developer generate professional documents from their RootSpec 
 Run scripts to understand the spec:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
-bash skills/rs-shared/scripts/extract-l1-pillars.sh <spec-dir>
-bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>
-bash skills/rs-shared/scripts/list-l5-stories.sh <spec-dir>
+bash ../rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/extract-l1-pillars.sh <spec-dir>
+bash ../rs-shared/scripts/list-l4-systems.sh <spec-dir>
+bash ../rs-shared/scripts/list-l5-stories.sh <spec-dir>
 ```
 
 If STATUS=no_spec, inform: "No specification found. Run `/rs-init` to create one first."

@@ -23,17 +23,17 @@ If no type provided, list the types above and ask: "Which artifact type?"
 Run context scripts:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/scan-spec.sh .
 ```
 
 Then run type-specific scripts:
 
-- **tdd**: `bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>`
-- **ux**: `bash skills/rs-shared/scripts/list-l5-stories.sh <spec-dir>` and `bash skills/rs-shared/scripts/extract-l5-journeys.sh <spec-dir>`
-- **ui**: `bash skills/rs-extend/scripts/find-ux-design.sh <spec-dir>` — requires UX artifact to exist
-- **brand**: `bash skills/rs-shared/scripts/extract-l1-pillars.sh <spec-dir>`
-- **analytics**: `bash skills/rs-shared/scripts/extract-l3-patterns.sh <spec-dir>`
-- **config**: `bash skills/rs-shared/scripts/list-l5-fine-tuning.sh <spec-dir>`
+- **tdd**: `bash ../rs-shared/scripts/list-l4-systems.sh <spec-dir>`
+- **ux**: `bash ../rs-shared/scripts/list-l5-stories.sh <spec-dir>` and `bash ../rs-shared/scripts/extract-l5-journeys.sh <spec-dir>`
+- **ui**: `bash scripts/find-ux-design.sh <spec-dir>` — requires UX artifact to exist
+- **brand**: `bash ../rs-shared/scripts/extract-l1-pillars.sh <spec-dir>`
+- **analytics**: `bash ../rs-shared/scripts/extract-l3-patterns.sh <spec-dir>`
+- **config**: `bash ../rs-shared/scripts/list-l5-fine-tuning.sh <spec-dir>`
 
 If required source files are missing, inform the developer what's needed.
 

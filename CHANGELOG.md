@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.1] - 2026-03-24
+
+### Fixed
+
+- **rs-shared not installed via `npx skills add`**: Added `SKILL.md` to `rs-shared` so the skills CLI discovers and installs it alongside other skills
+- **All skill path references broken post-install**: Converted all paths to skill-relative format per the [Agent Skills spec](https://agentskills.io/specification) — `skills/rs-shared/X` → `../rs-shared/X`, self-references use `scripts/X` or `templates/X`
+- **test-local.sh**: Simplified to symlink entire skill directories into `.claude/skills/`, matching the `npx skills add` layout
+
 ## [5.2.0] - 2026-03-24
 
 ### Added

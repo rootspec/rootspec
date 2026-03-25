@@ -10,14 +10,14 @@ You are helping a developer add a new feature to their RootSpec product specific
 Run scripts to understand current spec state:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
-bash skills/rs-shared/scripts/extract-l1-pillars.sh <spec-dir>
-bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>
+bash ../rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/extract-l1-pillars.sh <spec-dir>
+bash ../rs-shared/scripts/list-l4-systems.sh <spec-dir>
 ```
 
 If STATUS=no_spec, inform the developer: "No specification found. Run `/rs-init` to create one first."
 
-Read `skills/rs-shared/fragments/framework-rules.md` for reference hierarchy rules.
+Read `../rs-shared/fragments/framework-rules.md` for reference hierarchy rules.
 
 Report current pillars and systems to the developer.
 

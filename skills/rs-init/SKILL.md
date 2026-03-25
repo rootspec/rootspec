@@ -10,11 +10,11 @@ You are helping a developer create or reinterpret their product specification us
 Run these scripts to understand the current project state:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
-bash skills/rs-shared/scripts/scan-project.sh .
+bash ../rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/scan-project.sh .
 ```
 
-Read `skills/rs-shared/fragments/framework-rules.md` for the reference hierarchy and placeholder rules. Do NOT read `00.SPEC_FRAMEWORK.md` directly — it is too large. The fragments contain all the rules you need. If you need format examples for a specific level, search for that level's section heading in `00.SPEC_FRAMEWORK.md` using Grep rather than reading the whole file.
+Read `../rs-shared/fragments/framework-rules.md` for the reference hierarchy and placeholder rules. Do NOT read `00.SPEC_FRAMEWORK.md` directly — it is too large. The fragments contain all the rules you need. If you need format examples for a specific level, search for that level's section heading in `00.SPEC_FRAMEWORK.md` using Grep rather than reading the whole file.
 
 Based on results, determine the path:
 
@@ -28,9 +28,9 @@ If the developer provided a product description as a parameter, use it as contex
 
 ## Phase 2: Interview
 
-Read `skills/rs-shared/fragments/interview-protocol.md` for how to conduct the interview. Ask ONE question at a time. Wait for the answer before continuing.
+Read `../rs-shared/fragments/interview-protocol.md` for how to conduct the interview. Ask ONE question at a time. Wait for the answer before continuing.
 
-Read `skills/rs-shared/fragments/anti-patterns.md` to catch problems as they arise.
+Read `../rs-shared/fragments/anti-patterns.md` to catch problems as they arise.
 
 ### GREENFIELD Path
 
@@ -135,9 +135,9 @@ Use the same level-by-level interview, but adapt questions:
 1. Read all existing spec files.
 2. Run extraction scripts to summarize current state:
    ```bash
-   bash skills/rs-shared/scripts/extract-l1-pillars.sh <spec-dir>
-   bash skills/rs-shared/scripts/extract-l2-truths.sh <spec-dir>
-   bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>
+   bash ../rs-shared/scripts/extract-l1-pillars.sh <spec-dir>
+   bash ../rs-shared/scripts/extract-l2-truths.sh <spec-dir>
+   bash ../rs-shared/scripts/list-l4-systems.sh <spec-dir>
    ```
 
 3. Present current pillars, truths, and systems to the developer.

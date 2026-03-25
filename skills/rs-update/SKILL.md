@@ -12,7 +12,7 @@ You are helping a developer update their RootSpec framework and migrate their sp
 Run the scan script to find current spec and detect versions:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/scan-spec.sh .
 ```
 
 If STATUS=no_spec, inform: "No specification found. Run `/rs-init` to create one."

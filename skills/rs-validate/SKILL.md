@@ -10,12 +10,12 @@ You are validating a developer's RootSpec specification for compliance with the 
 Run the scan script to find the spec:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/scan-spec.sh .
 ```
 
 If STATUS=no_spec, inform the developer: "No specification found. Run `/rs-init` to create one."
 
-Read `skills/rs-shared/fragments/framework-rules.md` for the rules you'll be checking against.
+Read `../rs-shared/fragments/framework-rules.md` for the rules you'll be checking against.
 
 ## Phase 2: Parallel Validation
 
@@ -35,7 +35,7 @@ Prompt for the agent:
 
 2. HARDCODED NUMERICS in L1-L4: Any specific number with a unit (e.g., '500ms', '5 minutes', '100 points', '2 seconds'). Placeholders like '[brief duration]' are fine.
 
-3. DUPLICATE STORY IDS in L5: Run `bash skills/rs-validate/scripts/check-duplicate-ids.sh <spec-dir>` and report any duplicates found.
+3. DUPLICATE STORY IDS in L5: Run `bash scripts/check-duplicate-ids.sh <spec-dir>` and report any duplicates found.
 
 For each finding, report: file, line number, the exact violating text. Do NOT assign severity — just report facts."
 

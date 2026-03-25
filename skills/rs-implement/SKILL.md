@@ -5,18 +5,18 @@ description: Implement features from YAML user stories using test-driven develop
 
 You are helping a developer implement their product iteratively from RootSpec YAML user stories. This follows a test-driven approach: analyze stories, set up infrastructure, then implement one story at a time.
 
-Read `skills/rs-shared/fragments/l5-test-dsl.md` for the test DSL step reference, extension patterns, and decision tree.
-Read `skills/rs-shared/fragments/l5-yaml-format.md` for YAML syntax rules if you need to help debug story files.
+Read `../rs-shared/fragments/l5-test-dsl.md` for the test DSL step reference, extension patterns, and decision tree.
+Read `../rs-shared/fragments/l5-yaml-format.md` for YAML syntax rules if you need to help debug story files.
 
 ## Phase 1: Context
 
 Run scripts to understand the spec and stories:
 
 ```bash
-bash skills/rs-shared/scripts/scan-spec.sh .
-bash skills/rs-shared/scripts/list-l5-stories.sh <spec-dir>
-bash skills/rs-shared/scripts/extract-l5-journeys.sh <spec-dir>
-bash skills/rs-shared/scripts/list-l4-systems.sh <spec-dir>
+bash ../rs-shared/scripts/scan-spec.sh .
+bash ../rs-shared/scripts/list-l5-stories.sh <spec-dir>
+bash ../rs-shared/scripts/extract-l5-journeys.sh <spec-dir>
+bash ../rs-shared/scripts/list-l4-systems.sh <spec-dir>
 ```
 
 Read all YAML user story files found.
