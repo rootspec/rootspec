@@ -41,11 +41,10 @@ See [AXIOMS.md](rootspec/00.AXIOMS.md) for the foundational beliefs this framewo
 
 ## Quick Start
 
-Install the plugin:
+Install ([detailed instructions](https://github.com/vercel-labs/skills)):
 
 ```
-/plugin marketplace add rootspec/rootspec
-/plugin install rootspec
+npx skills add rootspec/rootspec
 ```
 
 Then:

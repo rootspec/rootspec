@@ -1,8 +1,0 @@
-{
-  "name": "rootspec",
-  "description": "Specification language for software — init, spec, implement, validate",
-  "version": "6.0.0",
-  "author": {
-    "name": "RootSpec"
-  }
-}
