@@ -9,7 +9,7 @@ This guide explains how to implement your application iteratively, using the YAM
 ## Prerequisites
 
 - Complete specification (01-05 files)
-- YAML user stories in `05.IMPLEMENTATION/USER_STORIES/`
+- YAML user stories in `rootspec/05.IMPLEMENTATION/USER_STORIES/`
 - Cypress test framework installed (see [CYPRESS_SETUP.md](CYPRESS_SETUP.md))
 - Basic understanding of the test DSL
 
@@ -25,10 +25,10 @@ Start by reading all YAML files:
 
 ```bash
 # Look at MVP tests first
-ls 05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
+ls rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
 
 # Then scan other priorities
-ls 05.IMPLEMENTATION/USER_STORIES/by_priority/
+ls rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/
 ```
 
 #### Identify Global Requirements
@@ -801,7 +801,7 @@ After completing MVP implementation:
 ## Related Documentation
 
 - [CYPRESS_SETUP.md](CYPRESS_SETUP.md) - Initial test framework setup
-- [00.SPEC_FRAMEWORK.md](../00.SPEC_FRAMEWORK.md) - Complete framework reference
+- [00.FRAMEWORK.md](../rootspec/00.FRAMEWORK.md) - Complete framework reference
 - [prompts/implement-from-tests.md](../prompts/implement-from-tests.md) - AI assistant prompt for this workflow
 - [prompts/validate-spec.md](../prompts/validate-spec.md) - Validate specification compliance
 - [prompts/add-feature.md](../prompts/add-feature.md) - Add new features to spec

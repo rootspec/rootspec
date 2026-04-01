@@ -1,370 +1,61 @@
 # RootSpec Roadmap
 
-**Status**: v4.6.0 published to npm ✅
-**Last Updated**: 2026-02-16
+**Last Updated:** 2026-04-01
 
 ---
 
-## ✅ Completed - v4.0.0 Launch
+## Current — v6.0.0
 
-### Branding
-- [x] Rename project to "RootSpec"
-- [x] Create GitHub namespace (github.com/rootspec)
-- [x] Transfer repository to new org
+### Completed
 
-### npm Distribution
-- [x] Create CLI package with TypeScript
-- [x] Build CLI commands (`init`, `prompts`, `cypress`, `validate`)
-- [x] Publish to npm as `rootspec`
-- [x] Create CLI README for npm page
-
-### User Experience
-- [x] Replace manual curl/cp with CLI commands
-- [x] Add interactive init prompts
-- [x] Add template engine for AI prompts
-
-### Community & Open Source
-- [x] Add CONTRIBUTING.md
-- [x] Add CODE_OF_CONDUCT.md
-- [x] Add SECURITY.md
-- [x] Create GitHub issue templates (bug, feature, question)
-- [x] Create PR template
-- [x] Add badges to README
-- [x] Create v4.0.0 GitHub release
-
-### GitHub Settings
-- [x] Configure repository description and topics
-- [x] Enable Discussions (with categories)
-- [x] Set up branch protection for `main`
-- [x] Enable Dependabot alerts and security updates
-- [x] Enable CodeQL security scanning
-- [x] Configure PR merge settings
+- [x] Four-skill architecture: `/rs-init`, `/rs-spec`, `/rs-impl`, `/rs-validate`
+- [x] Agentic loop pattern with iteration caps for all skills
+- [x] Renamed spec files: `01.PHILOSOPHY.md`, `02.TRUTHS.md`, `03.INTERACTIONS.md`
+- [x] `rootspec/` directory convention — immediately identifiable
+- [x] `00.AXIOMS.md` — foundational beliefs, shipped with every project
+- [x] `.rootspec.json` project config with prerequisites
+- [x] `spec-status.json` and `tests-status.json` for tracking
+- [x] Prerequisites system (detect or create: dev server, pre-commit hook, release script, validation script)
+- [x] Removed CLI package (replaced by Claude Code skills in v5.0)
+- [x] Removed Cypress package (templates now bundled with skills)
+- [x] Self-hosted product spec (`rootspec/01.PHILOSOPHY.md`)
+- [x] Comprehensive workflow documentation (`docs/WORKFLOWS.md`)
 
 ---
 
-## ✅ Completed - v4.5.0 Release (2026-02-15)
+## Next
 
-### New Features
-- [x] New `rootspec extend` command with 6 extension types
-- [x] Extension type prompts: technical-design, ux-design, brand-guidelines, ui-design, analytics-plan, config-schema
-- [x] Auto-detection of spec context in extension prompts
-- [x] Dependency tracking for extension types
+### Framework
+- [ ] User Personas as optional L1 section (lightweight, 2-5 personas)
+- [ ] Example project — fully-generated spec with passing Cypress tests
 
-### Testing & Quality
-- [x] Comprehensive integration testing (TaskFlow spec, 44 minutes, 92/100 score)
-- [x] Fix Design Pillar extraction bug (only extracted 1 of 3 pillars)
-- [x] Create shared extraction utilities to eliminate code duplication
-- [x] Document known issues in KNOWN_ISSUES.md
+### Skills
+- [ ] Sub-skills for fine-grained control (e.g., spec a single level, review a single system)
+- [ ] Execution profiles for CI/CD vs interactive mode
+- [ ] Hard scope restrictions via Claude Code hooks
 
-### Bug Fixes
-- [x] Fix regex pattern for Design Pillar extraction
-- [x] Consolidate duplicate extraction code between `prompts.ts` and `extend.ts`
-- [x] Improve extraction reliability with `Array.from()` for iterators
-- [x] Fix ESM import syntax for fs-extra
+### Testing
+- [ ] Automated testing of the skills themselves (not just user specs)
+- [ ] CI workflow for validating skill definitions
 
----
-
-## ✅ Completed - v4.6.0 Release (2026-02-16)
-
-### New Features
-- [x] Optional Market Context sections in Level 1 (Foundational Philosophy)
-  - Competitors — Similar products in market
-  - Table Stakes — Expected baseline features
-  - Pain Points — Problems with existing solutions
-  - Influences — Inspiring products/patterns
-- [x] Updated all prompts with market context discovery questions
-- [x] Added market context validation checks
-- [x] Enhanced framework documentation with examples
+### Community
+- [ ] Example specs gallery
+- [ ] Documentation site (rootspec.dev)
 
 ---
 
-## 📋 Pending - Post-Launch Tasks
+## Future Ideas
 
-### Framework Features (High Priority)
-
-- [ ] Add User Personas as optional Level 1 section
-  - Another method of framing and thinking about a product alongside market context
-  - Who the product is for (name, role, goals, frustrations, context)
-  - Lightweight format — 2-5 personas max, focus on what matters for design decisions
-  - Informs Design Pillars (who are we creating these experiences for?)
-  - Distinct from anti-goals ("not for") — personas describe who IS the user
-  - Example: "Maya, 32, freelance designer — needs to stay focused without rigid schedules"
-
-### Week 2-3: Automation & Code Quality (Medium Priority)
-
-**GitHub Automation:**
-- [ ] Create `.github/CODEOWNERS` file
-  - Auto-assign reviewers for PRs
-  - Define ownership by directory
-
-- [ ] Create `.github/dependabot.yml`
-  - Weekly dependency update checks
-  - Auto-create PRs for npm updates
-
-- [ ] Create `.github/workflows/test.yml`
-  - Run tests on all PRs
-  - Run on push to main
-  - Node.js matrix testing (18, 20, 22)
-
-- [ ] Create `.github/workflows/publish.yml`
-  - Auto-publish to npm on version tags OR manual workflow_dispatch trigger
-  - Triggered by `v*` tags or manual button in Actions tab
-  - Requires NPM_TOKEN secret
-  - Handles 2FA by requiring OTP as workflow input for manual triggers
-  - Alternative: Keep fully manual publish (current workflow)
-
-**Code Quality Tools:**
-- [ ] Set up ESLint in `packages/cli/`
-  - Add `.eslintrc.json`
-  - Add `lint` script to package.json
-  - Install dependencies
-
-- [ ] Set up Prettier in `packages/cli/`
-  - Add `.prettierrc.json`
-  - Add `format` script to package.json
-  - Install dependencies
-
-- [ ] Add pre-commit hooks
-  - Install Husky + lint-staged
-  - Auto-format on commit
-  - Run linter before commit
-
-**Release Tooling:**
-- [ ] Fix `scripts/release.sh` dry-run verification bug
-  - Issue: Dry-run mode doesn't actually update files, so verification step fails when checking if versions were updated
-  - Symptom: "Error: package.json version not updated correctly" during --dry-run
-  - Fix: Skip verification step in dry-run mode OR perform verification differently
-  - Also consider: Better handling of already-updated versions (detect if version already matches target)
-
-### Week 3-4: Testing Infrastructure (Medium Priority)
-
-**Test Setup:**
-- [ ] Add Vitest configuration
-  - Create `vitest.config.ts`
-  - Install vitest and @vitest/ui
-  - Add test scripts to package.json
-
-**Test Coverage:**
-- [ ] Write CLI command tests
-  - `src/commands/init.test.ts`
-  - `src/commands/prompts.test.ts`
-  - `src/commands/cypress.test.ts`
-  - `src/commands/validate.test.ts`
-
-- [ ] Write utility tests
-  - `src/utils/config.test.ts`
-  - `src/utils/template.test.ts`
-
-- [ ] Target 40%+ code coverage
-  - Focus on critical paths
-  - Test error handling
-  - Test edge cases
-
-**Example Projects:**
-- [ ] Create demo project in this repo
-  - Fully-generated RootSpec specification
-  - Complete user stories in YAML
-  - Working Cypress tests that pass
-  - Serves as reference implementation
-
-- [ ] Create `examples/` directory structure
-  - `examples/README.md` with overview
-
-- [ ] Create example 1: `examples/saas-app/`
-  - Complete RootSpec specification
-  - Demonstrates SaaS product structure
-  - Includes user stories and Cypress tests
-
-- [ ] Create example 2: `examples/mobile-app/`
-  - Mobile application specification
-  - Shows cross-platform considerations
-
-- [ ] Create example 3: `examples/developer-tool/`
-  - CLI/library specification
-  - Demonstrates technical product spec
-
-### Week 4+: Local Web UI (High Priority)
-
-**Browser-Based Interface:**
-- [ ] Create local web server for RootSpec interaction
-  - Run via `rootspec serve` command
-  - Localhost web UI (e.g., http://localhost:3000)
-  - No authentication (local-only, trusted environment)
-
-**Core Features:**
-- [ ] Specification viewer
-  - Browse all levels (L1-L5) in structured UI
-  - Syntax highlighting for YAML user stories
-  - Collapsible sections for easy navigation
-  - Visual hierarchy representation
-
-- [ ] Specification editor
-  - Edit markdown files directly in browser
-  - Real-time preview
-  - Validation on save
-  - Auto-save drafts
-
-- [ ] AI prompt integration
-  - Generate prompts with one click (replace manual CLI commands)
-  - Pre-filled context from current spec
-  - Copy to clipboard or open in AI chat
-  - Prompt history and favorites
-
-- [ ] Validation dashboard
-  - Run `rootspec validate` checks
-  - Visual report with pass/fail indicators
-  - Reference hierarchy graph
-  - Jump to issues in editor
-
-**Technical Stack (TBD):**
-- Backend: Express/Fastify server in TypeScript
-- Frontend: React/Vue/Svelte (keep lightweight)
-- Bundler: Vite for fast dev experience
-- File watching: chokidar for live updates
-- Packaging: Include in main CLI package
-
-**Benefits:**
-- More accessible for non-CLI users
-- Faster iteration on specs
-- Better visualization of hierarchy
-- Integrated AI workflow
-
-### Week 5+: Documentation & Polish (Low Priority)
-
-**Documentation:**
-- [ ] Merge Quick Start guide into README
-  - Make it a brief section in README
-  - Remove `docs/QUICK_START.md` (redundant)
-  - Keep README as single comprehensive doc
-
-- [ ] Trim markdown files (~30-40% reduction)
-  - Focus on clarity and conciseness
-  - Remove redundancy
-  - Improve readability
-
-- [ ] Add visual diagrams
-  - Framework hierarchy diagram
-  - Level dependencies visualization
-  - User journey flowchart
-
-- [ ] Create video walkthrough
-  - Getting started tutorial
-  - CLI demo
-  - AI prompt workflow
-
-**Community Growth:**
-- [ ] Monitor and respond to GitHub Issues
-- [ ] Monitor and respond to Discussions
-- [ ] Track npm download metrics
-- [ ] Pin welcome message in Discussions
-- [ ] Create public roadmap in GitHub Projects
-
-**Optional Enhancements:**
-- [ ] Create `.github/FUNDING.yml` (if enabling sponsorships)
-
-- [ ] Set up documentation site with Docus (or similar)
-  - Use Docus, VitePress, or Docusaurus
-  - Create `/docs` site within this repo
-  - Deploy to GitHub Pages
-  - Custom domain (rootspec.dev?)
-  - Features: search, API docs, interactive examples
-
-- [ ] Add more CLI features
-  - `rootspec doctor` - Validate environment
-  - `rootspec upgrade` - Update to latest version
-  - `rootspec config` - Manage .rootspecrc.json
+- VSCode extension (syntax highlighting for YAML stories, spec validation)
+- Jira/Linear integration (sync stories with tickets)
+- Spec diff tool (show changes between versions, impact analysis)
+- Specification templates by industry/domain
+- Visual hierarchy browser (local web UI)
 
 ---
 
-## 🔮 Future Ideas / Research
+## Links
 
-### Derivation Seeds
-See [SEEDS_ROADMAP.md](SEEDS_ROADMAP.md) for detailed vision on derivation capabilities.
-
-### Framework Evolution
-- [ ] Technical specification layer (tech stack decisions)?
-- [ ] Code/implementation as another spec layer?
-- [ ] Balance prescription vs. flexibility
-  - Care about WHY and WHAT
-  - Less prescriptive about HOW
-  - Allow implementation variation
-
-### Tooling Enhancements
-- [ ] VSCode extension
-  - Syntax highlighting for user stories
-  - Snippets for common patterns
-  - Spec validation
-
-- [ ] RootSpec linter
-  - Validate specification hierarchy
-  - Check for circular references
-  - Ensure Design Pillar alignment
-
-- [ ] Specification diff tool
-  - Show changes between versions
-  - Impact analysis (what levels affected)
-
-### Integrations
-- [ ] Jira/Linear integration
-  - Sync user stories with tickets
-  - Track implementation progress
-
-- [ ] Notion/Confluence integration
-  - Export specs to documentation platforms
-
-- [ ] Storybook integration
-  - Link UI components to specs
-
-### Community Features
-- [ ] Specification gallery
-  - Showcase community projects
-  - Search and filter by domain
-
-- [ ] Templates/boilerplates
-  - Common project types
-  - Industry-specific templates
-
-- [ ] CLI plugins system
-  - Extensible architecture
-  - Community-contributed commands
-
----
-
-## 📊 Success Metrics to Track
-
-**Week 1:**
-- npm downloads > 50
-- GitHub stars > 10
-- 1-2 user issues/questions
-
-**Month 1:**
-- npm downloads > 500
-- GitHub stars > 50
-- 5-10 active users
-- First external contributor
-
-**Month 3:**
-- npm downloads > 2000
-- GitHub stars > 200
-- 20+ active users
-- 3-5 external contributors
-- 2-3 community example projects
-
----
-
-## 🔗 Quick Links
-
-- **npm Package**: https://www.npmjs.com/package/rootspec
-- **GitHub Repo**: https://github.com/rootspec/rootspec
-- **Releases**: https://github.com/rootspec/rootspec/releases
-- **Discussions**: https://github.com/rootspec/rootspec/discussions
-- **Issues**: https://github.com/rootspec/rootspec/issues
-
----
-
-## 📝 Notes
-
-- This roadmap is a living document - update as priorities change
-- Focus on user feedback over roadmap rigidity
-- Ship iteratively, don't wait for perfect
-- Community contributions > feature completeness
+- **GitHub:** https://github.com/rootspec/rootspec
+- **Releases:** https://github.com/rootspec/rootspec/releases
+- **Issues:** https://github.com/rootspec/rootspec/issues

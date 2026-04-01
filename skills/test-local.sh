@@ -4,7 +4,7 @@
 #
 # Creates a test project with:
 # - .claude/skills/ populated with all rs-* skills (including rs-shared)
-# - A sample 00.SPEC_FRAMEWORK.md
+# - A sample 00.FRAMEWORK.md in rootspec/
 # - A sample partial spec (L1 only) for testing validation/editing
 
 set -euo pipefail
@@ -27,12 +27,14 @@ for skill_dir in "$ROOTSPEC_DIR"/skills/rs-*/; do
   ln -sfn "$skill_dir" "$TEST_DIR/.claude/skills/$skill_name"
 done
 
-# Copy framework file
-cp "$ROOTSPEC_DIR/00.SPEC_FRAMEWORK.md" "$TEST_DIR/00.SPEC_FRAMEWORK.md"
+# Copy axioms and framework files into rootspec/ directory
+mkdir -p "$TEST_DIR/rootspec"
+cp "$ROOTSPEC_DIR/00.AXIOMS.md" "$TEST_DIR/rootspec/00.AXIOMS.md"
+cp "$ROOTSPEC_DIR/00.FRAMEWORK.md" "$TEST_DIR/rootspec/00.FRAMEWORK.md"
 
-# Create a sample L1 spec for testing rs-validate and rs-level
-mkdir -p "$TEST_DIR/04.SYSTEMS"
-cat > "$TEST_DIR/01.FOUNDATIONAL_PHILOSOPHY.md" << 'SPEC'
+# Create a sample L1 spec for testing rs-spec and rs-validate
+mkdir -p "$TEST_DIR/rootspec/04.SYSTEMS"
+cat > "$TEST_DIR/rootspec/01.PHILOSOPHY.md" << 'SPEC'
 # Foundational Philosophy
 
 ## Mission
@@ -72,7 +74,7 @@ discovered a new recipe they loved, and didn't spend more than 5 minutes
 planning it. No one felt stressed. Everyone feels nourished.
 SPEC
 
-cat > "$TEST_DIR/02.STABLE_TRUTHS.md" << 'SPEC'
+cat > "$TEST_DIR/rootspec/02.TRUTHS.md" << 'SPEC'
 # Stable Truths
 
 ## Fridge-First Design
@@ -86,7 +88,7 @@ A good-enough meal plan delivered in 30 seconds beats a perfect one
 that takes 10 minutes to configure.
 SPEC
 
-cat > "$TEST_DIR/04.SYSTEMS/SYSTEMS_OVERVIEW.md" << 'SPEC'
+cat > "$TEST_DIR/rootspec/04.SYSTEMS/SYSTEMS_OVERVIEW.md" << 'SPEC'
 # Systems Overview
 
 Three systems coordinate meal planning:
@@ -96,13 +98,23 @@ Three systems coordinate meal planning:
 - **RECIPE_SYSTEM** — matches recipes to available ingredients
 SPEC
 
-# Create .rootspecrc.json
-cat > "$TEST_DIR/.rootspecrc.json" << 'JSON'
+# Create .rootspec.json
+cat > "$TEST_DIR/.rootspec.json" << 'JSON'
 {
-  "specDirectory": ".",
-  "version": "4.6.2"
+  "version": "6.0.0",
+  "specDirectory": "rootspec",
+  "prerequisites": {
+    "devServer": null,
+    "preCommitHook": null,
+    "releaseScript": null,
+    "validationScript": null
+  }
 }
 JSON
+
+# Create empty status files
+echo '{ "hash": null, "validatedAt": null, "valid": false, "version": "6.0.0" }' > "$TEST_DIR/rootspec/spec-status.json"
+echo '{ "lastRun": null, "stories": {} }' > "$TEST_DIR/rootspec/tests-status.json"
 
 echo "Test project created!"
 echo
@@ -117,9 +129,9 @@ echo "  cd $TEST_DIR"
 echo "  claude"
 echo
 echo "Then try:"
-echo "  /rs-help"
+echo "  /rs-spec"
 echo "  /rs-validate"
-echo "  /rs-level 4 add a grocery list system"
-echo "  /rs-feature push notifications when groceries run low"
+echo "  /rs-spec add a grocery list system"
+echo "  /rs-impl MVP"
 echo
 echo "Note: Skills are symlinked — edits in $ROOTSPEC_DIR/skills/ are reflected immediately."

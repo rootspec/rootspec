@@ -21,7 +21,7 @@ This framework includes a runtime test generation system that converts YAML user
 
 - **Node.js 18+** and npm or yarn
 - **Existing project** with `package.json`
-- **User stories** in `05.IMPLEMENTATION/USER_STORIES/` (YAML format)
+- **User stories** in `rootspec/05.IMPLEMENTATION/USER_STORIES/` (YAML format)
 
 ---
 
@@ -61,7 +61,7 @@ rootspec cypress
 The CLI will:
 - Copy `cypress.config.ts` with RootSpec tasks (loginAs, seedItem, resetDatabase, log)
 - Copy all Cypress support files and test generators
-- Detect your spec directory from `.rootspecrc.json`
+- Detect your spec directory from `.rootspec.json`
 - Set up proper paths automatically
 - Provide next steps and installation instructions
 
@@ -82,7 +82,7 @@ Next steps:
    - loginAs: Authentication logic
    - seedItem: Test data seeding
    - resetDatabase: Database cleanup
-3. Create user stories in ./spec/05.IMPLEMENTATION/USER_STORIES/
+3. Create user stories in ./rootspec/05.IMPLEMENTATION/USER_STORIES/
 4. Run tests: npx cypress open
 ```
 
@@ -128,7 +128,7 @@ Edit the glob pattern in `cypress/e2e/example.cy.ts` to match your project struc
 
 ```typescript
 const rawFiles = import.meta.glob(
-  '../../../05.IMPLEMENTATION/USER_STORIES/**/*.yaml',  // ← Your path
+  '../../../rootspec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml',  // ← Your path
   { query: '?raw', import: 'default', eager: true }
 ) as Record<string, string>;
 ```
@@ -142,12 +142,12 @@ const rawFiles = import.meta.glob(
 
 Standard:
 ```typescript
-'../../../05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
+'../../../rootspec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
 ```
 
 Content subdirectory:
 ```typescript
-'../../content/spec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
+'../../content/rootspec/05.IMPLEMENTATION/USER_STORIES/**/*.yaml'
 ```
 
 Monorepo:
@@ -307,10 +307,10 @@ Copy an example YAML file and customize it:
 ```bash
 # Copy example
 cp node_modules/@rootspec/cypress/templates/USER_STORIES/by_priority/MVP.example.yaml \
-   05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
+   rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
 
 # Or create from scratch
-mkdir -p 05.IMPLEMENTATION/USER_STORIES/by_priority
+mkdir -p rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority
 ```
 
 **Example user story YAML:**
@@ -427,7 +427,7 @@ CYPRESS_LOG_BROWSER=1 npm run cypress:run
 
 **Create a minimal test story to validate everything works:**
 
-Create `05.IMPLEMENTATION/USER_STORIES/by_priority/SETUP_TEST.yaml`:
+Create `rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/SETUP_TEST.yaml`:
 
 ```yaml
 # @spec_version: 3.0
@@ -547,9 +547,9 @@ on('task', {
 **Problem:** Test generator can't find your user story files
 
 **Solution:** Check that files are in correct location:
-- `05.IMPLEMENTATION/USER_STORIES/by_priority/*.yaml`
-- `05.IMPLEMENTATION/USER_STORIES/by_journey/*.yaml`
-- `05.IMPLEMENTATION/USER_STORIES/by_system/*.yaml`
+- `rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/*.yaml`
+- `rootspec/05.IMPLEMENTATION/USER_STORIES/by_journey/*.yaml`
+- `rootspec/05.IMPLEMENTATION/USER_STORIES/by_system/*.yaml`
 
 The test generator looks for YAML files matching the directory structure.
 
@@ -613,7 +613,7 @@ Or configure `baseUrl` in `cypress.config.ts` to point to your running app.
 
 ✅ **Setup complete!** Now you can:
 
-1. **Write user stories** - Create YAML files in `05.IMPLEMENTATION/USER_STORIES/`
+1. **Write user stories** - Create YAML files in `rootspec/05.IMPLEMENTATION/USER_STORIES/`
 2. **Run tests** - `npm run cypress:run`
 3. **Extend DSL** - Add domain-specific steps in `steps.ts`
 4. **Integrate CI** - Add `npm run test:e2e` to your CI pipeline
@@ -621,7 +621,7 @@ Or configure `baseUrl` in `cypress.config.ts` to point to your running app.
 **Resources:**
 - Full YAML format spec: `node_modules/@rootspec/cypress/templates/USER_STORIES/USER_STORIES_OVERVIEW.md`
 - Extension examples: `cypress/support/steps.ts`
-- Framework reference: `00.SPEC_FRAMEWORK.md` (lines 338-583)
+- Framework reference: `00.FRAMEWORK.md` (lines 338-583)
 
 ---
 

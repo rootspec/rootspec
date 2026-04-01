@@ -63,7 +63,7 @@ npm link
 
 ```
 rootspec/
-├── 00.SPEC_FRAMEWORK.md     # Framework definition
+├── 00.FRAMEWORK.md          # Framework definition (symlink)
 ├── README.md                 # Main documentation
 ├── CHANGELOG.md              # Version history
 ├── CLAUDE.md                 # AI assistant guidance

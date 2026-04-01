@@ -266,7 +266,7 @@ rootspec prompts init        # Get AI prompt for new project
 **None** - 3.x specification files are fully compatible with 4.0.0.
 
 The CLI is an addition, not a replacement. You can still:
-- Manually download `00.SPEC_FRAMEWORK.md`
+- Manually download `00.FRAMEWORK.md`
 - Edit prompts directly from `prompts/` directory
 - Use the framework without the CLI
 
@@ -302,4 +302,4 @@ The CLI automatically processes these when generating prompts.
 - **Documentation:** [README.md](README.md)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
 - **Issues:** https://github.com/rootspec/rootspec/issues
-- **Framework Reference:** `00.SPEC_FRAMEWORK.md`
+- **Framework Reference:** `00.FRAMEWORK.md`

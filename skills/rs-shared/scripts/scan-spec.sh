@@ -7,16 +7,16 @@ set -euo pipefail
 
 ROOT="${1:-.}"
 
-# Try .rootspecrc.json first
+# Try .rootspec.json first
 SPEC_DIR=""
-if [[ -f "$ROOT/.rootspecrc.json" ]]; then
-  SPEC_DIR=$(grep -o '"specDirectory"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/.rootspecrc.json" 2>/dev/null | head -1 | sed 's/.*"specDirectory"[[:space:]]*:[[:space:]]*"//' | sed 's/"//')
+if [[ -f "$ROOT/.rootspec.json" ]]; then
+  SPEC_DIR=$(grep -o '"specDirectory"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/.rootspec.json" 2>/dev/null | head -1 | sed 's/.*"specDirectory"[[:space:]]*:[[:space:]]*"//' | sed 's/"//')
 fi
 
 # Fall back to scanning common locations
 if [[ -z "$SPEC_DIR" ]]; then
-  for dir in "./spec" "./docs/spec" "."; do
-    if [[ -f "$ROOT/$dir/00.SPEC_FRAMEWORK.md" ]]; then
+  for dir in "./rootspec" "./spec" "."; do
+    if [[ -f "$ROOT/$dir/00.FRAMEWORK.md" ]]; then
       SPEC_DIR="$dir"
       break
     fi
@@ -34,7 +34,7 @@ echo "SPEC_DIR=$SPEC_DIR"
 
 # Detect version from framework file
 VERSION="unknown"
-FRAMEWORK_FILE="$ROOT/$SPEC_DIR/00.SPEC_FRAMEWORK.md"
+FRAMEWORK_FILE="$ROOT/$SPEC_DIR/00.FRAMEWORK.md"
 if [[ -f "$FRAMEWORK_FILE" ]]; then
   VERSION=$(grep -oE 'v[0-9]+\.[0-9]+(\.[0-9]+)?' "$FRAMEWORK_FILE" | head -1 || echo "unknown")
 fi
@@ -42,10 +42,11 @@ echo "VERSION=$VERSION"
 
 # Check for expected files
 EXPECTED_FILES=(
-  "00.SPEC_FRAMEWORK.md"
-  "01.FOUNDATIONAL_PHILOSOPHY.md"
-  "02.STABLE_TRUTHS.md"
-  "03.INTERACTION_ARCHITECTURE.md"
+  "00.AXIOMS.md"
+  "00.FRAMEWORK.md"
+  "01.PHILOSOPHY.md"
+  "02.TRUTHS.md"
+  "03.INTERACTIONS.md"
   "04.SYSTEMS/SYSTEMS_OVERVIEW.md"
 )
 
@@ -76,7 +77,7 @@ echo "HAS_USER_STORIES=$HAS_STORIES"
 echo "HAS_FINE_TUNING=$HAS_FINE_TUNING"
 
 # Determine overall status
-if [[ -f "$ROOT/$SPEC_DIR/01.FOUNDATIONAL_PHILOSOPHY.md" ]]; then
+if [[ -f "$ROOT/$SPEC_DIR/01.PHILOSOPHY.md" ]]; then
   echo "STATUS=has_spec"
 else
   echo "STATUS=framework_only"

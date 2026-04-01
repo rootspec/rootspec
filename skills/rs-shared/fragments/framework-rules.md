@@ -7,7 +7,7 @@ All spec files (01-05), Cypress files, and derived artifacts belong to the user 
 - Preserve all existing content — only add or modify what was discussed
 - For Cypress files: merge additions, never replace
 
-The only file that may be replaced during upgrades is `00.SPEC_FRAMEWORK.md`.
+The only file that may be replaced during upgrades is `00.FRAMEWORK.md`.
 
 ## Reference Hierarchy
 

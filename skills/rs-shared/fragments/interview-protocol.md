@@ -14,7 +14,7 @@ How to conduct the RootSpec interview process.
 
 5. **Adapt to context** — if editing an existing spec, start by asking what feels wrong or has changed. If creating new, start from scratch with open questions.
 
-6. **Skip when parameterized** — if the skill was invoked with arguments (e.g., `/rs-feature push notifications`), use that as context and skip the "what do you want?" question. Jump to the deeper questions.
+6. **Skip when parameterized** — if the skill was invoked with a focus (e.g., `/rs-spec add push notifications`), use that as context and skip the "what do you want?" question. Jump to the deeper questions.
 
 ## Anti-Pattern Challenges
 

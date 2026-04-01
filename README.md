@@ -5,14 +5,14 @@
 <h1 align="center">RootSpec</h1>
 
 <p align="center">
-  <strong>Hierarchical Specification Framework</strong><br>
+  <strong>Specification Language for Software</strong><br>
   Philosophy guides implementation, never vice versa.
 </p>
 
 <p align="center">
   <a href="CHANGELOG.md">Changelog</a> •
-  <a href="skills/">Skills</a> •
-  <a href="00.SPEC_FRAMEWORK.md">Framework</a>
+  <a href="docs/WORKFLOWS.md">Workflows</a> •
+  <a href="rootspec/00.FRAMEWORK.md">Framework</a>
 </p>
 
 <p align="center">
@@ -22,11 +22,18 @@
 
 ---
 
-**Version v5.2.1**
+## What and Why
 
-A structured approach to software specification that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa.
+RootSpec is a specification language that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa. You define what your product is and why it exists, then derive everything else — strategies, interaction patterns, system architecture, testable user stories — in a strict hierarchy where each level can only reference the levels above it.
 
-**AI-First Design:** Built as Claude Code skills that interview you, create your spec, validate it, and drive test-first implementation.
+AI can generate code and specs trivially. The real value is **validation and proof**. RootSpec transforms AI-generated output from "unverifiable claims" into "proven implementations" by tracing every detail back to a user need, through a design pillar, to a mission.
+
+See [AXIOMS.md](rootspec/00.AXIOMS.md) for the foundational beliefs this framework is built on.
+
+**Good for:** Complex products, long-lived systems, team collaboration, AI-assisted development.
+**Not ideal for:** Throwaway prototypes, single-developer experiments.
+
+---
 
 ## Quick Start
 
@@ -40,160 +47,104 @@ Install the plugin:
 Then:
 
 ```
-/rs-init my productivity app for remote teams
+/rs-init
+/rs-spec my productivity app for remote teams
+/rs-impl MVP
+/rs-validate
 ```
 
-The skill auto-detects your project state (greenfield, existing code, or existing spec) and interviews you level by level to create your specification.
+---
 
-## Skills
+## Usage
 
-| Skill | Description |
-|-------|-------------|
-| `/rs-init [product desc]` | Create, adopt, or reinterpret a spec |
-| `/rs-level <1-5> [change]` | Edit any spec level by number |
-| `/rs-feature [description]` | Add feature with impact analysis across all levels |
-| `/rs-review [target]` | Review feature/code against spec alignment |
-| `/rs-validate` | Validate spec: hierarchy, content quality, coverage |
-| `/rs-implement [story ID]` | Implement from YAML user stories (test-driven) |
-| `/rs-docs [type]` | Generate PRD, TDD, backlog, pillar matrix, API docs |
-| `/rs-extend <type>` | Derive artifact: tdd, ux, ui, brand, analytics, config |
-| `/rs-update` | Update framework + migrate spec to latest version |
-| `/rs-cypress` | Install/merge Cypress test templates |
-| `/rs-help` | Show skills, tips, best practices |
+### Skills
 
-## The Five Levels
+Four skills, each an agentic loop with an iteration cap. All accept an optional **focus** argument to narrow what they work on.
 
-| Level | Purpose | Key Question | References |
-|-------|---------|-------------|------------|
-| **1: Foundational Philosophy** | WHY & WHAT EXPERIENCE | "What problem must we solve? What should users feel?" | External only |
-| **2: Stable Truths** | Design strategies & commitments | "What approach will we take?" | L1 + External |
-| **3: Interaction Architecture** | HOW users and product interact | "What's the behavioral pattern?" | L1-2 + External |
-| **4: Systems** | Implementation architecture | "How do we build this?" | L1-3 + Sibling L4 + External |
-| **5: Implementation** | Validation (YAML + Cypress) & tuning | "Does it work? What values?" | All levels + External |
+| Skill | Description | Mode |
+|-------|-------------|------|
+| `/rs-init [focus]` | Initialize project — directories, base files, prerequisites | Interactive |
+| `/rs-spec [focus]` | Create or update specification — interview + validation loop | Interactive (skippable) |
+| `/rs-impl [focus]` | Implement from spec — test-driven, autonomous | Non-interactive |
+| `/rs-validate [focus]` | Run tests and report results | Non-interactive |
 
-### Reference Rules
+### Focus Examples
+
+| Command | What it does |
+|---------|-------------|
+| `/rs-spec` | Full spec interview, level by level |
+| `/rs-spec add dark mode` | Add a feature across all affected levels |
+| `/rs-spec reinterpret` | Rethink the spec from L1 down |
+| `/rs-impl MVP` | Implement MVP-priority stories only |
+| `/rs-impl US-101` | Implement one specific story |
+| `/rs-validate TASK_SYSTEM` | Test stories for one system |
+| `/rs-validate failing` | Re-run previously failing tests |
+
+### The Five Levels
+
+| Level | Purpose | Key Question |
+|-------|---------|-------------|
+| **1: Philosophy** | WHY & WHAT EXPERIENCE | "What should users feel?" |
+| **2: Truths** | Design strategies & commitments | "What approach will we take?" |
+| **3: Interactions** | HOW users and product interact | "What's the behavioral pattern?" |
+| **4: Systems** | Implementation architecture | "How do we build this?" |
+| **5: Implementation** | Validation & tuning (YAML) | "Does it work? What values?" |
 
 Each level can only reference higher levels, never lower. This prevents circular dependencies and keeps philosophy stable when implementation changes.
 
-## How It Works
+---
 
-### 1. Interview-Driven Spec Creation
+## In-Depth
 
-Skills guide you through a conversational interview, one question at a time. They challenge anti-patterns (features masquerading as feelings, hardcoded numbers in the wrong level) and help you build a spec that's structurally sound.
+### How It Works
 
-```
-/rs-init meal planning app for busy families
+1. **Init** — Set up project directories, base files, and prerequisites
+2. **Spec** — Define what to build through interview-driven dialogue with built-in validation
+3. **Impl** — Build it test-driven from the spec, autonomously
+4. **Validate** — Run tests and prove it works
 
-> No existing spec. Let's build from the ground up.
-> What 3-5 similar products exist? What do they get wrong?
-```
-
-### 2. Cascading Changes
-
-When you edit a level, the skill offers to review downstream levels:
-
-```
-/rs-level 2 add a new trade-off
-
-> Level 2 updated. Changes may affect levels 3-5.
-> 1. Review next level → /rs-level 3
-> 2. Skip
-> 3. Show what might need changing (read-only)
-```
-
-### 3. Parallel Validation
-
-`/rs-validate` launches sub-agents to check hierarchy, content quality, and coverage simultaneously:
-
-```
-/rs-validate
-
-> Score: 72/100
-> FAIL  L2:45 references "INVENTORY_SYSTEM" (L4 concept)
-> WARN  L3:78 "500ms" should be placeholder [brief duration]
-> Fix with /rs-level 2 for the hierarchy violation.
-```
-
-### 4. Test-Driven Implementation
-
-YAML user stories auto-generate Cypress E2E tests. The test ledger tracks pass/fail history per acceptance criterion.
-
-```
-/rs-cypress          # Install test templates
-/rs-implement        # Implement from stories, one at a time
-```
-
-## Project Structure (After Setup)
+### Project Structure
 
 ```
 your-project/
-├── 00.SPEC_FRAMEWORK.md           # Framework definition (reference)
-├── 01.FOUNDATIONAL_PHILOSOPHY.md  # L1: WHY & WHAT EXPERIENCE
-├── 02.STABLE_TRUTHS.md            # L2: Design strategies
-├── 03.INTERACTION_ARCHITECTURE.md # L3: Interaction patterns
-├── 04.SYSTEMS/                    # L4: System specs
-│   ├── SYSTEMS_OVERVIEW.md
-│   └── [YOUR_SYSTEMS].md
-├── 05.IMPLEMENTATION/             # L5: User stories + parameters
-│   ├── USER_STORIES/              # YAML → Cypress tests
-│   └── FINE_TUNING/               # Numeric parameter YAML
-├── test-ledger.json               # Test pass/fail tracking
-└── DERIVED_ARTIFACTS/             # Generated docs (from /rs-extend)
+├── .rootspec.json                   # Project config
+├── rootspec/                        # Specification directory
+│   ├── 00.AXIOMS.md                # Foundational beliefs (reference)
+│   ├── 00.FRAMEWORK.md             # Framework definition (reference)
+│   ├── 01.PHILOSOPHY.md            # L1: WHY & WHAT EXPERIENCE
+│   ├── 02.TRUTHS.md                # L2: Design strategies
+│   ├── 03.INTERACTIONS.md          # L3: Interaction patterns
+│   ├── 04.SYSTEMS/                 # L4: System specs
+│   │   ├── SYSTEMS_OVERVIEW.md
+│   │   └── [YOUR_SYSTEMS].md
+│   ├── 05.IMPLEMENTATION/          # L5: User stories + parameters
+│   │   ├── USER_STORIES/           # YAML → Cypress tests
+│   │   └── FINE_TUNING/            # Numeric parameter YAML
+│   ├── spec-status.json            # Spec validation tracking
+│   └── tests-status.json           # Test pass/fail tracking
+└── ...
 ```
 
-## Why This Framework?
+### Further Reading
 
-### Validation in an AI-Driven World
+- [00.FRAMEWORK.md](rootspec/00.FRAMEWORK.md) — Complete framework specification (the language definition)
+- [docs/IMPLEMENTATION_WORKFLOW.md](docs/IMPLEMENTATION_WORKFLOW.md) — Detailed guide for translating YAML stories into code
+- [docs/CYPRESS_SETUP.md](docs/CYPRESS_SETUP.md) — Setting up E2E testing with Cypress
 
-AI can generate code and specs trivially. The real value is **validation and proof**.
+---
 
-This framework provides proof through:
-1. **Top-down goal fulfillment** — start with Design Pillars (the "why")
-2. **Strategic clarity** — determine "what" fulfills the philosophy
-3. **Behavioral patterns** — define "how" users interact
-4. **System architecture** — figure out what systems are needed
-5. **User validation** — executable tests that prove it works
+## Workflows
 
-Every detail traces back to a user need, which traces to a Design Pillar, which serves the mission. The framework transforms AI-generated code from "unverifiable claims" into "proven implementations."
+| Scenario | Commands |
+|----------|----------|
+| **New project** | `/rs-init` → `/rs-spec` → `/rs-impl MVP` → `/rs-validate` |
+| **Existing codebase** | `/rs-init` → `/rs-spec` (scans your code) → `/rs-impl` → `/rs-validate` |
+| **Add a feature** | `/rs-spec add push notifications` → `/rs-impl` → `/rs-validate` |
+| **Change the spec** | `/rs-spec update L2 trade-offs` → `/rs-impl failing` → `/rs-validate` |
+| **Run tests** | `/rs-validate` or `/rs-validate MVP` or `/rs-validate TASK_SYSTEM` |
 
-### Philosophy
+See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for detailed walkthroughs of each scenario.
 
-Traditional spec approaches suffer from circular dependencies and implementation-driven design. This framework solves it through dependency inversion:
+---
 
-```
-Philosophy (Level 1)
-    ↓ guides
-Strategy (Level 2)
-    ↓ guides
-Interaction Patterns (Level 3)
-    ↓ guides
-System Architecture (Level 4)
-    ↓ guides
-Implementation & Tests (Level 5)
-```
-
-**Key benefits:**
-- Stable foundations — philosophy doesn't change when you adjust implementation
-- Clear decision-making — Design Pillars filter feature requests
-- Living documentation — YAML user stories auto-generate tests
-- Team alignment — shared understanding from "why" to "how much"
-
-### When to Use
-
-**Good for:** Complex products, long-lived systems, team collaboration, AI-assisted development
-
-**Not ideal for:** Throwaway prototypes, single-developer experiments
-
-## Version Information
-
-**Current Version:** v5.2.1
-
-See [CHANGELOG.md](CHANGELOG.md) for version history and migration guides.
-
-## License
-
-MIT — see [LICENSE](LICENSE).
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Found a bug? [File an issue](https://github.com/rootspec/rootspec/issues/new/choose).
+**Version v6.0.0** — See [CHANGELOG.md](CHANGELOG.md) for history. MIT [License](LICENSE). [Contributing](CONTRIBUTING.md).
