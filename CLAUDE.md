@@ -6,7 +6,9 @@ Guidance for Claude Code when working with RootSpec.
 
 ## What RootSpec Is
 
-A specification language for software. Five hierarchical levels — philosophy, truths, interactions, systems, implementation — where each level can only reference higher levels. Four skills (`/rs-init`, `/rs-spec`, `/rs-impl`, `/rs-validate`) drive all workflows.
+An implementation of **purpose-aligned declarative specification** — a methodology where philosophy guides implementation, never vice versa. The methodology is AI-independent; RootSpec is one implementation using a specification language, file structure, YAML DSL, and AI-agent skills.
+
+Five hierarchical levels — philosophy, truths, interactions, systems, implementation — where each level can only reference higher levels. The spec is declarative, executable, and acts as a validation gate. Four skills (`/rs-init`, `/rs-spec`, `/rs-impl`, `/rs-validate`) drive all workflows.
 
 **Are you in the framework repository?**
 - Files: `00.FRAMEWORK.md`, `skills/`, `CLAUDE.md`, `rootspec/` (self-hosted product spec)

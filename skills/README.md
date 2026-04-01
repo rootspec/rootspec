@@ -1,6 +1,6 @@
 # RootSpec Skills
 
-Claude Code skills for the [RootSpec](https://github.com/rootspec/rootspec) specification framework.
+AI-agent skills for the [RootSpec](https://github.com/rootspec/rootspec) specification framework.
 
 ## Skills
 

@@ -24,9 +24,13 @@
 
 ## What and Why
 
-RootSpec is a specification language that enforces **dependency inversion**: foundational philosophy guides implementation, never vice versa. You define what your product is and why it exists, then derive everything else — strategies, interaction patterns, system architecture, testable user stories — in a strict hierarchy where each level can only reference the levels above it.
+RootSpec implements **purpose-aligned declarative specification** — a methodology where foundational philosophy guides implementation, never vice versa. The methodology works with or without AI, with any tooling, any team.
 
-AI can generate code and specs trivially. The real value is **validation and proof**. RootSpec transforms AI-generated output from "unverifiable claims" into "proven implementations" by tracing every detail back to a user need, through a design pillar, to a mission.
+You define what your product is and why it exists, then derive everything else — strategies, interaction patterns, system architecture, testable user stories — in a strict hierarchy where each level can only reference the levels above it. The spec is **declarative**, **executable**, and serves as a **validation gate**: nothing ships unless it traces back to a user need, through a design pillar, to a mission.
+
+AI makes this methodology more urgent: when code and specs can be generated trivially, the real value is **validation and proof**. The spec transforms output from "unverifiable claims" into "proven implementations."
+
+RootSpec is one implementation of this methodology — a specification language, file structure, YAML DSL, and four AI-agent skills that operationalize the approach for building software.
 
 See [AXIOMS.md](rootspec/00.AXIOMS.md) for the foundational beliefs this framework is built on.
 
