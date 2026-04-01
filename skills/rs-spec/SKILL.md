@@ -137,7 +137,7 @@ Write the output hash to `rootspec/spec-status.json`:
   "hash": "<the sha256 hash>",
   "validatedAt": "<ISO timestamp>",
   "valid": true,
-  "version": "6.0.0"
+  "version": "6.1.0"
 }
 ```
 
