@@ -83,7 +83,7 @@ For brownfield: "Your codebase has [detected components]. Let's map those to sys
 **L5 — Implementation (HOW MUCH and validation)**
 - For user stories: What can a user accomplish in 5 minutes? In a day? In a week?
 - What observable behaviors prove each story works? (These become acceptance criteria)
-- Which stories are MVP vs. later? (Priority: MVP, SECONDARY, ADVANCED)
+- Which stories belong to which phase? (Phases are user-defined, e.g., MVP, v1, sprint-1)
 - For fine-tuning: What numeric values need to be defined? What rationale drives each?
 
 ## Step 4: Draft and write
@@ -142,7 +142,7 @@ Write the output hash to `rootspec/spec-status.json`:
 ```
 
 Then suggest next steps:
-- "Spec validated. Run `/rs-impl` to start implementing, or `/rs-impl MVP` for just the MVP stories."
+- "Spec validated. Run `/rs-impl` to start implementing, or `/rs-impl <phase>` for a specific phase."
 
 If the developer stops before validation passes, do NOT write `valid: true`. Leave `rootspec/spec-status.json` as-is or write `valid: false`.
 

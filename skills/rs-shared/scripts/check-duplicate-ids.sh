@@ -4,7 +4,7 @@
 # Output: duplicates with file:line format
 #
 # Handles two layouts:
-#   - View directories (by_priority/, by_journey/, etc.): cross-file dupes checked per view dir
+#   - View directories (by_phase/, by_journey/, etc.): cross-file dupes checked per view dir
 #     (stories are intentionally duplicated across view dirs)
 #   - Flat layout: cross-file dupes checked across all files
 # Intra-file duplicates are always checked.

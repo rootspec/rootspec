@@ -52,7 +52,7 @@ Then:
 ```
 /rs-init
 /rs-spec my productivity app for remote teams
-/rs-impl MVP
+/rs-impl
 /rs-validate
 ```
 
@@ -78,7 +78,7 @@ Four skills, each an agentic loop with an iteration cap. All accept an optional 
 | `/rs-spec` | Full spec interview, level by level |
 | `/rs-spec add dark mode` | Add a feature across all affected levels |
 | `/rs-spec reinterpret` | Rethink the spec from L1 down |
-| `/rs-impl MVP` | Implement MVP-priority stories only |
+| `/rs-impl MVP` | Implement stories tagged with MVP phase |
 | `/rs-impl US-101` | Implement one specific story |
 | `/rs-validate TASK_SYSTEM` | Test stories for one system |
 | `/rs-validate failing` | Re-run previously failing tests |
@@ -140,11 +140,11 @@ your-project/
 
 | Scenario | Commands |
 |----------|----------|
-| **New project** | `/rs-init` → `/rs-spec` → `/rs-impl MVP` → `/rs-validate` |
+| **New project** | `/rs-init` → `/rs-spec` → `/rs-impl` → `/rs-validate` |
 | **Existing codebase** | `/rs-init` → `/rs-spec` (scans your code) → `/rs-impl` → `/rs-validate` |
 | **Add a feature** | `/rs-spec add push notifications` → `/rs-impl` → `/rs-validate` |
 | **Change the spec** | `/rs-spec update L2 trade-offs` → `/rs-impl failing` → `/rs-validate` |
-| **Run tests** | `/rs-validate` or `/rs-validate MVP` or `/rs-validate TASK_SYSTEM` |
+| **Run tests** | `/rs-validate` or `/rs-validate <phase>` or `/rs-validate TASK_SYSTEM` |
 
 See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for detailed walkthroughs of each scenario.
 

@@ -36,7 +36,7 @@
 ## Level 5: Implementation
 
 - **Missing @spec_source**: User stories without traceability to higher levels
-- **Missing @priority**: No prioritization (MVP / SECONDARY / ADVANCED)
+- **Missing @phase**: No phase assignment (e.g., MVP, v1, sprint-1)
 - **Vague acceptance criteria**: "It should work" instead of specific observable behaviors
 - **Untestable stories**: Criteria that can't be verified with Cypress DSL
 - **Missing screen coverage**: L3 screens with no corresponding user stories

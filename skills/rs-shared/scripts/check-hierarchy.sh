@@ -41,7 +41,7 @@ check_file() {
 
     # Check for L5 references in L1-L4 (user story IDs, fine-tuning file refs)
     if [[ "$level" -le 4 ]]; then
-      if echo "$line" | grep -qiE '(USER_STORIES|FINE_TUNING|\.yml|\.yaml|@priority|@journey)'; then
+      if echo "$line" | grep -qiE '(USER_STORIES|FINE_TUNING|\.yml|\.yaml|@phase|@journey)'; then
         echo "VIOLATION L${level}:${lineno} references L5 concept: $(echo "$line" | head -c 80)"
         VIOLATIONS=$((VIOLATIONS + 1))
       fi

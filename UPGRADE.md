@@ -52,7 +52,7 @@ rootspec extend brand-guidelines   # Generate brand guidelines prompt
 
 If using Cypress templates:
 1. Update your test file's glob to load ALL yaml files (`**/*.yaml`)
-2. Use `--env stories=by_priority/MVP` instead of separate test files
+2. Use `--env stories=by_phase/MVP` instead of separate test files
 
 ```bash
 npm install -g rootspec@4.4.0

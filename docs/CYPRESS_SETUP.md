@@ -115,7 +115,7 @@ After creating test suites for your project:
 ```
     └── e2e/
         ├── example.cy.ts         # Template (can delete after copying)
-        ├── mvp.cy.ts             # Loads by_priority/MVP/**/*.yaml
+        ├── mvp.cy.ts             # Loads by_phase/MVP/**/*.yaml
         ├── onboarding.cy.ts      # Loads by_journey/ONBOARDING/**/*.yaml
         └── tasks.cy.ts           # Loads by_system/TASKS/**/*.yaml
 ```
@@ -169,7 +169,7 @@ Add these scripts to your `package.json`:
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test:e2e": "cypress run",
-    "test:e2e:mvp": "cypress run --env stories=by_priority/MVP",
+    "test:e2e:mvp": "cypress run --env stories=by_phase/MVP",
     "test:e2e:onboarding": "cypress run --env stories=by_journey/ONBOARDING"
   }
 }
@@ -306,18 +306,18 @@ Copy an example YAML file and customize it:
 
 ```bash
 # Copy example
-cp node_modules/@rootspec/cypress/templates/USER_STORIES/by_priority/MVP.example.yaml \
-   rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
+cp node_modules/@rootspec/cypress/templates/USER_STORIES/by_phase/MVP.example.yaml \
+   rootspec/05.IMPLEMENTATION/USER_STORIES/by_phase/MVP.yaml
 
 # Or create from scratch
-mkdir -p rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority
+mkdir -p rootspec/05.IMPLEMENTATION/USER_STORIES/by_phase
 ```
 
 **Example user story YAML:**
 
 ```yaml
 # @spec_version: 3.0
-# @priority: P0
+# @phase: P0
 # @journey: CORE_FUNCTIONALITY
 
 user_stories:
@@ -370,7 +370,7 @@ Use `--env stories=<filter>` to run only stories whose file paths contain the fi
 
 ```bash
 # Run MVP priority stories
-cypress run --env stories=by_priority/MVP
+cypress run --env stories=by_phase/MVP
 
 # Run onboarding journey
 cypress run --env stories=ONBOARDING
@@ -396,7 +396,7 @@ Then add mappings in the test file's `autoFilter` object:
 
 ```typescript
 const autoFilter: Record<string, string> = {
-  'mvp.cy.ts': 'by_priority/MVP',
+  'mvp.cy.ts': 'by_phase/MVP',
   'onboarding.cy.ts': 'by_journey/ONBOARDING',
 };
 ```
@@ -427,11 +427,11 @@ CYPRESS_LOG_BROWSER=1 npm run cypress:run
 
 **Create a minimal test story to validate everything works:**
 
-Create `rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/SETUP_TEST.yaml`:
+Create `rootspec/05.IMPLEMENTATION/USER_STORIES/by_phase/SETUP_TEST.yaml`:
 
 ```yaml
 # @spec_version: 3.0
-# @priority: P0
+# @phase: P0
 
 user_stories:
   - id: US-SETUP-TEST
@@ -547,7 +547,7 @@ on('task', {
 **Problem:** Test generator can't find your user story files
 
 **Solution:** Check that files are in correct location:
-- `rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/*.yaml`
+- `rootspec/05.IMPLEMENTATION/USER_STORIES/by_phase/*.yaml`
 - `rootspec/05.IMPLEMENTATION/USER_STORIES/by_journey/*.yaml`
 - `rootspec/05.IMPLEMENTATION/USER_STORIES/by_system/*.yaml`
 
@@ -560,7 +560,7 @@ The test generator looks for YAML files matching the directory structure.
 **Problem:** YAML structure doesn't match expected schema
 
 **Solution:** Check your YAML format matches the spec:
-- Required annotations: `@spec_version`, `@priority` (or `@journey` or `@systems`)
+- Required annotations: `@spec_version`, `@phase` (or `@journey` or `@systems`)
 - Required fields: `user_stories`, `id`, `title`, `acceptance_criteria`
 - Each acceptance criterion needs: `id`, `given`, `when`, `then`
 

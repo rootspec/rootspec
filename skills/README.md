@@ -16,7 +16,7 @@ AI-agent skills for the [RootSpec](https://github.com/rootspec/rootspec) specifi
 ```
 /rs-init
 /rs-spec my productivity app for remote teams
-/rs-impl MVP
+/rs-impl
 /rs-validate
 ```
 

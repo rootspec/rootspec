@@ -55,7 +55,7 @@ If user asks about:
 
 **Adding a feature:** `/rs-spec add feature description`
 
-**Implementing:** `/rs-impl` or `/rs-impl MVP` or `/rs-impl US-101`
+**Implementing:** `/rs-impl` or `/rs-impl <phase>` or `/rs-impl US-101`
 
 **Testing:** `/rs-validate` or `/rs-validate failing`
 
@@ -103,7 +103,7 @@ Comment-annotated YAML with `@annotation: value` metadata.
 
 **Test DSL core steps:** `visit`, `click`, `fill`, `loginAs`, `seedItem`, `shouldContain`, `shouldExist`
 
-**Common annotations:** `@spec_version`, `@priority`, `@journey`, `@systems`, `@spec_source`, `@rationale`
+**Common annotations:** `@spec_version`, `@phase`, `@journey`, `@systems`, `@spec_source`, `@rationale`
 
 ---
 

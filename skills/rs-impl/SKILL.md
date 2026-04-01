@@ -29,7 +29,7 @@ If these paths don't resolve, search for the scripts in the skills directory.
 
 Read `../rs-shared/fragments/l5-test-dsl.md` for the test DSL step reference.
 
-Announce what you found: "Found X stories (Y MVP, Z SECONDARY). N already passing. I'll implement [focus or: starting with MVP stories]."
+Announce what you found: "Found X stories across N phases. M already passing. I'll implement [focus or: starting with the first phase]."
 
 ## Step 2: Plan
 
@@ -44,12 +44,12 @@ Replace `[focus]` with the argument (e.g., `MVP`, `US-101`, `TASK_SYSTEM`, `fail
 The script filters by:
 - `"US-101"` → that specific story
 - `"TASK_SYSTEM"` → stories tagged with `@systems: [TASK_SYSTEM]`
-- `"MVP"` → all MVP-priority stories
+- `"MVP"` (or any phase name) → stories tagged with that `@phase`
 - `"failing"` → stories with `status: "fail"` in tests-status.json
 
-Otherwise, work through all stories by priority: MVP → SECONDARY → ADVANCED.
+Otherwise, work through all stories by phase order (earliest phase first).
 
-Within a priority, order by dependency — foundational flows (auth, onboarding, core CRUD) before features that depend on them.
+Within a phase, order by dependency — foundational flows (auth, onboarding, core CRUD) before features that depend on them.
 
 **First implementation?** If `rootspec/tests-status.json` has no passing stories, handle global setup first (see below).
 
@@ -103,7 +103,7 @@ The parse script extracts story/criteria pass/fail from Cypress JSON. The build 
 ### 3f. Report and continue
 
 After each story:
-- Pass: `"US-101: PASS (3/12 MVP stories complete)"`
+- Pass: `"US-101: PASS (3/12 stories complete)"`
 - Fail: `"US-101: FAIL — [reason]. Moving to next story."`
 
 Loop to the next story. If all target stories pass, or iteration cap is reached, go to Step 4.
@@ -145,10 +145,10 @@ Present the setup plan in your first progress report, then proceed.
 ## Focus
 
 Arguments narrow what the skill works on:
-- No focus → all stories by priority (MVP first)
+- No focus → all stories by phase order (earliest first)
 - `"US-101"` → specific story
 - `"TASK_SYSTEM"` → stories for a system
-- `"MVP"` → MVP-priority stories only
+- `"MVP"` (or any phase name) → stories tagged with that phase
 - `"failing"` → re-implement previously failing stories
 
 ## Scope

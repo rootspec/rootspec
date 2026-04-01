@@ -41,7 +41,7 @@ Replace `[focus]` with the argument (e.g., `MVP`, `US-101`, `TASK_SYSTEM`, `fail
 The script filters by:
 - `"US-101"` → that specific story
 - `"TASK_SYSTEM"` → stories tagged with `@systems: [TASK_SYSTEM]`
-- `"MVP"` → all MVP-priority stories
+- `"MVP"` (or any phase name) → stories tagged with that `@phase`
 - `"failing"` → stories with `status: "fail"` in tests-status.json
 
 Otherwise, run all tests.
@@ -112,8 +112,8 @@ Still failing:
 
 Coverage:
 - MVP: 10/12 passing
-- SECONDARY: 0/5 (not yet implemented)
-- ADVANCED: 0/3 (not yet implemented)
+- post-launch: 0/5 (not yet implemented)
+- v2: 0/3 (not yet implemented)
 ```
 
 If all tests pass: "All tests passing. Implementation matches spec."
@@ -128,7 +128,7 @@ Arguments narrow what the skill tests:
 - No focus → all tests
 - `"US-101"` → specific story
 - `"TASK_SYSTEM"` → stories for a system
-- `"MVP"` → MVP-priority stories only
+- `"MVP"` (or any phase name) → stories tagged with that phase
 - `"failing"` → re-run previously failing stories
 
 ## Scope

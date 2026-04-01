@@ -7,7 +7,7 @@
 # USER STORY: [Title]
 # =============================================================================
 # @spec_version: 1.0.0
-# @priority: MVP | SECONDARY | ADVANCED
+# @phase: <user-defined> (e.g., MVP, v1, sprint-1)
 # @journey: JOURNEY_NAME
 # @systems: [SYSTEM_A, SYSTEM_B]
 # @last_updated: 2025-01-01T00:00:00Z

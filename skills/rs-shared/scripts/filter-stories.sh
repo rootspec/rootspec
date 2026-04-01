@@ -7,7 +7,7 @@
 #   (none)       → all YAML files
 #   US-101       → file containing that story ID
 #   TASK_SYSTEM  → files with @systems annotation containing that name
-#   MVP          → files with @priority: MVP (also SECONDARY, ADVANCED)
+#   MVP          → files with @phase: MVP (or any user-defined phase name)
 #   failing      → files containing stories that failed in tests-status.json
 
 set -euo pipefail
@@ -46,18 +46,7 @@ if echo "$FOCUS" | grep -qE '^US-[0-9]+$'; then
   exit 0
 fi
 
-# Priority focus (MVP, SECONDARY, ADVANCED)
-FOCUS_UPPER=$(echo "$FOCUS" | tr '[:lower:]' '[:upper:]')
-if [[ "$FOCUS_UPPER" == "MVP" || "$FOCUS_UPPER" == "SECONDARY" || "$FOCUS_UPPER" == "ADVANCED" ]]; then
-  for f in "${yaml_files[@]}"; do
-    if grep -qi "@priority:.*${FOCUS_UPPER}" "$f" 2>/dev/null; then
-      echo "$f"
-    fi
-  done
-  exit 0
-fi
-
-# Failing stories focus
+# Failing stories focus (checked before phase to avoid matching "failing" as a phase)
 if [[ "$FOCUS" == "failing" ]]; then
   STATUS_FILE="$SPEC_DIR/tests-status.json"
   if [[ ! -f "$STATUS_FILE" ]]; then
@@ -87,7 +76,20 @@ if [[ "$FOCUS" == "failing" ]]; then
   exit 0
 fi
 
-# System name focus (anything else: treat as @systems annotation match)
+# Phase focus: try @phase annotation match first
+phase_matches=()
+for f in "${yaml_files[@]}"; do
+  if grep -qi "@phase:.*${FOCUS}" "$f" 2>/dev/null; then
+    phase_matches+=("$f")
+  fi
+done
+
+if [[ ${#phase_matches[@]} -gt 0 ]]; then
+  printf '%s\n' "${phase_matches[@]}"
+  exit 0
+fi
+
+# System name focus (fallback: treat as @systems annotation match)
 for f in "${yaml_files[@]}"; do
   if grep -qi "@systems:.*${FOCUS}" "$f" 2>/dev/null; then
     echo "$f"

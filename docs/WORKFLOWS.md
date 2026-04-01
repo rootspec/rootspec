@@ -31,10 +31,10 @@ Walks you through a level-by-level interview to build your specification:
 The skill validates your spec after each draft. When it passes, a hash is recorded so downstream skills know the spec is stable.
 
 ```
-/rs-impl MVP
+/rs-impl
 ```
 
-Reads your user stories and implements them test-first, starting with MVP-priority stories. Works autonomously — reads a story, builds the feature, runs the test, moves to the next. Reports progress as it goes.
+Reads your user stories and implements them test-first, working through phases in order. Works autonomously — reads a story, builds the feature, runs the test, moves to the next. Reports progress as it goes.
 
 ```
 /rs-validate
@@ -188,7 +188,7 @@ Run everything. Get a report.
 /rs-validate MVP
 ```
 
-Run only MVP-priority stories. Useful for quick checks.
+Run only stories tagged with the MVP phase. Useful for quick checks.
 
 ```
 /rs-validate TASK_SYSTEM
@@ -219,7 +219,7 @@ Failures:
 
 Coverage:
 - MVP: 10/12 passing
-- SECONDARY: 0/5 (not yet implemented)
+- post-launch: 0/5 (not yet implemented)
 ```
 
 Failures tell you what broke and where. Coverage tells you how much of the spec is proven.
@@ -243,7 +243,7 @@ Failures tell you what broke and where. Coverage tells you how much of the spec 
 | `/rs-spec` | `add dark mode` | Add a feature across all levels |
 | `/rs-spec` | `L3` | Work on Level 3 only |
 | `/rs-spec` | `reinterpret` | Rethink the spec from L1 down |
-| `/rs-impl` | `MVP` | Implement MVP-priority stories only |
+| `/rs-impl` | `MVP` | Implement stories tagged with MVP phase |
 | `/rs-impl` | `US-101` | Implement one specific story |
 | `/rs-impl` | `TASK_SYSTEM` | Implement stories for one system |
 | `/rs-validate` | `failing` | Re-run previously failing tests |

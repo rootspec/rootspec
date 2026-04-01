@@ -132,6 +132,6 @@ echo "Then try:"
 echo "  /rs-spec"
 echo "  /rs-validate"
 echo "  /rs-spec add a grocery list system"
-echo "  /rs-impl MVP"
+echo "  /rs-impl"
 echo
 echo "Note: Skills are symlinked — edits in $ROOTSPEC_DIR/skills/ are reflected immediately."

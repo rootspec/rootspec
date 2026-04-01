@@ -24,11 +24,11 @@ Before writing any code, understand what you need to build.
 Start by reading all YAML files:
 
 ```bash
-# Look at MVP tests first
-ls rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/MVP.yaml
+# Look at first-phase tests
+ls rootspec/05.IMPLEMENTATION/USER_STORIES/by_phase/
 
-# Then scan other priorities
-ls rootspec/05.IMPLEMENTATION/USER_STORIES/by_priority/
+# Then scan all phases
+ls rootspec/05.IMPLEMENTATION/USER_STORIES/by_phase/
 ```
 
 #### Identify Global Requirements
@@ -77,8 +77,8 @@ Example checklist:
 - [ ] updateProfile
 
 ## Test Count
-- MVP: 12 acceptance criteria
-- POST_MVP: 8 acceptance criteria
+- Phase 1: 12 acceptance criteria
+- Phase 2: 8 acceptance criteria
 - Total: 20 tests to pass
 ```
 
@@ -222,7 +222,7 @@ After implementing global setup, verify it works:
 
 ```bash
 # Create a simple test
-npm test -- --spec cypress/e2e/by_priority.cy.ts
+npm test -- --spec cypress/e2e/phase1.cy.ts
 ```
 
 If tests can authenticate and reset properly, you're ready for Phase 3.
@@ -236,7 +236,7 @@ Now implement features one test at a time.
 #### The Iteration Loop
 
 ```
-1. Pick next failing test (MVP first)
+1. Pick next failing test (earliest phase first)
 2. Run the test
 3. Identify what's missing (DSL? App feature? Data?)
 4. Implement minimal solution
@@ -248,11 +248,11 @@ Now implement features one test at a time.
 
 **1. Pick Next Test**
 
-Start with MVP, work through acceptance criteria in order:
+Start with the earliest phase, work through acceptance criteria in order:
 
 ```bash
-# Run MVP tests
-npm test -- --spec cypress/e2e/by_priority.cy.ts --grep "MVP"
+# Run first-phase tests
+npm test -- --spec cypress/e2e/phase1.cy.ts
 ```
 
 Pick the first failing test. Focus on ONE acceptance criteria at a time.
@@ -633,7 +633,7 @@ beforeEach(() => {
 ### Do
 
 - ✅ **Work incrementally** - One test at a time
-- ✅ **Start with MVP** - Ship working software early
+- ✅ **Start with earliest phase** - Ship working software early
 - ✅ **Use exact selectors** - Match data-test attributes precisely
 - ✅ **Follow the spec** - Reference Level 4 for architecture
 - ✅ **Commit often** - After each passing test
@@ -765,11 +765,9 @@ npm test  # Some fail
 - **Output:** Working auth, database reset, seed data
 
 ### Phase 3: Implementation
-- **MVP tests:** 1-4 weeks for typical SaaS MVP
+- **First phase:** 1-4 weeks for typical SaaS MVP
 - **Per test:** 15 minutes - 2 hours per acceptance criteria
-- **POST_MVP:** 2-4 weeks additional
-
-**Total for MVP:** 2-6 weeks of focused development
+- **Later phases:** 2-4 weeks additional per phase
 
 ---
 
@@ -777,7 +775,7 @@ npm test  # Some fail
 
 You'll know you're succeeding when:
 
-- ✅ All MVP tests pass reliably
+- ✅ All current-phase tests pass reliably
 - ✅ Tests run in any order
 - ✅ CI/CD pipeline runs tests successfully
 - ✅ Application matches specification architecture
@@ -788,10 +786,10 @@ You'll know you're succeeding when:
 
 ## Next Steps
 
-After completing MVP implementation:
+After completing the current phase:
 
-1. **Deploy MVP** - Get user feedback
-2. **Continue with POST_MVP** - Use same workflow
+1. **Deploy** - Get user feedback
+2. **Continue with next phase** - Use same workflow
 3. **Update spec as needed** - Use [add-feature.md](../prompts/add-feature.md)
 4. **Maintain tests** - Keep them in sync with code
 5. **Onboard team** - Teach this workflow to others
