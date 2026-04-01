@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-04-01
+
+### Breaking Changes
+
+- **Four-skill architecture**: Replaced 11 skills with 4 agentic loops — `/rs-init`, `/rs-spec`, `/rs-impl`, `/rs-validate`. All other skills removed.
+- **Renamed spec files**: `01.FOUNDATIONAL_PHILOSOPHY.md` → `01.PHILOSOPHY.md`, `02.STABLE_TRUTHS.md` → `02.TRUTHS.md`, `03.INTERACTION_ARCHITECTURE.md` → `03.INTERACTIONS.md`, `00.SPEC_FRAMEWORK.md` → `00.FRAMEWORK.md`
+- **Spec directory**: All spec files now live inside `rootspec/` directory instead of project root
+- **Config file**: `.rootspecrc.json` → `.rootspec.json` with prerequisites section
+- **Status files**: `test-ledger.json` replaced by `rootspec/spec-status.json` and `rootspec/tests-status.json`
+- **Removed packages**: `packages/cli/` and `packages/cypress/` deleted (replaced by skills in v5.0)
+
+### Added
+
+- `00.AXIOMS.md` — foundational beliefs, shipped with every project
+- `rootspec/01.PHILOSOPHY.md` — self-hosted product spec with design pillars (Guided Confidence, Honest Feedback, Progressive Depth, Invisible Structure)
+- `docs/WORKFLOWS.md` — five detailed workflow walkthroughs (greenfield, brownfield, add feature, change spec, ongoing validation)
+- Prerequisites system — detect or create dev server, pre-commit hook, release script, validation script
+- 10 new deterministic scripts: compute-spec-hash, check-pillar-quality, check-tradeoffs, check-coverage, detect-prerequisites, verify-init, filter-stories, parse-cypress-results, build-tests-status, compare-test-runs
+- Focus arguments for all skills — narrow what each skill works on
+- Scope restrictions (soft) — each skill declares what it can and cannot write
+- rs-impl commits only when all target tests pass
+- rs-validate reports regressions (was passing, now failing) separately
+
+### Removed
+
+- 11 skill directories: rs-level, rs-implement, rs-docs, rs-extend, rs-cypress, rs-review, rs-help, rs-feature, rs-update (old rs-init and rs-validate replaced)
+- 7 obsolete scripts: extract-l1-pillars, extract-l2-truths, extract-l3-patterns, extract-l5-journeys, list-l4-systems, list-l5-stories, list-l5-fine-tuning
+- `docs/QUICK_START.md` (replaced by WORKFLOWS.md)
+- `cascade-protocol.md` fragment (folded into rs-spec)
+
+### Changed
+
+- Docs restructured: what/why → quick start → usage → in-depth → workflows
+- Release script now updates all version locations (9 across 6 files) and scans for stale versions
+- Validation scripts moved from rs-validate/scripts/ to rs-shared/scripts/
+- README rewritten — concise, flows naturally, links to WORKFLOWS.md
+- CLAUDE.md rewritten — same flow, AI-focused
+
 ## [5.2.1] - 2026-03-24
 
 ### Fixed
