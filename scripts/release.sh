@@ -105,14 +105,6 @@ update_version "README.md" \
   's/Version v[0-9]+\.[0-9]+\.[0-9]+/Version v'"$VERSION"'/g' \
   "Version footer"
 
-# Plugin registration
-update_version ".claude-plugin/plugin.json" \
-  's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' \
-  "Plugin version"
-update_version ".claude-plugin/marketplace.json" \
-  's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/' \
-  "Marketplace version"
-
 # Skill files (version in JSON examples)
 update_version "skills/rs-init/SKILL.md" \
   's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/g' \
@@ -160,15 +152,9 @@ fi
 # Verify key files updated correctly
 if [ "$DRY_RUN" != "--dry-run" ]; then
   UPDATED_FW=$(grep -oE 'Version:\*\* [0-9]+\.[0-9]+\.[0-9]+' 00.FRAMEWORK.md | head -1 | sed 's/Version:\*\* //')
-  UPDATED_PLUGIN=$(grep -oE '"version": "[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json | head -1 | sed 's/"version": "//' | sed 's/"//')
   echo "Framework: $UPDATED_FW"
-  echo "Plugin:    $UPDATED_PLUGIN"
   if [ "$UPDATED_FW" != "$VERSION" ]; then
     echo "Error: 00.FRAMEWORK.md version not updated correctly"
-    exit 1
-  fi
-  if [ "$UPDATED_PLUGIN" != "$VERSION" ]; then
-    echo "Error: plugin.json version not updated correctly"
     exit 1
   fi
   echo "Verified."
@@ -195,7 +181,7 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md .claude-plugin/plugin.json .claude-plugin/marketplace.json skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh"
+run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh"
 run "git commit -m 'Release v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."

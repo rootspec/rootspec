@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-04-01
+
+### Changed
+
+- **Methodology distinction**: Docs now distinguish "purpose-aligned declarative specification" (the AI-independent methodology) from RootSpec (one implementation). README, CLAUDE.md, and skills/README.md updated.
+- **`@priority` → `@phase`**: Replaced prescriptive MVP/SECONDARY/ADVANCED taxonomy with user-defined phases. The agent suggests phases at implementation time; the user tailors them. Renamed `by_priority/` → `by_phase/` across framework, skills, scripts, and docs.
+- **Installation**: Switched from Claude Code plugin marketplace to `npx skills add rootspec/rootspec`. Removed `.claude-plugin/` directory.
+- **Release script**: Removed `.claude-plugin` references.
+
+### Added
+
+- **Axiom 7**: Implicit intent drifts — the spec must externalize it
+- **Axiom 8**: Natural language is the specification medium
+- **Axiom 9**: Structure directs attention
+- Generalized Axiom 4: "AI needs structured interpretation" → "Validation requires structured interpretation" (methodology is AI-independent)
+
+### Removed
+
+- `.claude-plugin/` directory (vendor-specific distribution)
+- Pre-6.0.0 entries in UPGRADE.md
+
 ## [6.0.0] - 2026-04-01
 
 ### Breaking Changes
