@@ -101,7 +101,7 @@ SPEC
 # Create .rootspec.json
 cat > "$TEST_DIR/.rootspec.json" << 'JSON'
 {
-  "version": "6.1.0",
+  "version": "6.2.0",
   "specDirectory": "rootspec",
   "prerequisites": {
     "devServer": null,
@@ -113,7 +113,7 @@ cat > "$TEST_DIR/.rootspec.json" << 'JSON'
 JSON
 
 # Create empty status files
-echo '{ "hash": null, "validatedAt": null, "valid": false, "version": "6.1.0" }' > "$TEST_DIR/rootspec/spec-status.json"
+echo '{ "hash": null, "validatedAt": null, "valid": false, "version": "6.2.0" }' > "$TEST_DIR/rootspec/spec-status.json"
 echo '{ "lastRun": null, "stories": {} }' > "$TEST_DIR/rootspec/tests-status.json"
 
 echo "Test project created!"
