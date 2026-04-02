@@ -118,6 +118,14 @@ update_version "skills/test-local.sh" \
   's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "'"$VERSION"'"/g' \
   "JSON examples (x2)"
 
+# Roadmap
+update_version "docs/ROADMAP.md" \
+  's/Current — v[0-9]+\.[0-9]+\.[0-9]+/Current — v'"$VERSION"'/' \
+  "Current version heading"
+update_version "docs/ROADMAP.md" \
+  's/\*\*Last Updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}/**Last Updated:** '"$CURRENT_DATE"'/' \
+  "Last Updated field"
+
 echo ""
 echo "Step 2: Verify — no stale versions"
 echo "------------------------------------"
@@ -129,6 +137,7 @@ STALE=$(grep -rn "$CURRENT_VERSION" \
   . 2>/dev/null \
   | grep -v CHANGELOG.md \
   | grep -v UPGRADE.md \
+  | grep -v ROADMAP.md \
   | grep -v scripts/release.sh \
   | grep -v docs/archive/ \
   || true)
@@ -181,7 +190,7 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh"
+run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh docs/ROADMAP.md"
 run "git commit -m 'Release v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."
