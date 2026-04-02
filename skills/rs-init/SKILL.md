@@ -58,9 +58,11 @@ Read `../rs-shared/fragments/prerequisites.md` for the full reference on what ea
 Report what was found. For each prerequisite with `=none`, ask the developer:
 - "No [prerequisite] detected. Want me to create a template, or skip for now?"
 
+**Default to recommending creation**, especially for greenfield projects. These templates are lightweight and `/rs-impl` will need them — a dev server script, test runner, and pre-commit hook are standard infrastructure. Don't suggest skipping unless the developer has a specific reason (e.g., they already have their own tooling they plan to wire up later).
+
 For each prerequisite:
 - **Found** → confirm with developer, record the path
-- **Not found** → offer to create a template or skip
+- **Not found** → offer to create a template (recommended) or skip
 - **Skipped** → record `null`
 
 ### Dev server template
