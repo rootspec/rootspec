@@ -2,10 +2,12 @@
 
 ## Never Overwrite User Work
 
-All spec files (01-05), Cypress files, and derived artifacts belong to the user once created. Never overwrite, replace, or regenerate them without explicit approval. When making changes:
+All spec files (01-05) and Cypress files belong to the user once created. Never overwrite, replace, or regenerate them without explicit approval. When making changes:
 - Present diffs and get approval before writing
 - Preserve all existing content — only add or modify what was discussed
 - For Cypress files: merge additions, never replace
+
+Derived artifacts (`rootspec/DERIVED_ARTIFACTS/`) are an exception — they are regenerated from the spec on every `/rs-spec` run and may be overwritten without approval.
 
 The only file that may be replaced during upgrades is `00.FRAMEWORK.md`.
 

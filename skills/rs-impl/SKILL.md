@@ -63,15 +63,21 @@ For each story:
 
 Read the YAML. Understand the given/when/then steps and what needs to exist for the test to pass.
 
-### 3b. Read existing code first
+### 3b. Read existing code and derived artifacts
 
-Before writing anything, understand the project's patterns. Check FRAMEWORK from the project scan. Read existing source files to understand:
+Before writing anything, understand the project's patterns and architectural guidance.
+
+**Check for derived artifacts** in `rootspec/DERIVED_ARTIFACTS/`:
+- If `technical-design.md` exists, read it for technology stack, architecture patterns, coding conventions, API approach, and data model guidance. Follow these conventions when implementing.
+- If `visual-design.md` exists, read it for design principles, component patterns, layout approach, and responsive strategy. Follow these when building UI.
+
+**Read existing source files.** Check FRAMEWORK from the project scan. Understand:
 - Project structure and conventions
 - How routing works
 - How state is managed
 - What patterns are already established
 
-Match these patterns. Don't introduce new frameworks or paradigms unless the story requires it.
+Match derived artifact guidance and existing patterns. Don't introduce new frameworks or paradigms unless the story requires it. When derived artifacts and existing code conflict, prefer the artifact — it reflects current spec intent.
 
 ### 3c. Build what's missing
 

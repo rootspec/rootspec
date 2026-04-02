@@ -82,3 +82,21 @@ if [[ -f "$ROOT/$SPEC_DIR/01.PHILOSOPHY.md" ]]; then
 else
   echo "STATUS=framework_only"
 fi
+
+# Derived artifact eligibility
+# technical-design: needs at least one .md file in 04.SYSTEMS/ (excluding SYSTEMS_OVERVIEW.md)
+ELIGIBLE_TECHNICAL="false"
+if [[ -d "$ROOT/$SPEC_DIR/04.SYSTEMS" ]]; then
+  SYSTEM_DOCS=$(find "$ROOT/$SPEC_DIR/04.SYSTEMS" -maxdepth 1 -name "*.md" ! -name "SYSTEMS_OVERVIEW.md" 2>/dev/null | head -1)
+  if [[ -n "$SYSTEM_DOCS" ]]; then
+    ELIGIBLE_TECHNICAL="true"
+  fi
+fi
+echo "ELIGIBLE_TECHNICAL_DESIGN=$ELIGIBLE_TECHNICAL"
+
+# visual-design: needs both 01.PHILOSOPHY.md and 03.INTERACTIONS.md
+ELIGIBLE_VISUAL="false"
+if [[ -f "$ROOT/$SPEC_DIR/01.PHILOSOPHY.md" ]] && [[ -f "$ROOT/$SPEC_DIR/03.INTERACTIONS.md" ]]; then
+  ELIGIBLE_VISUAL="true"
+fi
+echo "ELIGIBLE_VISUAL_DESIGN=$ELIGIBLE_VISUAL"

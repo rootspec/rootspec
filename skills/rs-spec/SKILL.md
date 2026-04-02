@@ -1,6 +1,6 @@
 ---
 name: rs-spec
-description: Create or update a RootSpec specification — interview-driven with built-in validation. Use this when a user wants to define, expand, revise, or reinterpret their product specification, add features, or edit any spec level.
+description: Create or update a RootSpec specification — interview-driven with built-in validation and derived artifact generation. Use this when a user wants to define, expand, revise, or reinterpret their product specification, add features, or edit any spec level.
 ---
 
 You are a specification agent. Your job is to create, update, or refine a 5-level product specification through structured dialogue and iterative validation.
@@ -122,29 +122,54 @@ bash "$(dirname "$0")/../rs-shared/scripts/check-coverage.sh" rootspec
 
 If violations are found, report them and fix. Loop between drafting and validation until the spec is clean — but don't loop more than 20 iterations total across the entire session.
 
-## Step 6: Record and hand off
+## Step 6: Generate derived artifacts
 
-When the spec passes validation (zero critical violations), compute and record the hash:
+After validation passes, generate specialized artifacts that project the specification into implementation-ready guidance.
+
+Read `../rs-shared/fragments/derived-artifacts.md` for what to generate and how.
+
+Re-read the scan-project.sh output from Step 1 — you need FRAMEWORK, SOURCE_DIRS, CONFIG_FILES, and HAS_CODE to determine the project scenario (empty greenfield, scaffolded, or brownfield).
+
+Create `rootspec/DERIVED_ARTIFACTS/` if it doesn't exist.
+
+**Check eligibility** from the scan-spec.sh output in Step 1:
+
+| Artifact | Generate if... |
+|----------|---------------|
+| `technical-design.md` | `ELIGIBLE_TECHNICAL_DESIGN=true` |
+| `visual-design.md` | `ELIGIBLE_VISUAL_DESIGN=true` |
+
+This step runs regardless of which path you took (A, B, or C). Even if you only edited one level, regenerate all eligible artifacts — they derive from the full spec state, not just what changed.
+
+For each eligible artifact:
+1. Read the source spec files listed in the fragment
+2. For project context, read: `package.json`, config files (tsconfig, eslint, tailwind, etc.), and 2-3 representative source files for pattern detection. Don't read the entire codebase.
+3. Generate the artifact following the fragment's section guidance
+4. Write to `rootspec/DERIVED_ARTIFACTS/<artifact-name>.md`
+
+Always overwrite existing artifacts — they are regenerated from the current spec state.
+
+If no artifacts can be generated (insufficient spec levels), skip this step and note it in the hand-off: "Derived artifacts not yet generated — complete L4 for technical design, L1+L3 for visual design."
+
+## Step 7: Record and hand off
+
+When the spec passes validation (zero critical violations), write the status file:
 
 ```bash
-bash "$(dirname "$0")/../rs-shared/scripts/compute-spec-hash.sh" rootspec
+bash "$(dirname "$0")/../rs-shared/scripts/write-spec-status.sh" rootspec true
 ```
 
-Write the output hash to `rootspec/spec-status.json`:
-
-```json
-{
-  "hash": "<the sha256 hash>",
-  "validatedAt": "<ISO timestamp>",
-  "valid": true,
-  "version": "6.1.0"
-}
-```
+This computes the hash, detects the framework version, and writes `rootspec/spec-status.json` with the current timestamp.
 
 Then suggest next steps:
 - "Spec validated. Run `/rs-impl` to start implementing, or `/rs-impl <phase>` for a specific phase."
+- If artifacts were generated: "Generated derived artifacts in `rootspec/DERIVED_ARTIFACTS/` — these will guide implementation decisions."
 
-If the developer stops before validation passes, do NOT write `valid: true`. Leave `rootspec/spec-status.json` as-is or write `valid: false`.
+If the developer stops before validation passes, do NOT write `valid: true`. Leave `rootspec/spec-status.json` as-is, or write it with `false`:
+
+```bash
+bash "$(dirname "$0")/../rs-shared/scripts/write-spec-status.sh" rootspec false
+```
 
 ## Focus
 
@@ -167,5 +192,5 @@ Each level can ONLY reference higher levels, never lower:
 ## Scope
 
 - **CAN read:** All project files
-- **CAN write:** `rootspec/` directory (spec files, `spec-status.json`)
+- **CAN write:** `rootspec/` directory (spec files, `spec-status.json`, `DERIVED_ARTIFACTS/`)
 - **SHOULD NOT write:** Application code, test files, `.rootspec.json`, `tests-status.json`

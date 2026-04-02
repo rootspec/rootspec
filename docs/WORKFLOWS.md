@@ -28,7 +28,7 @@ Walks you through a level-by-level interview to build your specification:
 - **L4 — Systems:** What systems need to exist? What are their boundaries and responsibilities?
 - **L5 — Implementation:** User stories (YAML with testable acceptance criteria) and fine-tuning parameters.
 
-The skill validates your spec after each draft. When it passes, a hash is recorded so downstream skills know the spec is stable.
+The skill validates your spec after each draft. When it passes, a hash is recorded so downstream skills know the spec is stable. After validation, `/rs-spec` generates derived artifacts (`rootspec/DERIVED_ARTIFACTS/`) — a technical design document and visual design document that guide implementation.
 
 ```
 /rs-impl
@@ -72,7 +72,7 @@ The interview adapts to brownfield projects. Instead of inventing from scratch, 
 - **L4:** What systems exist in the code? The skill can profile your project to find them.
 - **L5:** Write user stories for existing behavior AND for gaps you want to fill.
 
-The goal isn't to document everything — it's to formalize the intent behind what exists, then identify what's unspecified.
+The goal isn't to document everything — it's to formalize the intent behind what exists, then identify what's unspecified. The derived artifacts will absorb your existing codebase conventions — detected frameworks, libraries, and patterns get documented alongside spec-derived guidance.
 
 ```
 /rs-impl
@@ -110,7 +110,7 @@ The focus argument tells the skill what you want to add. It analyzes the impact 
 - Does it need a new system or extend an existing one? (L4)
 - What user stories capture the new behavior? (L5)
 
-The skill walks through each affected level, drafts changes, and validates the result.
+The skill walks through each affected level, drafts changes, and validates the result. Derived artifacts regenerate to reflect the updated spec.
 
 ```
 /rs-impl push notifications
@@ -255,7 +255,7 @@ Each skill has soft restrictions on what it can read and write:
 | Skill | Can write | Cannot write |
 |-------|-----------|-------------|
 | `/rs-init` | `rootspec/`, `.rootspec.json`, templates | Application code |
-| `/rs-spec` | `rootspec/` (spec files + `spec-status.json`) | Application code, test files |
+| `/rs-spec` | `rootspec/` (spec files, `spec-status.json`, `DERIVED_ARTIFACTS/`) | Application code, test files |
 | `/rs-impl` | Application code, test files, `rootspec/tests-status.json` | Spec files in `rootspec/` |
 | `/rs-validate` | `rootspec/tests-status.json` only | Everything else |
 
