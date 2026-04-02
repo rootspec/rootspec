@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.2.1] - 2026-04-02
+
+### Added
+
+- **Managed dev server script**: Bundled `dev.sh` template with process management — start/stop/restart/status/logs commands, PID tracking, port conflict detection, log output.
+- **Package.json integration**: `/rs-init` adds `dev:start`, `dev:stop`, `dev:restart` scripts when creating the dev server prerequisite.
+
+### Changed
+
+- **Prerequisite detection**: `scripts/dev.sh` and `dev:start` now detected before plain `npm run dev`.
+- **`/rs-impl` and `/rs-validate`**: Use managed `dev.sh` lifecycle commands instead of bare dev server invocation.
+
 ## [6.2.0] - 2026-04-01
 
 ### Added
