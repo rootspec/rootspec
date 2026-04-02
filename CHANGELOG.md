@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.2.0] - 2026-04-01
+
+### Added
+
+- **Derived artifacts**: `/rs-spec` now auto-generates `technical-design.md` and `visual-design.md` in `rootspec/DERIVED_ARTIFACTS/` after validation. Progressive (generates based on completed levels), project-aware (absorbs existing conventions), ephemeral (regenerated on every run).
+- **`derived-artifacts.md` fragment**: Generation guidance for technical and visual design artifacts, with section specs and scenario-specific instructions (empty greenfield, scaffolded, brownfield).
+- **`write-spec-status.sh` script**: Deterministic spec-status.json writing — computes hash, detects version, generates timestamp. Replaces interpretive JSON assembly by the AI agent.
+- **Artifact eligibility flags**: `scan-spec.sh` now outputs `ELIGIBLE_TECHNICAL_DESIGN` and `ELIGIBLE_VISUAL_DESIGN` flags.
+- `/rs-impl` reads `DERIVED_ARTIFACTS/` before implementing — technical design informs architecture, visual design informs UI.
+
+### Changed
+
+- **Root Extensions section** in `00.FRAMEWORK.md`: Rewritten from opt-in CLI commands to always-generate model.
+- **`framework-rules.md`**: Derived artifacts excluded from overwrite protection (they are ephemeral).
+- Knowledge-vs-wisdom rationale added to README — explains why humans own upper spec levels.
+
 ## [6.1.0] - 2026-04-01
 
 ### Changed
