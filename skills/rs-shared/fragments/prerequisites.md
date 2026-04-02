@@ -5,11 +5,19 @@ Prerequisites are project infrastructure that RootSpec skills depend on. They ar
 ## The four prerequisites
 
 ### Dev server script
-**What:** A command or script that starts the development server.
-**Why:** rs-impl and rs-validate need a running app to test against.
-**Detect:** Look for `package.json` scripts (`dev`, `start`, `serve`), `Makefile` targets, shell scripts in `scripts/`.
-**Template:** A simple shell script that runs the project's dev server command.
-**Example path:** `./scripts/dev.sh`, or record `"npm run dev"` as the command.
+**What:** A script that manages the development server lifecycle (start, stop, restart, status, logs).
+**Why:** rs-impl and rs-validate need a running app to test against. Multiple skills may invoke the dev server — the script prevents duplicate processes and provides clean lifecycle control.
+**Detect:** Look for `scripts/dev.sh` first, then `package.json` scripts (`dev`, `start`, `serve`), `Makefile` targets.
+**Template:** Bundled at `rs-shared/scripts/dev.sh`. Copy into the project as `scripts/dev.sh`. The template:
+- Tracks PID in `.dev-server.pid` and logs to `.dev-server.log` (both gitignored)
+- Checks both PID file and port (`lsof`) before starting — prevents duplicates
+- Auto-detects port from vite/next/astro config, falls back to 3000
+- Commands: `start` (default), `stop`, `restart`, `status`, `logs`
+**Package.json integration:** When `package.json` exists, add convenience scripts:
+- `"dev:start": "./scripts/dev.sh start"`
+- `"dev:stop": "./scripts/dev.sh stop"`
+- `"dev:restart": "./scripts/dev.sh restart"`
+**Example path:** `./scripts/dev.sh`
 
 ### Pre-commit hook
 **What:** A git hook that runs before commits.

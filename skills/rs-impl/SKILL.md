@@ -91,7 +91,7 @@ Follow the decision tree from `l5-test-dsl.md`:
 
 Check `.rootspec.json` for the `validationScript` prerequisite — that's how to run tests. If not configured, look for `package.json` scripts (`test`, `test:e2e`, `cypress run`).
 
-If the dev server needs to be running, check the `devServer` prerequisite.
+If the dev server needs to be running, check the `devServer` prerequisite in `.rootspec.json`. If it points to `scripts/dev.sh`, run `./scripts/dev.sh status` first — only start if not already running. Use `./scripts/dev.sh start` to start and `./scripts/dev.sh stop` when done. Never run the dev command directly if the managed script exists.
 
 Run the test for this specific story.
 

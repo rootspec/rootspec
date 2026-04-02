@@ -63,6 +63,21 @@ For each prerequisite:
 - **Not found** → offer to create a template or skip
 - **Skipped** → record `null`
 
+### Dev server template
+
+When creating the dev server template:
+
+1. **Copy the bundled template** from `../rs-shared/scripts/dev.sh` to `scripts/dev.sh` in the project. Make it executable. Read the source and write it — don't generate from scratch.
+2. **Edit the `DEV_CMD` variable** at the top of the copied script to match the project's actual dev command (e.g., `npm run dev`, `npx vite`, etc.).
+3. **Add package.json scripts** if `package.json` exists — add `dev:start`, `dev:stop`, and `dev:restart` entries that delegate to `scripts/dev.sh`:
+   ```json
+   "dev:start": "./scripts/dev.sh start",
+   "dev:stop": "./scripts/dev.sh stop",
+   "dev:restart": "./scripts/dev.sh restart"
+   ```
+   If `package.json` doesn't exist, tell the developer: "No package.json found — run `npm init` first if you want convenience scripts."
+4. **Update .gitignore** — if `.gitignore` exists, add `.dev-server.pid` and `.dev-server.log` if not already present.
+
 ## Step 4: Write `.rootspec.json`
 
 Create (or update) `.rootspec.json` at the project root:

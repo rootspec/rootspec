@@ -9,9 +9,12 @@ ROOT="${1:-.}"
 
 # --- Dev server ---
 DEV_SERVER="none"
-if [[ -f "$ROOT/package.json" ]]; then
-  # Check scripts section for dev, start, serve (in priority order)
-  for script in dev start serve; do
+# Prefer managed dev.sh script (has process management)
+if [[ -f "$ROOT/scripts/dev.sh" ]]; then
+  DEV_SERVER="./scripts/dev.sh"
+elif [[ -f "$ROOT/package.json" ]]; then
+  # Check for dev:start first (managed), then plain scripts
+  for script in "dev:start" dev start serve; do
     if grep -qE "\"$script\"[[:space:]]*:" "$ROOT/package.json"; then
       DEV_SERVER="npm run $script"
       break
@@ -25,9 +28,6 @@ if [[ "$DEV_SERVER" == "none" && -f "$ROOT/Makefile" ]]; then
       break
     fi
   done
-fi
-if [[ "$DEV_SERVER" == "none" && -f "$ROOT/scripts/dev.sh" ]]; then
-  DEV_SERVER="scripts/dev.sh"
 fi
 echo "DEV_SERVER=$DEV_SERVER"
 

@@ -49,7 +49,7 @@ Otherwise, run all tests.
 ## Step 3: Run tests
 
 Check `.rootspec.json` for prerequisites:
-- `devServer` — start the dev server if it's not already running
+- `devServer` — if it points to `scripts/dev.sh`, run `./scripts/dev.sh status` first and only `./scripts/dev.sh start` if not running. Otherwise, start the recorded command. Never spawn a duplicate dev server.
 - `validationScript` — use this to run the test suite
 
 If neither is configured, look for `package.json` scripts (`test`, `test:e2e`, `cypress run`). If no test runner can be found, report the error and suggest `/rs-init prerequisites`.
