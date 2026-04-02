@@ -30,6 +30,8 @@ You define what your product is and why it exists, then derive everything else �
 
 AI makes this methodology more urgent: when code and specs can be generated trivially, the real value is **validation and proof**. The spec transforms output from "unverifiable claims" into "proven implementations."
 
+AI has knowledge but not wisdom. It can retrieve and recombine, but it has no experience, no intuition, no skin in the game. This is why the hierarchy matters — humans supply the philosophy (why it exists, what users should feel), and AI executes the implementation. The upper levels encode the judgment that AI lacks; the lower levels leverage the speed that humans lack.
+
 RootSpec is one implementation of this methodology — a specification language, file structure, YAML DSL, and four AI-agent skills that operationalize the approach for building software.
 
 See [AXIOMS.md](rootspec/00.AXIOMS.md) for the foundational beliefs this framework is built on.
