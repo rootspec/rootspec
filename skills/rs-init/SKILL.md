@@ -55,15 +55,16 @@ The script outputs `DEV_SERVER=`, `PRE_COMMIT_HOOK=`, `RELEASE_SCRIPT=`, `VALIDA
 
 Read `../rs-shared/fragments/prerequisites.md` for the full reference on what each prerequisite is.
 
-Report what was found. For each prerequisite with `=none`, ask the developer:
-- "No [prerequisite] detected. Want me to create a template, or skip for now?"
+Report what was found. For missing prerequisites, tell the developer you'll create all templates and proceed unless they object:
 
-**Default to recommending creation**, especially for greenfield projects. These templates are lightweight and `/rs-impl` will need them — a dev server script, test runner, and pre-commit hook are standard infrastructure. Don't suggest skipping unless the developer has a specific reason (e.g., they already have their own tooling they plan to wire up later).
+"I'll create templates for [list missing]. These are lightweight and needed by `/rs-impl` and `/rs-validate`. Let me know if you'd rather skip any."
+
+Then create them all. Do not present a menu of options or ask which ones to create — just create them. The developer can always delete what they don't want. `/rs-impl` needs the dev server and validation script. `/rs-validate` needs both. The pre-commit hook catches problems early. The release script is the only truly optional one, but it's cheap to create.
 
 For each prerequisite:
 - **Found** → confirm with developer, record the path
-- **Not found** → offer to create a template (recommended) or skip
-- **Skipped** → record `null`
+- **Not found** → create the template
+- **Skipped (only if developer explicitly asks)** → record `null`
 
 ### Dev server template
 
