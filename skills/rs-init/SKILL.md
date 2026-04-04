@@ -36,7 +36,7 @@ Create whatever is missing:
 3. **`rootspec/00.FRAMEWORK.md`** — copy from `../rs-shared/00.FRAMEWORK.md`. Same approach.
 4. **`rootspec/spec-status.json`**:
    ```json
-   { "hash": null, "validatedAt": null, "valid": false, "version": "6.2.2" }
+   { "hash": null, "validatedAt": null, "valid": false, "version": "6.2.3" }
    ```
 5. **`rootspec/tests-status.json`**:
    ```json
@@ -96,7 +96,7 @@ Create (or update) `.rootspec.json` at the project root:
 
 ```json
 {
-  "version": "6.2.2",
+  "version": "6.2.3",
   "specDirectory": "rootspec",
   "prerequisites": {
     "devServer": null,
