@@ -24,7 +24,9 @@ If these paths don't resolve, search for the scripts in the skills directory.
 
 **If STATUS=has_spec:** Read the existing spec files. Read `rootspec/spec-status.json` for the last validation state.
 
-**If HAS_CODE=true:** This is a brownfield project. The interview should reference what already exists — ask about the intent behind the code, not just abstract questions. Use FRAMEWORK, SOURCE_DIRS, and CONFIG_FILES from the scan to ground your questions.
+**If HAS_CODE=true:** This is a brownfield project. Before the interview, **read the source code** — not just the scan output. Read every component, route, utility, and hook. Understand what the app actually does: what the user sees, what they can interact with, what data flows where. Use this understanding to drive the interview and to draft spec levels without requiring the developer to describe what's already in the code.
+
+The interview should confirm and clarify intent, not re-discover what exists. If the developer says "just scan it" or "derive from the code," you have enough information to draft all levels — present drafts for review rather than asking questions the code already answers.
 
 Report what you found before proceeding.
 
@@ -60,7 +62,7 @@ Ask ONE question at a time. Wait for the answer. Summarize your understanding be
 - What will you never compromise on? (Inviolable principles)
 - Describe the ideal experience 6 months from now in one paragraph. (North star)
 
-For brownfield: "Looking at your codebase, it seems to be a [framework] app with [components]. What was the original vision? What experience were you going for?"
+For brownfield: Present what you've inferred from reading the code: "Based on your codebase, this is a [framework] [type of app] that [does X, Y, Z]. Here's what I think the philosophy is — does this capture the intent?" Draft L1 from the code and ask for corrections, rather than asking open-ended questions.
 
 **L2 — Truths (WHAT strategy)**
 - What design philosophy drives this product? (e.g., "simplicity over completeness")
@@ -80,13 +82,15 @@ For brownfield: "Looking at your codebase, it seems to be a [framework] app with
 - How do the systems talk to each other? What are the boundaries?
 - Are there calculated or derived values that cross systems?
 
-For brownfield: "Your codebase has [detected components]. Let's map those to systems — which ones are distinct subsystems vs parts of the same system?"
+For brownfield: Map the existing code to systems yourself: "I see these subsystems in your code: [weather API layer], [favorites/storage], [settings], [UI components]. Here's how I'd structure L4 — anything I'm missing or mischaracterizing?"
 
 **L5 — Implementation (HOW MUCH and validation)**
 - For user stories: What can a user accomplish in 5 minutes? In a day? In a week?
 - What observable behaviors prove each story works? (These become acceptance criteria)
 - Which stories belong to which phase? (Phases are user-defined, e.g., MVP, v1, sprint-1)
 - For fine-tuning: What numeric values need to be defined? What rationale drives each?
+
+For brownfield: **Generate user stories for all existing functionality.** Read every component, route, and interaction in the code. Each distinct user-facing behavior should become a story with testable acceptance criteria. The goal is full coverage of what the app already does — not aspirational features. Present the full story list to the developer for review: "Here are [N] stories covering your existing app. Anything missing or miscategorized?" Tag these stories as an "existing" or "baseline" phase to distinguish them from new work.
 
 ## Step 4: Draft and write
 
