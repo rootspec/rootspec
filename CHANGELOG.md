@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.2.3] - 2026-04-04
+
+### Changed
+
+- **Brownfield spec path**: `/rs-spec` now reads all source code before interviewing, drafts spec levels from the code, and generates user stories covering all existing functionality. Presents drafts for review rather than asking open-ended questions.
+
 ## [6.2.2] - 2026-04-04
 
 ### Added
