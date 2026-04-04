@@ -81,6 +81,15 @@ When creating the dev server template:
    If `package.json` doesn't exist, tell the developer: "No package.json found — run `npm init` first if you want convenience scripts."
 4. **Update .gitignore** — if `.gitignore` exists, add `.dev-server.pid` and `.dev-server.log` if not already present.
 
+### Cypress plugin setup
+
+When creating the validation script template, also set up the RootSpec Cypress reporter:
+
+1. **Copy the reporter** from `../rs-shared/cypress/rootspec-reporter.ts` to `cypress/support/rootspec-reporter.ts` in the project.
+2. **Wire it into `cypress.config.ts`** — if the config exists, add the `setupNodeEvents` hook with the reporter. If creating a new config, include it from the start. See `../rs-shared/fragments/prerequisites.md` for the exact wiring.
+
+This plugin automatically updates `rootspec/tests-status.json` after every Cypress run — the agent doesn't need to parse results or call scripts.
+
 ## Step 4: Write `.rootspec.json`
 
 Create (or update) `.rootspec.json` at the project root:

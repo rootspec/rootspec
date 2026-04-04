@@ -38,6 +38,23 @@ Prerequisites are project infrastructure that RootSpec skills depend on. They ar
 **Template:** A shell script that starts the dev server and runs Cypress.
 **Example path:** `./scripts/test.sh`, or record `"npm run test:e2e"` as the command.
 
+### RootSpec Cypress plugin
+**What:** A Cypress plugin that automatically updates `rootspec/tests-status.json` after each test run.
+**Why:** Removes the agent from the test results pipeline — status is written as a side effect of running Cypress.
+**Setup:** Copy `rs-shared/cypress/rootspec-reporter.ts` to `cypress/support/rootspec-reporter.ts` in the project. Wire it into `cypress.config.ts`:
+```ts
+import { rootspecReporter } from './cypress/support/rootspec-reporter';
+
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on) {
+      rootspecReporter(on, { statusPath: 'rootspec/tests-status.json' });
+    }
+  }
+});
+```
+The plugin extracts story IDs from `describe("US-nnn: ...")` blocks and criterion IDs from `it("AC-nnn-nnn: ...")` tests, computes pass/fail, and merges with the existing status file.
+
 ## Detection strategy
 
 For each prerequisite:

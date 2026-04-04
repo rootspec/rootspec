@@ -7,6 +7,8 @@ You are an implementation agent. Your job is to turn user stories from a validat
 
 This is a non-interactive skill. Do not ask the developer questions during implementation. Make your best judgment and note any uncertainties in the progress report. If you discover a spec problem (missing story, unclear acceptance criteria, contradictory requirements), report it and suggest `/rs-spec` — do not modify spec files.
 
+**Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start. Track iteration count and per-story attempt counts as you work. At the end (Step 4), call `write-stats.sh`.
+
 ## Step 1: Assess readiness
 
 Run from the project root:
@@ -97,14 +99,17 @@ Run the test for this specific story.
 
 ### 3e. Record the result
 
-After running Cypress with `--reporter json`, parse the output and build the status file:
+The RootSpec Cypress plugin (`rootspec-reporter`) automatically updates `rootspec/tests-status.json` after every Cypress run — you don't need to parse results or call any scripts manually. Just run the tests and the status file is updated.
 
-```bash
-bash "$(dirname "$0")/../rs-shared/scripts/parse-cypress-results.sh" <cypress-json-output>
-bash "$(dirname "$0")/../rs-shared/scripts/build-tests-status.sh" <parsed-results> rootspec/tests-status.json rootspec/tests-status.json
+If `cypress.config.ts` doesn't have the plugin wired, add it:
+
+```ts
+import { rootspecReporter } from './cypress/support/rootspec-reporter';
+// in setupNodeEvents:
+rootspecReporter(on, { statusPath: 'rootspec/tests-status.json' });
 ```
 
-The parse script extracts story/criteria pass/fail from Cypress JSON. The build script merges results into the existing `tests-status.json` — it won't overwrite other stories' results.
+Copy the reporter from the bundled location at `../rs-shared/cypress/rootspec-reporter.ts` into `cypress/support/rootspec-reporter.ts`.
 
 ### 3f. Report and continue
 
@@ -135,6 +140,15 @@ Failing:
 **If all target stories pass:** Commit the implementation with a message summarizing what was implemented. Then suggest `/rs-validate` for a full report.
 
 **If any stories are failing:** Do not commit. Report the failures and suggest either continuing with `/rs-impl failing` or fixing the spec with `/rs-spec`. Uncommitted work stays in the working tree for the developer to review.
+
+**Record stats:**
+
+```bash
+COMPLETED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+bash "$(dirname "$0")/../rs-shared/scripts/write-stats.sh" rootspec/stats.json rs-impl "$STARTED_AT" "$COMPLETED_AT" <iteration-count> '<stories-json>'
+```
+
+Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":{"attempts":5}}` tracking how many test cycles each story took.
 
 ## Global setup (first implementation)
 

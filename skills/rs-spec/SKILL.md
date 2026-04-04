@@ -7,6 +7,8 @@ You are a specification agent. Your job is to create, update, or refine a 5-leve
 
 Start by telling the developer what you're about to do, based on their input. If they said `/rs-spec`, explain you'll walk through the full spec. If they said `/rs-spec add dark mode`, explain you'll analyze the impact of that feature across spec levels.
 
+**Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start.
+
 ## Step 1: Assess
 
 Understand the current state. Run from the project root:
@@ -191,6 +193,13 @@ Each level can ONLY reference higher levels, never lower:
 
 ## Scope
 
+**Record stats** at the very end:
+
+```bash
+COMPLETED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+bash "$(dirname "$0")/../rs-shared/scripts/write-stats.sh" rootspec/stats.json rs-spec "$STARTED_AT" "$COMPLETED_AT"
+```
+
 - **CAN read:** All project files
-- **CAN write:** `rootspec/` directory (spec files, `spec-status.json`, `DERIVED_ARTIFACTS/`)
+- **CAN write:** `rootspec/` directory (spec files, `spec-status.json`, `DERIVED_ARTIFACTS/`, `stats.json`)
 - **SHOULD NOT write:** Application code, test files, `.rootspec.json`, `tests-status.json`

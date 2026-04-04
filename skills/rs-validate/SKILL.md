@@ -7,6 +7,8 @@ You are a validation agent. Run tests, record results, produce a clear report. Y
 
 This is non-interactive and read-only (except recording results to `rootspec/tests-status.json`).
 
+**Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start.
+
 ## Step 1: Verify readiness
 
 Run from the project root:
@@ -54,37 +56,31 @@ Check `.rootspec.json` for prerequisites:
 
 If neither is configured, look for `package.json` scripts (`test`, `test:e2e`, `cypress run`). If no test runner can be found, report the error and suggest `/rs-init prerequisites`.
 
-Run the test suite with `--reporter json`. After Cypress completes, parse the output to map results back to story IDs and acceptance criteria:
-
-```bash
-bash "$(dirname "$0")/../rs-shared/scripts/parse-cypress-results.sh" <cypress-json-output>
-```
-
-The script extracts story IDs and acceptance criterion IDs from Cypress JSON output, mapping `describe` blocks to stories and `it` blocks to criteria.
-
-**Story statuses:**
-- **pass** — all acceptance criteria pass
-- **fail** — test exists but at least one criterion fails
-- **skip** — story has `skip: true` in the YAML
-- **not implemented** — no test file exists for this story yet
-
-If the test runner fails due to infrastructure (not test failures — actual crashes, missing dependencies, server not starting), retry once. If it fails again, exit with an error report.
-
-## Step 4: Record results
-
-**Note:** Before running tests in Step 3, back up the existing status file for later comparison:
+**Before running tests**, back up the existing status file for later comparison:
 
 ```bash
 cp rootspec/tests-status.json rootspec/tests-status.json.bak 2>/dev/null
 ```
 
-After parsing Cypress results (Step 3), build the updated status file:
+Run the test suite. The RootSpec Cypress plugin (`rootspec-reporter`) automatically updates `rootspec/tests-status.json` after every run — you don't need to parse results or call any scripts manually.
 
-```bash
-bash "$(dirname "$0")/../rs-shared/scripts/build-tests-status.sh" <parsed-results> rootspec/tests-status.json rootspec/tests-status.json
+If `cypress.config.ts` doesn't have the plugin wired, add it:
+
+```ts
+import { rootspecReporter } from './cypress/support/rootspec-reporter';
+// in setupNodeEvents:
+rootspecReporter(on, { statusPath: 'rootspec/tests-status.json' });
 ```
 
-This merges new results into the existing `tests-status.json` without overwriting other stories.
+Copy the reporter from the bundled location at `../rs-shared/cypress/rootspec-reporter.ts` into `cypress/support/rootspec-reporter.ts`.
+
+**Story statuses:**
+- **pass** — all acceptance criteria pass
+- **fail** — test exists but at least one criterion fails
+- **skip** — story has `skip: true` in the YAML (agent must record this manually — the plugin only handles pass/fail)
+- **not implemented** — no test file exists for this story yet (agent must record this manually)
+
+If the test runner fails due to infrastructure (not test failures — actual crashes, missing dependencies, server not starting), retry once. If it fails again, exit with an error report.
 
 ## Step 5: Report
 
@@ -121,6 +117,13 @@ If all tests pass: "All tests passing. Implementation matches spec."
 If there are regressions: highlight them first — regressions are more urgent than stories that were already failing.
 
 If there are failures: suggest `/rs-impl failing` to address them.
+
+**Record stats:**
+
+```bash
+COMPLETED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+bash "$(dirname "$0")/../rs-shared/scripts/write-stats.sh" rootspec/stats.json rs-validate "$STARTED_AT" "$COMPLETED_AT"
+```
 
 ## Focus
 
