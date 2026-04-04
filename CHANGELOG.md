@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.2.2] - 2026-04-04
+
+### Added
+
+- **Cypress reporter plugin**: `rootspec-reporter.ts` auto-writes `tests-status.json` after every Cypress run — removes agent from the test results pipeline.
+- **Stats tracking**: `write-stats.sh` appends skill run entries (duration, iterations, per-story attempts) to `rootspec/stats.json`. All skills (`rs-spec`, `rs-impl`, `rs-validate`) now record stats.
+- **Cypress plugin setup** in `/rs-init`: copies reporter and wires it into `cypress.config.ts` during prerequisite setup.
+
+### Changed
+
+- **`/rs-impl` and `/rs-validate`**: No longer manually parse Cypress results or call `build-tests-status.sh` — the plugin handles it.
+
 ## [6.2.1] - 2026-04-02
 
 ### Added
