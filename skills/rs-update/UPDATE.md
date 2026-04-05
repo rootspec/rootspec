@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 6.3.1
+
+Summary: Commit conventions, release notification workflow
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: Run `git config core.hooksPath .githooks` to activate commit hooks
+
 ## 6.3.0
 
 Summary: /rs-update skill for framework version upgrades
