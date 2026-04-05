@@ -1,0 +1,26 @@
+name: Notify Demos of Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch to demos repo
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DEMOS_DISPATCH_TOKEN }}
+          script: |
+            const version = context.payload.release.tag_name.replace(/^v/, '');
+            const tag = context.payload.release.tag_name;
+
+            console.log(`Notifying rootspec/demos of release ${tag}`);
+
+            await github.rest.repos.createDispatchEvent({
+              owner: 'rootspec',
+              repo: 'demos',
+              event_type: 'rootspec-release',
+              client_payload: { version, tag }
+            });
