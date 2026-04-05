@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 6.3.0
+
+Summary: /rs-update skill for framework version upgrades
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — /rs-update is now available after upgrading
+
 ## 6.2.3
 
 Summary: Stronger brownfield spec derivation

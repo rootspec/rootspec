@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.0] - 2026-04-05
+
+### Added
+
+- **`/rs-update` skill**: Detects version gap via `.rootspec.json`, updates framework files (`00.FRAMEWORK.md`, `00.AXIOMS.md`), creates missing prerequisites, flags changed prerequisites for reconciliation. Interactive workflow with dry-run (`check`) and focus arguments.
+- **`gap-analysis.sh` script**: Compares project version against bundled framework version, detects stale files and templates, parses `UPDATE.md` for prerequisite changes.
+- **`skills/rs-update/UPDATE.md`**: Per-version upgrade instructions with `NEW:`/`CHANGED:` prerequisite tags. Replaces root `UPGRADE.md`.
+
+### Changed
+
+- **`/rs-init` re-init path**: Now suggests `/rs-update` when project version is behind bundled framework.
+- **Release script**: References `skills/rs-update/UPDATE.md` instead of `UPGRADE.md`.
+
+### Removed
+
+- Root `UPGRADE.md` (content moved to `skills/rs-update/UPDATE.md`).
+
 ## [6.2.3] - 2026-04-04
 
 ### Changed
