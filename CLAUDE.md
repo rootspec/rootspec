@@ -126,6 +126,25 @@ Comment-annotated YAML with `@annotation: value` metadata.
 9. `DERIVED_ARTIFACTS/technical-design.md` — Architecture, stack, conventions (generated)
 10. `DERIVED_ARTIFACTS/visual-design.md` — Design principles, components, layout (generated)
 
+### Commit Conventions
+
+After cloning, activate hooks: `git config core.hooksPath .githooks`
+
+Commit messages must use conventional prefixes:
+
+| Prefix | Use | Requires CHANGELOG |
+|--------|-----|-------------------|
+| `feat:` | New feature | Yes |
+| `fix:` | Bug fix | Yes |
+| `chore:` | Maintenance, cleanup | No |
+| `docs:` | Documentation only | No |
+| `refactor:` | Code restructure, no behavior change | No |
+| `style:` | Formatting, whitespace | No |
+| `test:` | Test additions/changes | No |
+| `release:` | Version bumps (release script) | No |
+
+Bypass CHANGELOG check: `SKIP_CHANGELOG_CHECK=1 git commit ...`
+
 ### Releasing a New Framework Version
 
 **Use the release script:** `scripts/release.sh`

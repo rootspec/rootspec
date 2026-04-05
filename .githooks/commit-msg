@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Enforce conventional commit prefixes and CHANGELOG.md updates.
+#
+# Allowed prefixes: feat, fix, chore, docs, refactor, style, test, release
+# feat/fix commits must include CHANGELOG.md in staged files.
+# Bypass: SKIP_CHANGELOG_CHECK=1 git commit ...
+
+set -euo pipefail
+
+MSG_FILE="$1"
+MSG=$(head -1 "$MSG_FILE")
+
+# Allow explicit bypass
+if [[ "${SKIP_CHANGELOG_CHECK:-}" == "1" ]]; then
+  exit 0
+fi
+
+# Skip merge commits
+if [[ "$MSG" =~ ^Merge ]]; then
+  exit 0
+fi
+
+# Validate conventional commit prefix
+PREFIXES="feat|fix|chore|docs|refactor|style|test|release"
+if ! [[ "$MSG" =~ ^($PREFIXES): ]]; then
+  echo ""
+  echo "ERROR: Commit message must start with a conventional prefix."
+  echo ""
+  echo "  Allowed: feat, fix, chore, docs, refactor, style, test, release"
+  echo "  Example: feat: add /rs-update skill"
+  echo ""
+  exit 1
+fi
+
+# Extract prefix
+PREFIX="${BASH_REMATCH[1]}"
+
+# feat/fix require CHANGELOG.md
+if [[ "$PREFIX" == "feat" || "$PREFIX" == "fix" ]]; then
+  STAGED=$(git diff --cached --name-only 2>/dev/null || true)
+  if ! echo "$STAGED" | grep -q '^CHANGELOG.md$'; then
+    echo ""
+    echo "ERROR: $PREFIX: commits require a CHANGELOG.md entry."
+    echo ""
+    echo "  Bypass with: SKIP_CHANGELOG_CHECK=1 git commit ..."
+    echo ""
+    exit 1
+  fi
+fi

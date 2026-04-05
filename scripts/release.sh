@@ -191,7 +191,7 @@ echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
 run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh docs/ROADMAP.md skills/rs-update/UPDATE.md"
-run "git commit -m 'Release v$VERSION
+run "SKIP_CHANGELOG_CHECK=1 git commit -m 'release: v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."
 

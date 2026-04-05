@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Commit-msg hook**: `.githooks/commit-msg` enforces conventional commit prefixes (`feat:`, `fix:`, `chore:`, etc.) and requires CHANGELOG.md updates for `feat:`/`fix:` commits. Bypass with `SKIP_CHANGELOG_CHECK=1`.
+
 ## [6.3.0] - 2026-04-05
 
 ### Added
