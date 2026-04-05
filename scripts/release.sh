@@ -136,7 +136,7 @@ STALE=$(grep -rn "$CURRENT_VERSION" \
   --exclude-dir=node_modules --exclude-dir=.git \
   . 2>/dev/null \
   | grep -v CHANGELOG.md \
-  | grep -v UPGRADE.md \
+  | grep -v UPDATE.md \
   | grep -v ROADMAP.md \
   | grep -v scripts/release.sh \
   | grep -v docs/archive/ \
@@ -170,17 +170,17 @@ if [ "$DRY_RUN" != "--dry-run" ]; then
 fi
 
 echo ""
-echo "Step 3: Remind to update CHANGELOG.md and UPGRADE.md"
+echo "Step 3: Remind to update CHANGELOG.md and UPDATE.md"
 echo "-----------------------------------------------------"
-echo "Please ensure CHANGELOG.md and UPGRADE.md are updated with:"
+echo "Please ensure CHANGELOG.md and skills/rs-update/UPDATE.md are updated with:"
 echo "  - New version section in CHANGELOG.md"
-echo "  - Upgrade instructions in UPGRADE.md (if needed)"
+echo "  - Upgrade entry in skills/rs-update/UPDATE.md"
 echo ""
 if [ "$DRY_RUN" != "--dry-run" ] && [ "$AUTO_CONFIRM" != "yes" ]; then
-  read -p "Have you updated CHANGELOG.md and UPGRADE.md? (y/N) " -n 1 -r
+  read -p "Have you updated CHANGELOG.md and skills/rs-update/UPDATE.md? (y/N) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Please update these files and run the script again."
+    echo "Please update these files and run the script again. (UPGRADE.md has moved to skills/rs-update/UPDATE.md)"
     exit 1
   fi
 else
@@ -190,7 +190,7 @@ fi
 echo ""
 echo "Step 4: Commit version updates"
 echo "-------------------------------"
-run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh docs/ROADMAP.md"
+run "git add skills/rs-shared/00.FRAMEWORK.md 00.FRAMEWORK.md 00.AXIOMS.md README.md skills/rs-init/SKILL.md skills/rs-spec/SKILL.md skills/test-local.sh docs/ROADMAP.md skills/rs-update/UPDATE.md"
 run "git commit -m 'Release v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>'" || echo "Nothing new to commit."

@@ -8,7 +8,7 @@ Guidance for Claude Code when working with RootSpec.
 
 An implementation of **purpose-aligned declarative specification** — a methodology where philosophy guides implementation, never vice versa. The methodology is AI-independent; RootSpec is one implementation using a specification language, file structure, YAML DSL, and AI-agent skills.
 
-Five hierarchical levels — philosophy, truths, interactions, systems, implementation — where each level can only reference higher levels. The spec is declarative, executable, and acts as a validation gate. Four skills (`/rs-init`, `/rs-spec`, `/rs-impl`, `/rs-validate`) drive all workflows.
+Five hierarchical levels — philosophy, truths, interactions, systems, implementation — where each level can only reference higher levels. The spec is declarative, executable, and acts as a validation gate. Five skills (`/rs-init`, `/rs-spec`, `/rs-impl`, `/rs-validate`, `/rs-update`) drive all workflows.
 
 **Are you in the framework repository?**
 - Files: `00.FRAMEWORK.md`, `skills/`, `CLAUDE.md`, `rootspec/` (self-hosted product spec)
@@ -31,6 +31,7 @@ If user asks about:
 - "Is my spec valid?" → `/rs-spec` (validates as part of its loop)
 - "How do I implement?" → `/rs-impl`
 - "Run my tests" → `/rs-validate`
+- "How do I upgrade?" → `/rs-update`
 
 ---
 
@@ -44,6 +45,7 @@ If user asks about:
 | `/rs-spec [focus]` | Create or update specification — interview + validation loop | Interactive (skippable) |
 | `/rs-impl [focus]` | Implement from spec — test-driven, autonomous | Non-interactive |
 | `/rs-validate [focus]` | Run tests and report results | Non-interactive |
+| `/rs-update [focus]` | Upgrade project to latest framework version | Interactive |
 
 ### Scenarios
 
@@ -58,6 +60,8 @@ If user asks about:
 **Implementing:** `/rs-impl` or `/rs-impl <phase>` or `/rs-impl US-101`
 
 **Testing:** `/rs-validate` or `/rs-validate failing`
+
+**Upgrading framework version:** `/rs-update` after `npx skills add rootspec/rootspec`
 
 ---
 
@@ -133,7 +137,7 @@ Comment-annotated YAML with `@annotation: value` metadata.
 ./scripts/release.sh 6.0.1 --dry-run # preview changes
 ```
 
-Before running: update `CHANGELOG.md` and `UPGRADE.md`, commit feature changes first.
+Before running: update `CHANGELOG.md` and `skills/rs-update/UPDATE.md`, commit feature changes first.
 
 ---
 

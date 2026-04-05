@@ -10,6 +10,7 @@ AI-agent skills for the [RootSpec](https://github.com/rootspec/rootspec) specifi
 | `/rs-spec [focus]` | Create or update specification — interview + validation loop | Interactive (skippable) |
 | `/rs-impl [focus]` | Implement from spec — test-driven, autonomous | Non-interactive |
 | `/rs-validate [focus]` | Run tests and report results | Non-interactive |
+| `/rs-update [focus]` | Upgrade project to latest framework version | Interactive |
 
 ## Quick Start
 
@@ -39,5 +40,6 @@ skills/
   rs-init/           Initialize project
   rs-spec/           Create or update specification
   rs-impl/           Implement from spec
+  rs-update/          Upgrade project to latest framework version
   rs-validate/       Run tests and report
 ```

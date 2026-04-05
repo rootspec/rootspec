@@ -13,6 +13,7 @@ This skill contains shared resources for all RootSpec skills. Do not invoke dire
 | `/rs-spec` | Create or update specification — interview + validation loop | Interactive (skippable) |
 | `/rs-impl` | Implement from spec — test-driven, autonomous | Non-interactive |
 | `/rs-validate` | Run tests and report results | Non-interactive |
+| `/rs-update` | Upgrade project to latest framework version | Interactive |
 
 ## Scripts
 
@@ -29,9 +30,10 @@ This skill contains shared resources for all RootSpec skills. Do not invoke dire
 - `scripts/check-coverage.sh` — Cross-reference L4 systems with L5 stories
 - `scripts/compute-spec-hash.sh` — Compute deterministic hash of all spec files
 
-### Initialization
+### Initialization and upgrade
 - `scripts/detect-prerequisites.sh` — Detect dev server, hooks, release/test scripts
 - `scripts/verify-init.sh` — Check all expected init files exist
+- `scripts/gap-analysis.sh` — Compare project version against bundled framework version
 
 ### Stories and testing
 - `scripts/filter-stories.sh` — Filter L5 stories by ID, system, priority, or status
