@@ -2,14 +2,14 @@
 
 Conventions docs are prescriptive, list-driven implementation guides. They describe HOW the project is built — stack, patterns, tokens, and conventions. They live in `rootspec/CONVENTIONS/` as two files: `technical.md` and `visual.md`.
 
-Conventions are **implementation-owned**, not spec-derived. They are created and maintained by `/rs-impl`, never by `/rs-spec`.
+Conventions are a bridge between the spec and the codebase. `/rs-spec` creates them; `/rs-impl` maintains them.
 
 ## Lifecycle
 
-1. **Created** by `/rs-impl` during first implementation (Global setup)
+1. **Created** by `/rs-spec` after validation passes (if they don't already exist)
 2. **Read** by `/rs-impl` before each story for consistency
 3. **Updated** by `/rs-impl` when implementation changes a convention
-4. **Never overwritten** by `/rs-spec` — if conventions exist, skip
+4. **Never overwritten** — if conventions exist, `/rs-spec` skips creation. Existing conventions mean the implementation is established.
 
 ## Creation
 

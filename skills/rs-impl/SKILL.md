@@ -30,6 +30,7 @@ If these paths don't resolve, search for the scripts in the skills directory.
 **Read all YAML user story files** from `rootspec/05.IMPLEMENTATION/USER_STORIES/`.
 
 Read `../rs-shared/fragments/l5-test-dsl.md` for the test DSL step reference.
+Read `../rs-shared/fragments/conventions.md` for the conventions format and categories (needed for Step 3g maintenance).
 
 Announce what you found: "Found X stories across N phases. M already passing. I'll implement [focus or: starting with the first phase]."
 
@@ -128,7 +129,15 @@ After each story:
 
 ### 3g. Update conventions
 
-If the implementation introduced or changed any convention — new library, different file pattern, new API approach, design tokens — update the relevant entry in `rootspec/CONVENTIONS/technical.md` or `visual.md`. Only update entries that actually changed.
+Conventions docs must stay in sync with the code. After implementing a story, check if the implementation introduced or changed anything documented in `rootspec/CONVENTIONS/`:
+
+- **New dependency** added to `package.json` → update Stack or relevant category in `technical.md`
+- **New file pattern** or directory → update Code Patterns in `technical.md`
+- **New or changed API approach** → update API in `technical.md`
+- **New component library, color, font, spacing** → update the relevant section in `visual.md`
+- **Conflict found in 3b** (code didn't match conventions) → update the conventions entry to match reality
+
+Read `../rs-shared/fragments/conventions.md` for the predefined categories and format. Match the existing format exactly: `## Heading` sections with `- **Label:** value` entries. Only update entries that actually changed — don't rewrite the whole file.
 
 Loop to the next story. If all target stories pass, or iteration cap is reached, go to Step 4.
 
@@ -167,16 +176,11 @@ Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":
 
 When no stories have been implemented yet, set up infrastructure before tackling individual stories:
 
-1. **Conventions docs** — If `rootspec/CONVENTIONS/` doesn't exist, create it. Read `../rs-shared/fragments/conventions.md` for the template and predefined categories.
-   - If HAS_CODE=true (brownfield): read source files, `package.json`, config files (tsconfig, eslint, tailwind, vite, etc.), and stylesheets. Extract what the project actually uses into each category.
-   - If HAS_CODE=false (greenfield): derive from spec (L4 systems, detected FRAMEWORK) and framework ecosystem defaults.
-   - Write both `technical.md` and `visual.md`.
-   - Report: `"Created conventions docs. Review before next run: rootspec/CONVENTIONS/"`
-2. **Test infrastructure** — Cypress config, support files, DSL step implementations
-3. **Authentication** — `loginAs` Cypress task if any stories use it
-4. **Database reset** — `beforeEach` hook if stories assume clean state
-5. **Seed data** — `seedItem` Cypress task if stories use it
-6. **Shared fixtures** — test data that appears across multiple stories
+1. **Test infrastructure** — Cypress config, support files, DSL step implementations
+2. **Authentication** — `loginAs` Cypress task if any stories use it
+3. **Database reset** — `beforeEach` hook if stories assume clean state
+4. **Seed data** — `seedItem` Cypress task if stories use it
+5. **Shared fixtures** — test data that appears across multiple stories
 
 Present the setup plan in your first progress report, then proceed.
 

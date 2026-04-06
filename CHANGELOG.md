@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.1] - 2026-04-06
+
+### Fixed
+
+- **Conventions ownership**: `/rs-spec` now creates conventions docs (was `/rs-impl`). Since `/rs-spec` always runs first and already reads the full codebase for brownfield, it's the natural place for initial creation. `/rs-impl` maintains conventions as implementation evolves.
+- **Brownfield conventions extraction**: `/rs-spec` now has thorough instructions for extracting conventions from existing code — reads source files, config, `package.json`, stylesheets, and checks 5+ files to confirm patterns.
+- **`/rs-impl` conventions maintenance**: Step 3g now references the conventions fragment for format/categories and lists concrete triggers for when to update (new dependency, changed API approach, etc.).
+
 ## [7.0.0] - 2026-04-06
 
 ### Added
