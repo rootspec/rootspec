@@ -1,10 +1,10 @@
 # RootSpec Roadmap
 
-**Last Updated:** 2026-04-05
+**Last Updated:** 2026-04-06
 
 ---
 
-## Current — v6.3.1
+## Current — v7.0.0
 
 ### Completed
 
