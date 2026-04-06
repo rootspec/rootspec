@@ -15,6 +15,7 @@ Run from the project root:
 
 ```bash
 bash "$(dirname "$0")/../rs-shared/scripts/scan-spec.sh" .
+bash "$(dirname "$0")/../rs-shared/scripts/scan-project.sh" .
 bash "$(dirname "$0")/../rs-shared/scripts/filter-stories.sh" rootspec
 ```
 
@@ -26,13 +27,13 @@ If these paths don't resolve, search for the scripts in the skills directory.
 
 **Read `rootspec/tests-status.json`** for current test state.
 
-**Read all YAML user story files** to understand what should be tested.
+**Check that tests exist.** If `cypress/e2e/` doesn't exist or contains no test files: "No tests found. Run `/rs-impl` first." Exit.
 
 Announce: "Found X stories. Running [focus or: all tests]."
 
-## Step 2: Determine what to test
+## Step 2: Run tests
 
-If the developer provided a focus, use the filter script to get the matching stories:
+If the developer provided a focus, use the filter script:
 
 ```bash
 bash "$(dirname "$0")/../rs-shared/scripts/filter-stories.sh" rootspec [focus]
@@ -48,31 +49,25 @@ The script filters by:
 
 Otherwise, run all tests.
 
-## Step 3: Run tests
+### Start the dev server
 
-Check `.rootspec.json` for prerequisites:
-- `devServer` — if it points to `scripts/dev.sh`, run `./scripts/dev.sh status` first and only `./scripts/dev.sh start` if not running. Otherwise, start the recorded command. Never spawn a duplicate dev server.
-- `validationScript` — use this to run the test suite
+Check `.rootspec.json` for the `devServer` prerequisite. If it points to `scripts/dev.sh`, run `./scripts/dev.sh status` first — only start if not already running. Use `./scripts/dev.sh start` to start. If `.rootspec.json` has no `devServer` entry or doesn't exist, check for `scripts/dev.sh` directly, then fall back to `nohup npm run dev > /dev/null 2>&1 &` and wait a few seconds for startup.
 
-If neither is configured, look for `package.json` scripts (`test`, `test:e2e`, `cypress run`). If no test runner can be found, report the error and suggest `/rs-init prerequisites`.
+If the dev server fails to start, report the error and exit. Do not guess or try alternative commands.
 
-**Before running tests**, back up the existing status file for later comparison:
+### Back up and run
 
 ```bash
 cp rootspec/tests-status.json rootspec/tests-status.json.bak 2>/dev/null
 ```
 
+Check `.rootspec.json` for the `validationScript` prerequisite — use it to run the test suite. If not configured, look for `package.json` scripts (`test`, `test:e2e`, `cypress run`). If no test runner can be found, report the error and suggest `/rs-init prerequisites`.
+
 Run the test suite. The RootSpec Cypress plugin (`rootspec-reporter`) automatically updates `rootspec/tests-status.json` after every run — you don't need to parse results or call any scripts manually.
 
-If `cypress.config.ts` doesn't have the plugin wired, add it:
+**If tests produce no results:** diff `rootspec/tests-status.json` against the `.bak` copy. If identical (or the file doesn't exist), report: "No test results recorded. Ensure /rs-impl set up the rootspec-reporter plugin." Exit.
 
-```ts
-import { rootspecReporter } from './cypress/support/rootspec-reporter';
-// in setupNodeEvents:
-rootspecReporter(on, { statusPath: 'rootspec/tests-status.json' });
-```
-
-Copy the reporter from the bundled location at `../rs-shared/cypress/rootspec-reporter.ts` into `cypress/support/rootspec-reporter.ts`.
+**If the test runner crashes** (not test failures — actual errors, missing dependencies, server not responding): retry once. If it fails again, report the error and exit.
 
 **Story statuses:**
 - **pass** — all acceptance criteria pass
@@ -80,9 +75,7 @@ Copy the reporter from the bundled location at `../rs-shared/cypress/rootspec-re
 - **skip** — story has `skip: true` in the YAML (agent must record this manually — the plugin only handles pass/fail)
 - **not implemented** — no test file exists for this story yet (agent must record this manually)
 
-If the test runner fails due to infrastructure (not test failures — actual crashes, missing dependencies, server not starting), retry once. If it fails again, exit with an error report.
-
-## Step 5: Report
+## Step 3: Report
 
 Compare the backed-up status against the new results to detect regressions and improvements:
 

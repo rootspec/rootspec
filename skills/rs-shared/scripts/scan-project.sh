@@ -13,6 +13,7 @@ if [[ -f "$ROOT/package.json" ]]; then
   DEPS=$(cat "$ROOT/package.json")
   if echo "$DEPS" | grep -q '"next"'; then FRAMEWORK="Next.js"
   elif echo "$DEPS" | grep -q '"nuxt"'; then FRAMEWORK="Nuxt"
+  elif echo "$DEPS" | grep -q '"astro"'; then FRAMEWORK="Astro"
   elif echo "$DEPS" | grep -q '"@angular/core"'; then FRAMEWORK="Angular"
   elif echo "$DEPS" | grep -q '"svelte"'; then FRAMEWORK="Svelte"
   elif echo "$DEPS" | grep -q '"react"'; then FRAMEWORK="React"

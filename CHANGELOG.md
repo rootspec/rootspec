@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.2] - 2026-04-06
+
+### Fixed
+
+- **rs-impl turn efficiency**: Restructured implementation loop to front-load all file reading in Step 1 (conventions, YAML, fragments, source files) with explicit "do NOT re-read" instruction. Collapsed per-story loop from 7 sub-steps (3a-3g) to 3 (build → test → report). Batched conventions updates to Step 4 instead of per-story. Added per-story cap (3 test-fix cycles, 6 turns max) and global setup turn budget (≤5 turns).
+- **rs-validate robustness**: Fixed step numbering gap (3→5 became 3→4). Added early exit for missing tests, "no results recorded" error path when reporter not wired, explicit dev server failure handling, and crash retry logic. Removed unnecessary YAML reads and reporter-wiring instructions.
+- **rs-spec non-interactive mode**: Added CI/non-interactive detection — skips interview and present-and-iterate loop when running via `claude -p`. Deferred `l5-yaml-format.md` read to L5 drafting only. Capped validation loop at 3 fix cycles. Added non-interactive cascade behavior.
+- **Astro framework detection**: `scan-project.sh` now detects Astro in `package.json` dependencies.
+- **Dev server fallback chain**: Both rs-impl and rs-validate now have consistent fallback: `.rootspec.json` → `scripts/dev.sh` → `nohup npm run dev`.
+- **Test command resolution**: rs-impl resolves the test command once in Step 1, references it in the loop instead of re-checking `.rootspec.json` per story.
+
 ## [7.0.1] - 2026-04-06
 
 ### Fixed

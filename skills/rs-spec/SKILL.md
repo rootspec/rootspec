@@ -7,6 +7,8 @@ You are a specification agent. Your job is to create, update, or refine a 5-leve
 
 Start by telling the developer what you're about to do, based on their input. If they said `/rs-spec`, explain you'll walk through the full spec. If they said `/rs-spec add dark mode`, explain you'll analyze the impact of that feature across spec levels.
 
+**Non-interactive mode:** If the full product context was provided in the initial prompt and no interactive conversation is possible (e.g., running via `claude -p` in CI), skip the interview (Step 3) and the present-and-iterate loop in Step 4. Use the provided prompt context to draft all levels directly, write them, then validate. Do not ask questions or wait for approval.
+
 **Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start.
 
 ## Step 1: Assess
@@ -47,6 +49,8 @@ Analyze which levels the feature touches. Work top-down through affected levels 
 Go directly to that level. Interview about the change, draft, validate. After writing, note downstream levels that may need updating — but don't automatically cascade. Ask: "This L2 change may affect L3-L5. Want to review those now, or handle them separately?"
 
 ## Step 3: Interview
+
+**Skip this step in non-interactive mode** — go directly to Step 4.
 
 Read `../rs-shared/fragments/interview-protocol.md` for the methodology. Read `../rs-shared/fragments/anti-patterns.md` for what to challenge.
 
@@ -95,14 +99,13 @@ For brownfield: **Generate user stories for all existing functionality.** Read e
 ## Step 4: Draft and write
 
 Read `../rs-shared/fragments/framework-rules.md` for hierarchy and placeholder rules.
-For L5 YAML format, read `../rs-shared/fragments/l5-yaml-format.md`.
 For format examples of a specific level, search `00.FRAMEWORK.md` for that level's heading using Grep — do not read the whole file.
+When drafting L5 (and only then), read `../rs-shared/fragments/l5-yaml-format.md` for YAML format rules.
 
 For each level:
 1. Draft the content following RootSpec conventions
-2. Present the draft to the developer
-3. Iterate until they approve
-4. Write the file to `rootspec/`
+2. **Interactive:** Present the draft to the developer. Iterate until they approve, then write.
+3. **Non-interactive:** Write directly without waiting for approval.
 
 **Cascade awareness:** After writing a level, briefly note downstream impact:
 - L1 changes → may affect L2-L5 (everything below)
@@ -111,7 +114,7 @@ For each level:
 - L4 changes → may affect L5
 - L5 changes → no downstream impact
 
-Don't automatically cascade — ask the developer if they want to continue to the next level.
+**Interactive:** Don't automatically cascade — ask the developer if they want to continue to the next level. **Non-interactive:** Cascade automatically through all affected levels.
 
 ## Step 5: Validate
 
@@ -126,7 +129,7 @@ bash "$(dirname "$0")/../rs-shared/scripts/check-tradeoffs.sh" rootspec
 bash "$(dirname "$0")/../rs-shared/scripts/check-coverage.sh" rootspec
 ```
 
-If violations are found, report them and fix. Loop between drafting and validation until the spec is clean — but don't loop more than 20 iterations total across the entire session.
+If violations are found, report them and fix. **Max 3 validation-fix cycles.** If still failing after 3, report remaining violations and exit.
 
 ## Step 5b: Reconcile baseline stories (brownfield only)
 

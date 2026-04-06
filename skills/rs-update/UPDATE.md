@@ -8,6 +8,20 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.2
+
+Summary: Skill turn efficiency for CI runs, Astro detection
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — skill improvements take effect immediately
+
+## 7.0.1
+
+Summary: Conventions ownership fix
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None
+
 ## 7.0.0
 
 Summary: Derived artifacts replaced by conventions docs, brownfield baseline behavior
