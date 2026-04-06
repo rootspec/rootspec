@@ -8,6 +8,22 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.0
+
+Summary: Derived artifacts replaced by conventions docs, brownfield baseline behavior
+Framework files: Replace
+Breaking:
+  - `rootspec/DERIVED_ARTIFACTS/` removed — replaced by `rootspec/CONVENTIONS/`
+  - `/rs-spec` no longer generates derived artifacts (Step 6 removed)
+  - `/rs-impl` now creates and maintains `rootspec/CONVENTIONS/technical.md` and `visual.md`
+  - `@phase: baseline` stories are now behavioral — `/rs-impl` skips implementation, only writes tests
+  - `scan-spec.sh` no longer outputs `ELIGIBLE_TECHNICAL_DESIGN` / `ELIGIBLE_VISUAL_DESIGN`
+Prerequisites: None
+Manual:
+  - Delete `rootspec/DERIVED_ARTIFACTS/` if it exists
+  - Run `/rs-impl` to create `rootspec/CONVENTIONS/` (auto-created on first run)
+  - If you had manual edits in old artifacts, review and apply to new conventions docs
+
 ## 6.3.1
 
 Summary: Commit conventions, release notification workflow

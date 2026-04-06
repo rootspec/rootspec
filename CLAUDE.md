@@ -123,8 +123,8 @@ Comment-annotated YAML with `@annotation: value` metadata.
 6. Specific system docs in `04.SYSTEMS/` as needed
 7. `05.IMPLEMENTATION/USER_STORIES/` — YAML with Cypress tests
 8. `05.IMPLEMENTATION/FINE_TUNING/` — Numeric parameter values (YAML)
-9. `DERIVED_ARTIFACTS/technical-design.md` — Architecture, stack, conventions (generated)
-10. `DERIVED_ARTIFACTS/visual-design.md` — Design principles, components, layout (generated)
+9. `CONVENTIONS/technical.md` — Stack, code patterns, API, testing (created by /rs-impl)
+10. `CONVENTIONS/visual.md` — Component library, tokens, layout, responsive (created by /rs-impl)
 
 ### Commit Conventions
 

@@ -1,6 +1,6 @@
 ---
 name: rs-spec
-description: Create or update a RootSpec specification — interview-driven with built-in validation and derived artifact generation. Use this when a user wants to define, expand, revise, or reinterpret their product specification, add features, or edit any spec level.
+description: Create or update a RootSpec specification — interview-driven with built-in validation. Use this when a user wants to define, expand, revise, or reinterpret their product specification, add features, or edit any spec level.
 ---
 
 You are a specification agent. Your job is to create, update, or refine a 5-level product specification through structured dialogue and iterative validation.
@@ -128,36 +128,31 @@ bash "$(dirname "$0")/../rs-shared/scripts/check-coverage.sh" rootspec
 
 If violations are found, report them and fix. Loop between drafting and validation until the spec is clean — but don't loop more than 20 iterations total across the entire session.
 
-## Step 6: Generate derived artifacts
+## Step 5b: Reconcile baseline stories (brownfield only)
 
-After validation passes, generate specialized artifacts that project the specification into implementation-ready guidance.
+Skip this step if HAS_CODE=false or if no stories are tagged `@phase: baseline`.
 
-Read `../rs-shared/fragments/derived-artifacts.md` for what to generate and how.
+For each baseline story, reconcile its acceptance criteria against the actual code:
 
-Re-read the scan-project.sh output from Step 1 — you need FRAMEWORK, SOURCE_DIRS, CONFIG_FILES, and HAS_CODE to determine the project scenario (empty greenfield, scaffolded, or brownfield).
+1. Re-read the specific source files that implement this story's functionality
+2. Compare each acceptance criterion against what the code actually does
+3. If a criterion doesn't match the code's behavior, fix the STORY to match the code:
+   - Adjust selectors to match actual DOM output
+   - Adjust expected text/values to match actual rendering
+   - Adjust given/when/then flow to match actual interaction patterns
+4. If a criterion describes behavior the code doesn't have, remove it and note: `"Removed AC-nnn-n: code does not implement [behavior]"`
 
-Create `rootspec/DERIVED_ARTIFACTS/` if it doesn't exist.
+The rule is: **for baseline stories, CODE IS TRUTH.** The spec adapts to the code, never the reverse.
 
-**Check eligibility** from the scan-spec.sh output in Step 1:
+Present the reconciliation summary:
 
-| Artifact | Generate if... |
-|----------|---------------|
-| `technical-design.md` | `ELIGIBLE_TECHNICAL_DESIGN=true` |
-| `visual-design.md` | `ELIGIBLE_VISUAL_DESIGN=true` |
+```
+Reconciled N baseline stories against code:
+- M stories matched exactly
+- K stories adjusted (list changes)
+```
 
-This step runs regardless of which path you took (A, B, or C). Even if you only edited one level, regenerate all eligible artifacts — they derive from the full spec state, not just what changed.
-
-For each eligible artifact:
-1. Read the source spec files listed in the fragment
-2. For project context, read: `package.json`, config files (tsconfig, eslint, tailwind, etc.), and 2-3 representative source files for pattern detection. Don't read the entire codebase.
-3. Generate the artifact following the fragment's section guidance
-4. Write to `rootspec/DERIVED_ARTIFACTS/<artifact-name>.md`
-
-Always overwrite existing artifacts — they are regenerated from the current spec state.
-
-If no artifacts can be generated (insufficient spec levels), skip this step and note it in the hand-off: "Derived artifacts not yet generated — complete L4 for technical design, L1+L3 for visual design."
-
-## Step 7: Record and hand off
+## Step 6: Record and hand off
 
 When the spec passes validation (zero critical violations), write the status file:
 
@@ -169,7 +164,7 @@ This computes the hash, detects the framework version, and writes `rootspec/spec
 
 Then suggest next steps:
 - "Spec validated. Run `/rs-impl` to start implementing, or `/rs-impl <phase>` for a specific phase."
-- If artifacts were generated: "Generated derived artifacts in `rootspec/DERIVED_ARTIFACTS/` — these will guide implementation decisions."
+- If `rootspec/CONVENTIONS/` does not exist: "Conventions docs will be created during the first `/rs-impl` run."
 
 If the developer stops before validation passes, do NOT write `valid: true`. Leave `rootspec/spec-status.json` as-is, or write it with `false`:
 
@@ -205,5 +200,6 @@ bash "$(dirname "$0")/../rs-shared/scripts/write-stats.sh" rootspec/stats.json r
 ```
 
 - **CAN read:** All project files
-- **CAN write:** `rootspec/` directory (spec files, `spec-status.json`, `DERIVED_ARTIFACTS/`, `stats.json`)
+- **CAN write:** `rootspec/` directory (spec files, `spec-status.json`, `stats.json`)
+- **CANNOT write:** `rootspec/CONVENTIONS/` (owned by `/rs-impl`)
 - **SHOULD NOT write:** Application code, test files, `.rootspec.json`, `tests-status.json`

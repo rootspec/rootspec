@@ -7,7 +7,7 @@ All spec files (01-05) and Cypress files belong to the user once created. Never 
 - Preserve all existing content — only add or modify what was discussed
 - For Cypress files: merge additions, never replace
 
-Derived artifacts (`rootspec/DERIVED_ARTIFACTS/`) are an exception — they are regenerated from the spec on every `/rs-spec` run and may be overwritten without approval.
+Conventions docs (`rootspec/CONVENTIONS/`) are owned by `/rs-impl` — created during first implementation and updated as conventions change. `/rs-spec` never writes to this directory.
 
 The only file that may be replaced during upgrades is `00.FRAMEWORK.md`.
 

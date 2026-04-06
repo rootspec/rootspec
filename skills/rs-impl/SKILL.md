@@ -65,13 +65,20 @@ For each story:
 
 Read the YAML. Understand the given/when/then steps and what needs to exist for the test to pass.
 
-### 3b. Read existing code and derived artifacts
+**Check the `@phase` annotation.** If `@phase: baseline`, this story describes existing functionality — the code already works. For baseline stories:
+- DO NOT implement application code. The feature exists.
+- Only write or verify the Cypress test.
+- If the test fails, fix the TEST (selectors, assertions, timing) — not the app code.
+- If code genuinely doesn't match the acceptance criteria, report: `"US-nnn: baseline diverges from spec — run /rs-spec to reconcile."` and move to the next story.
+- After writing/verifying the test, skip to Step 3d.
 
-Before writing anything, understand the project's patterns and architectural guidance.
+### 3b. Read existing code and conventions
 
-**Check for derived artifacts** in `rootspec/DERIVED_ARTIFACTS/`:
-- If `technical-design.md` exists, read it for technology stack, architecture patterns, coding conventions, API approach, and data model guidance. Follow these conventions when implementing.
-- If `visual-design.md` exists, read it for design principles, component patterns, layout approach, and responsive strategy. Follow these when building UI.
+Before writing anything, understand the project's patterns and conventions.
+
+**Check for conventions** in `rootspec/CONVENTIONS/`:
+- If `technical.md` exists, read it for technology stack, architecture patterns, coding conventions, API approach, and data model guidance. Follow these when implementing.
+- If `visual.md` exists, read it for component library, color tokens, spacing, typography, and layout patterns. Follow these when building UI.
 
 **Read existing source files.** Check FRAMEWORK from the project scan. Understand:
 - Project structure and conventions
@@ -79,9 +86,11 @@ Before writing anything, understand the project's patterns and architectural gui
 - How state is managed
 - What patterns are already established
 
-Match derived artifact guidance and existing patterns. Don't introduce new frameworks or paradigms unless the story requires it. When derived artifacts and existing code conflict, prefer the artifact — it reflects current spec intent.
+Follow conventions docs and existing patterns. Don't introduce new frameworks or paradigms unless the story requires it. When conventions docs and existing code conflict, prefer existing code — conventions may be stale. Update the conventions doc to match what's actually in the code.
 
 ### 3c. Build what's missing
+
+**Skip for baseline stories** (`@phase: baseline`). Baseline means the code exists — only the test needs to be written. Go to 3d.
 
 Follow the decision tree from `l5-test-dsl.md`:
 
@@ -116,6 +125,10 @@ Copy the reporter from the bundled location at `../rs-shared/cypress/rootspec-re
 After each story:
 - Pass: `"US-101: PASS (3/12 stories complete)"`
 - Fail: `"US-101: FAIL — [reason]. Moving to next story."`
+
+### 3g. Update conventions
+
+If the implementation introduced or changed any convention — new library, different file pattern, new API approach, design tokens — update the relevant entry in `rootspec/CONVENTIONS/technical.md` or `visual.md`. Only update entries that actually changed.
 
 Loop to the next story. If all target stories pass, or iteration cap is reached, go to Step 4.
 
@@ -154,11 +167,16 @@ Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":
 
 When no stories have been implemented yet, set up infrastructure before tackling individual stories:
 
-1. **Test infrastructure** — Cypress config, support files, DSL step implementations
-2. **Authentication** — `loginAs` Cypress task if any stories use it
-3. **Database reset** — `beforeEach` hook if stories assume clean state
-4. **Seed data** — `seedItem` Cypress task if stories use it
-5. **Shared fixtures** — test data that appears across multiple stories
+1. **Conventions docs** — If `rootspec/CONVENTIONS/` doesn't exist, create it. Read `../rs-shared/fragments/conventions.md` for the template and predefined categories.
+   - If HAS_CODE=true (brownfield): read source files, `package.json`, config files (tsconfig, eslint, tailwind, vite, etc.), and stylesheets. Extract what the project actually uses into each category.
+   - If HAS_CODE=false (greenfield): derive from spec (L4 systems, detected FRAMEWORK) and framework ecosystem defaults.
+   - Write both `technical.md` and `visual.md`.
+   - Report: `"Created conventions docs. Review before next run: rootspec/CONVENTIONS/"`
+2. **Test infrastructure** — Cypress config, support files, DSL step implementations
+3. **Authentication** — `loginAs` Cypress task if any stories use it
+4. **Database reset** — `beforeEach` hook if stories assume clean state
+5. **Seed data** — `seedItem` Cypress task if stories use it
+6. **Shared fixtures** — test data that appears across multiple stories
 
 Present the setup plan in your first progress report, then proceed.
 
@@ -175,5 +193,6 @@ Arguments narrow what the skill works on:
 
 - **CAN read:** All project files
 - **CAN write:** Application code, test infrastructure, config files
+- **CAN write:** `rootspec/CONVENTIONS/` (technical.md, visual.md)
 - **CAN update:** `rootspec/tests-status.json`
 - **CANNOT write:** Any other file in `rootspec/` (spec files, spec-status.json, 00.AXIOMS.md, 00.FRAMEWORK.md)

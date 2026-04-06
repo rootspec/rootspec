@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-04-06
+
+### Added
+
+- **Conventions docs**: New `rootspec/CONVENTIONS/` directory with `technical.md` and `visual.md` — prescriptive, list-driven implementation guides with predefined categories (stack, code patterns, color tokens, typography, etc.). Created and maintained by `/rs-impl`, never by `/rs-spec`.
+- **`conventions.md` fragment**: Defines the conventions format, categories, and lifecycle rules for both technical and visual docs.
+- **Baseline phase behavior**: `@phase: baseline` stories in `/rs-impl` now skip implementation and only write/verify Cypress tests. Prevents re-implementing existing functionality in brownfield projects.
+- **Spec-code reconciliation**: `/rs-spec` Step 5b verifies baseline story acceptance criteria against actual code for brownfield projects. Fixes stories to match code (code is truth for baseline).
+- **Brownfield-aware validation reporting**: `/rs-validate` distinguishes baseline failures ("code diverges from spec") from feature failures ("implementation incomplete").
+
+### Changed
+
+- **`/rs-impl` conflict rule**: When conventions and existing code conflict, prefer existing code (was: prefer artifact). Conventions may be stale; code is reality.
+- **`/rs-impl` global setup**: Now creates conventions docs during first implementation run — from code extraction (brownfield) or spec derivation (greenfield).
+- **`/rs-spec` Step 6**: No longer generates derived artifacts. Notes that conventions will be created by `/rs-impl`.
+- **`scan-spec.sh`**: Outputs `HAS_CONVENTIONS` flag instead of `ELIGIBLE_TECHNICAL_DESIGN`/`ELIGIBLE_VISUAL_DESIGN`.
+- **`00.FRAMEWORK.md`**: "Derived Artifacts" section rewritten as "Conventions".
+- **`framework-rules.md`**: Artifact regeneration exception replaced with conventions ownership note.
+
+### Removed
+
+- **Derived artifacts**: `rootspec/DERIVED_ARTIFACTS/` directory, `technical-design.md`, and `visual-design.md` are no longer generated or used.
+- **`derived-artifacts.md` fragment**: Replaced by `conventions.md`.
+- **Artifact eligibility checks**: `ELIGIBLE_TECHNICAL_DESIGN` and `ELIGIBLE_VISUAL_DESIGN` removed from `scan-spec.sh`.
+
 ## [6.3.1] - 2026-04-05
 
 ### Added

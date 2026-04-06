@@ -118,6 +118,18 @@ If there are regressions: highlight them first — regressions are more urgent t
 
 If there are failures: suggest `/rs-impl failing` to address them.
 
+**Brownfield projects (HAS_CODE=true from scan-project.sh):** When reporting failures, distinguish baseline stories (`@phase: baseline`) from feature stories. Read the YAML to check each failing story's phase.
+
+```
+Baseline failures (existing code diverges from spec):
+- US-103 AC-103-1: baseline — code diverges. Run /rs-spec to reconcile.
+
+Feature failures (implementation incomplete):
+- US-201 AC-201-1: implementation incomplete
+```
+
+This distinction helps developers know whether to fix the spec (baseline) or fix the code (feature).
+
 **Record stats:**
 
 ```bash

@@ -125,9 +125,9 @@ your-project/
 │   ├── 05.IMPLEMENTATION/          # L5: User stories + parameters
 │   │   ├── USER_STORIES/           # YAML → Cypress tests
 │   │   └── FINE_TUNING/            # Numeric parameter YAML
-│   ├── DERIVED_ARTIFACTS/          # Generated: technical & visual design
-│   │   ├── technical-design.md     # Architecture, stack, conventions
-│   │   └── visual-design.md        # Design principles, components, layout
+│   ├── CONVENTIONS/                # Implementation conventions (created by /rs-impl)
+│   │   ├── technical.md            # Stack, code patterns, API, testing
+│   │   └── visual.md               # Component library, tokens, layout
 │   ├── spec-status.json            # Spec validation tracking
 │   └── tests-status.json           # Test pass/fail tracking
 └── ...
