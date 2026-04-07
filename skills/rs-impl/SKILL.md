@@ -102,12 +102,38 @@ Before writing any code, plan how to group files into turns using parallel Write
 
 Aim for **4-6 write turns total** for all app code, not one file per turn.
 
-### Strategy: batch aggressively
+### Implementation loop: build → test targeted → test all
 
-1. **Write multiple files per turn** — use parallel Write tool calls. 3-4 component files in one turn is normal.
-2. **Batch test runs.** Run tests after implementing 3+ stories, NOT after each story. For a ~10 story project, aim for 2-3 total test runs.
-3. **Fix failures in ONE turn** — use parallel tool calls to fix multiple files at once.
-4. **If progress stalls**, implement all remaining stories before running tests again rather than retrying individual failures.
+Repeat this cycle for each batch of stories:
+
+#### Phase A: Build a batch
+
+Pick 2-4 related stories. Write all their code + test YAML in as few turns as possible using parallel Write calls.
+
+#### Phase B: Test targeted stories
+
+Run tests for just the stories you implemented:
+
+```bash
+npx cypress run --spec cypress/e2e/mvp.cy.ts 2>&1 | tail -20; cat rootspec/tests-status.json
+```
+
+If targeted stories fail, fix in ONE turn. Max 2 fix cycles per batch. Then move on.
+
+#### Phase C: Test ALL stories (regression check)
+
+After the targeted tests pass (or you've moved on), run the full suite:
+
+```bash
+npx cypress run 2>&1 | tail -20; cat rootspec/tests-status.json
+```
+
+Compare against what was passing before this batch. **If previously passing stories now fail, that's a regression.** Fix the regression before implementing more stories — it's usually a config/build issue (e.g., missing framework integration), not a per-story bug.
+
+**Regression response:**
+- If all tests broke at once → build/config problem. Check framework config, imports, build errors. Fix the root cause.
+- If specific stories regressed → your changes conflicted. Revert the conflicting part or fix the interaction.
+- Do NOT continue implementing new stories while regressions exist.
 
 ### Test file pattern (CRITICAL)
 
@@ -165,65 +191,44 @@ loadAndRun(contentStories);
 - **NEVER rewrite or shrink the test file during debugging.** Only append new stories or edit specific YAML strings. If you rewrite the file, you lose all existing passing stories.
 - **NEVER create additional test files** (no `debug.cy.ts`, `targeted.cy.ts`, etc.). All tests go in the single test file.
 
-### For each story:
-
-#### 3a. Build (1-2 turns)
+### Building a batch
 
 Do not re-read YAML, conventions, or fragments. Use the context from Step 1.
 
-**Check the `@phase` annotation.** If `@phase: baseline`, this story describes existing functionality — the code already works. For baseline stories:
-- DO NOT implement application code. The feature exists.
-- Only write or verify the Cypress test.
-- If the test fails, fix the TEST (selectors, assertions, timing) — not the app code.
-- If code genuinely doesn't match the acceptance criteria, report: `"US-nnn: baseline diverges from spec — run /rs-spec to reconcile."` and move to the next story.
+**Check `@phase` annotations.** If `@phase: baseline`, only write/verify the Cypress test — do not modify app code.
 
 For non-baseline stories, in ONE write turn per story:
 - Create/modify all application files (routes, components, pages, styles)
 - **Add the story's YAML to the test file** (append to the existing test file)
 - Use `data-test` attributes matching acceptance criteria selectors
-- Follow conventions from Step 1
 
-**A story is NOT implemented until its test YAML is in the test file.** App code without a test entry does not count as done. Do not skip test entries for any story.
+**A story is NOT implemented until its test YAML is in the test file.**
 
-**Batch implementation example:** If implementing US-001 (meta banner), US-002 (hero), and US-003 (problem section):
-- **Turn 1:** Write MetaBanner.astro, HeroSection.astro, ProblemSection.astro (3 parallel Write calls = 1 turn)
-- **Turn 2:** Update index.astro to include all three components + add all three story YAMLs to the test file (parallel writes)
-- **Turn 3:** Run `npx cypress run` to test the batch
+**Example batch** (3 stories, 3 turns):
+- **Turn 1:** Write MetaBanner.astro, HeroSection.astro, ProblemSection.astro (parallel Writes)
+- **Turn 2:** Update index.astro + add 3 story YAMLs to test file (parallel writes)
+- **Turn 3:** Run targeted tests for the batch (Phase B)
 
-That's 3 stories in 3 turns. Never write one component per turn when you can batch.
+### Fixing failures
 
-#### 3b. Test (1 turn per batch)
-
-Run the test suite:
-
-```bash
-npx cypress run 2>&1 | tail -20; cat rootspec/tests-status.json
-```
-
-The rootspec-reporter automatically updates `tests-status.json`. The `cat` shows pass/fail state.
-
-#### 3c. Fix if needed (0-1 turns)
-
-If tests fail, fix in ONE turn using Edit (not Write) on the specific lines that need changing. Max 2 test-fix cycles per story. After 2 failed attempts, record FAIL and move on — do NOT keep retrying.
+Fix in ONE turn using Edit on specific lines. Max 2 fix cycles per batch.
 
 **Common fixes:**
-- Wrong selector → update the `data-test` attribute in the component
-- Element not found → check if the component is rendered and the selector matches
-- Zod validation error → you used a DSL step that doesn't exist (only use core steps)
+- Wrong selector → update `data-test` in component
+- Element not found → check component renders and selector matches
+- Zod validation error → you used a non-core DSL step
 
-**NEVER do these when fixing:**
+**NEVER do these:**
 - Rewrite the entire test file (you'll lose passing stories)
-- Create a separate debug/targeted test file
+- Create separate debug/targeted test files
 - Add `wait` or `timeout` steps (not in the DSL)
 - Remove stories from the test file
 
-#### 3d. Report and continue
+### After each batch
 
-After each story or batch:
-- Pass: `"US-101: PASS (3/10 stories complete)"`
-- Fail: `"US-101: FAIL — [reason]. Moving to next story."`
+Report: `"Batch complete: US-001, US-002, US-003 PASS. Full suite: 6/10 passing, 0 regressions."`
 
-When all target stories pass, or iteration cap reached, go to Step 4.
+If regressions exist, fix before starting next batch. When all target stories pass (or per-story cap reached), go to Step 4.
 
 ## Step 4: Summary and commit (~3 turns)
 
