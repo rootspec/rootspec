@@ -160,11 +160,18 @@ Do not re-read YAML, conventions, or fragments. Use the context from Step 1.
 
 For non-baseline stories, in ONE write turn per story:
 - Create/modify all application files (routes, components, pages, styles)
-- Add the story's YAML to the test file (append to the existing test file)
+- **Add the story's YAML to the test file** (append to the existing test file)
 - Use `data-test` attributes matching acceptance criteria selectors
 - Follow conventions from Step 1
 
-**Batch implementation example:** If implementing US-101 (hero), US-102 (meta banner), and US-103 (problem section) — write ALL their components, update the page layout, AND add all three story YAMLs to the test file in 3 write turns. Then run tests ONCE for the whole batch.
+**A story is NOT implemented until its test YAML is in the test file.** App code without a test entry does not count as done. Do not skip test entries for any story.
+
+**Batch implementation example:** If implementing US-001 (meta banner), US-002 (hero), and US-003 (problem section):
+- **Turn 1:** Write MetaBanner.astro, HeroSection.astro, ProblemSection.astro (3 parallel Write calls = 1 turn)
+- **Turn 2:** Update index.astro to include all three components + add all three story YAMLs to the test file (parallel writes)
+- **Turn 3:** Run `npx cypress run` to test the batch
+
+That's 3 stories in 3 turns. Never write one component per turn when you can batch.
 
 #### 3b. Test (1 turn per batch)
 
@@ -225,11 +232,14 @@ Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":
 
 ### Report
 
+**Read `rootspec/tests-status.json` for the final pass/fail counts.** Do not self-assess — only stories recorded in tests-status.json count. Stories without test entries are "not implemented."
+
 ```
 Implementation complete.
 
-PASS: N stories
+PASS: N stories (from tests-status.json)
 FAIL: M stories
+NOT TESTED: K stories (in spec but no test entry)
 
 Passing: US-101, US-102, ...
 Failing:

@@ -22,6 +22,7 @@ This skill contains shared resources for all RootSpec skills. Do not invoke dire
 - `scripts/scan-project.sh` — Detect framework, source dirs, config files
 
 ### Spec validation
+- `scripts/validate-spec.sh` — Run all 6 validation checks in one call (hierarchy, numerics, duplicate IDs, pillar quality, tradeoffs, coverage)
 - `scripts/check-hierarchy.sh` — Find downward references across spec levels
 - `scripts/check-numerics.sh` — Find hardcoded numbers in L1-L4
 - `scripts/check-duplicate-ids.sh` — Find duplicate story IDs in L5

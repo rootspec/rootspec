@@ -118,16 +118,13 @@ For each level:
 
 ## Step 5: Validate
 
-Run the validation scripts:
+Run all validation checks in one call:
 
 ```bash
-bash "$(dirname "$0")/../rs-shared/scripts/check-hierarchy.sh" rootspec
-bash "$(dirname "$0")/../rs-shared/scripts/check-numerics.sh" rootspec
-bash "$(dirname "$0")/../rs-shared/scripts/check-duplicate-ids.sh" rootspec
-bash "$(dirname "$0")/../rs-shared/scripts/check-pillar-quality.sh" rootspec
-bash "$(dirname "$0")/../rs-shared/scripts/check-tradeoffs.sh" rootspec
-bash "$(dirname "$0")/../rs-shared/scripts/check-coverage.sh" rootspec
+bash "$(dirname "$0")/../rs-shared/scripts/validate-spec.sh" rootspec "$(dirname "$0")/../rs-shared"
 ```
+
+If the path doesn't resolve, search for `validate-spec.sh` in the skills directory. This runs all 6 checks (hierarchy, numerics, duplicate IDs, pillar quality, tradeoffs, coverage) and reports results.
 
 If violations are found, report them and fix. **Max 3 validation-fix cycles.** If still failing after 3, report remaining violations and exit.
 
