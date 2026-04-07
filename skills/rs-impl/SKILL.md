@@ -83,9 +83,20 @@ If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual
 
 **Target pace: ~3 turns per story.** Implement as many stories as the spec requires — don't cut corners to save turns.
 
+### Before implementing: plan your write batches
+
+Before writing any code, plan how to group files into turns using parallel Write calls:
+- **Page components:** Group components on the same page (e.g., Hero + MetaBanner + ProblemSection → 3 parallel Writes = 1 turn)
+- **Infrastructure:** Layout + global styles + Header + Footer → 1 turn
+- **Data/config:** All data files and configs → 1 turn
+- **Interactive components:** Complex React/TSX components can be 1 per turn if large
+- **Test file:** Add ALL story YAMLs to the test file — never defer test entries
+
+Aim for **4-6 write turns total** for all app code, not one file per turn.
+
 ### Strategy: batch aggressively
 
-1. **Write ALL files for a story in ONE turn** — use multiple parallel Write/Edit tool calls to create/modify several files simultaneously. App code + test file + styles in one turn. Never separate "write app code" and "write test" into different turns.
+1. **Write multiple files per turn** — use parallel Write tool calls. 3-4 component files in one turn is normal.
 2. **Batch test runs.** Run tests after implementing 3+ stories, NOT after each story. For a ~10 story project, aim for 2-3 total test runs.
 3. **Fix failures in ONE turn** — use parallel tool calls to fix multiple files at once.
 4. **If progress stalls**, implement all remaining stories before running tests again rather than retrying individual failures.

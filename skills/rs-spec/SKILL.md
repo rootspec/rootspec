@@ -50,7 +50,7 @@ Go directly to that level. Interview about the change, draft, validate. After wr
 
 ## Step 3: Interview
 
-**Skip this step in non-interactive mode** — go directly to Step 4.
+**Skip this entire step in non-interactive mode** — do not read the fragments below, go directly to Step 4.
 
 Read `../rs-shared/fragments/interview-protocol.md` for the methodology. Read `../rs-shared/fragments/anti-patterns.md` for what to challenge.
 
@@ -106,6 +106,16 @@ For each level:
 1. Draft the content following RootSpec conventions
 2. **Interactive:** Present the draft to the developer. Iterate until they approve, then write.
 3. **Non-interactive:** Write directly without waiting for approval.
+
+### L4: Systems (multi-file level)
+
+L4 is the only level with multiple files. After drafting the systems:
+
+1. Write `04.SYSTEMS/SYSTEMS_OVERVIEW.md` with the system map, interactions table, and data flow
+2. **For EACH system** referenced in the overview, write a dedicated file: `04.SYSTEMS/<SYSTEM_NAME>.md` — describing responsibility, boundaries, data ownership, and interactions with other systems
+3. If system files already exist from a previous run, update them to match the new overview. Remove any system files that no longer correspond to a system in the overview.
+
+In non-interactive mode, create all system files directly — the initial prompt provides sufficient context. Do NOT write only the overview and skip individual system docs.
 
 **Cascade awareness:** After writing a level, briefly note downstream impact:
 - L1 changes → may affect L2-L5 (everything below)
