@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.6] - 2026-04-07
+
+### Fixed
+
+- **rs-init**: Creates `package.json` with `npm init -y` in non-interactive mode when none exists. Required for true greenfield projects that start with no dependencies.
+
 ## [7.0.5] - 2026-04-07
 
 ### Added

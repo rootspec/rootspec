@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.6
+
+Summary: rs-init handles missing package.json in non-interactive mode
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None
+
 ## 7.0.5
 
 Summary: Deterministic scripts for test files, conventions, and reporting; L4 system file fix; write batching
