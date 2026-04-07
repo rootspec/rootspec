@@ -55,6 +55,8 @@ The script outputs `DEV_SERVER=`, `PRE_COMMIT_HOOK=`, `RELEASE_SCRIPT=`, `VALIDA
 
 Read `../rs-shared/fragments/prerequisites.md` for the full reference on what each prerequisite is.
 
+**Non-interactive mode:** If no `package.json` exists, create one with `npm init -y` before proceeding with prerequisites. The agent needs a package.json to install dev dependencies and configure scripts.
+
 Report what was found. For missing prerequisites, tell the developer you'll create all templates and proceed unless they object:
 
 "I'll create templates for [list missing]. These are lightweight and needed by `/rs-impl` and `/rs-validate`. Let me know if you'd rather skip any."
