@@ -9,9 +9,9 @@ This is a non-interactive skill. Do not ask the developer questions during imple
 
 **Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start. Track iteration count and per-story attempt counts as you work. At the end (Step 4), call `write-stats.sh`.
 
-**Turn budget:** Target ≤50 turns total. Be aggressive about batching file reads and writes. Every tool call costs one turn.
+**Turn efficiency:** Every tool call costs one turn. Be aggressive about batching file reads and writes. Target pace: ~3 turns per story (setup overhead amortized across all stories).
 
-## Step 1: Assess (budget: 1-2 turns)
+## Step 1: Assess (~2 turns)
 
 Front-load ALL reading in a single script call. Find the scripts directory first — look for `.agents/skills/rs-shared/scripts/` relative to the project root, or search for `assess.sh` under the skills directory.
 
@@ -38,7 +38,7 @@ Announce: "Found X stories across N phases. M already passing. Implementing [foc
 
 **You now have all context. Do NOT re-read any of these files during implementation.**
 
-## Step 2: Set up (budget: 3-5 turns)
+## Step 2: Set up (~4 turns)
 
 ### 2a. Filter stories (if focus provided)
 
@@ -77,18 +77,18 @@ sleep 3
 
 If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec and detected framework. Use `## Heading` sections with `- **Label:** value` entries.
 
-## Step 3: Implement (budget: 30-40 turns)
+## Step 3: Implement (~3 turns per story)
 
-**Iteration cap: 50. Per-story cap: 2 test-fix cycles.** Track your count: `Iteration N/50: implementing US-XXX`
+**Per-story cap: 2 test-fix cycles.** If you're spending more than 5 turns on one story, record FAIL and move on.
 
-**Target pace: 3-4 turns per story.** If you're spending more than 5 turns on one story, record FAIL and move on.
+**Target pace: ~3 turns per story.** Implement as many stories as the spec requires — don't cut corners to save turns.
 
 ### Strategy: batch aggressively
 
 1. **Write ALL files for a story in ONE turn** — use multiple parallel Write/Edit tool calls to create/modify several files simultaneously. App code + test file + styles in one turn. Never separate "write app code" and "write test" into different turns.
 2. **Batch test runs.** Run tests after implementing 3+ stories, NOT after each story. For a ~10 story project, aim for 2-3 total test runs.
 3. **Fix failures in ONE turn** — use parallel tool calls to fix multiple files at once.
-4. **Track your turn count.** If you're at turn 30 and fewer than 6 stories are complete, implement ALL remaining stories before running tests again.
+4. **If progress stalls**, implement all remaining stories before running tests again rather than retrying individual failures.
 
 ### Test file pattern (CRITICAL)
 
@@ -199,7 +199,7 @@ After each story or batch:
 
 When all target stories pass, or iteration cap reached, go to Step 4.
 
-## Step 4: Summary and commit (budget: 2-3 turns)
+## Step 4: Summary and commit (~3 turns)
 
 ### Update conventions (1 turn)
 
