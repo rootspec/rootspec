@@ -58,6 +58,14 @@ bash "$SHARED_DIR/scripts/scaffold-cypress.sh" . "$SHARED_DIR"
 
 This creates all Cypress files in one call: config, support files, DSL steps, schema, reporter. Review its output to see what was created vs skipped.
 
+**Then generate the test file from spec YAML:**
+
+```bash
+bash "$SHARED_DIR/scripts/generate-test-file.sh" rootspec cypress/e2e/mvp.cy.ts
+```
+
+This creates the test file with all stories embedded as YAML string literals using the `loadAndRun()` pattern. Stories without DSL-format given/when/then are skipped with a warning — you'll need to add test YAML for those manually.
+
 **After scaffolding, customize in ONE write turn.** Check your stories for:
 - `loginAs` steps → implement the task body in `cypress.config.ts`
 - `seedItem` steps → implement the task body in `cypress.config.ts`
@@ -243,19 +251,13 @@ Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":
 
 ### Report
 
-**Read `rootspec/tests-status.json` for the final pass/fail counts.** Do not self-assess — only stories recorded in tests-status.json count. Stories without test entries are "not implemented."
+Generate the report from `tests-status.json` — do not self-assess:
 
+```bash
+bash "$SHARED_DIR/scripts/generate-test-report.sh" rootspec/tests-status.json rootspec
 ```
-Implementation complete.
 
-PASS: N stories (from tests-status.json)
-FAIL: M stories
-NOT TESTED: K stories (in spec but no test entry)
-
-Passing: US-101, US-102, ...
-Failing:
-  US-108: AC-108-2 — [reason]
-```
+This outputs pass/fail/not-tested counts from the actual test results. Include its output in your summary.
 
 ## Focus
 

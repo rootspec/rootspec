@@ -104,25 +104,13 @@ bash "$(dirname "$0")/../rs-shared/scripts/compare-test-runs.sh" rootspec/tests-
 
 Flag regressions (was passing, now failing) prominently.
 
+Generate the pass/fail summary:
+
+```bash
+bash "$(dirname "$0")/../rs-shared/scripts/generate-test-report.sh" rootspec/tests-status.json rootspec
 ```
-Test Run: <timestamp>
 
-PASS: 8 stories
-FAIL: 2 stories
-SKIP: 1 story
-NOT IMPLEMENTED: 3 stories
-
-Regressions (was passing, now failing):
-- US-103 AC-103-2: Expected element [data-test=feedback] to exist
-
-Still failing:
-- US-107 AC-107-1: Timeout waiting for /api/tasks response
-
-Coverage:
-- MVP: 10/12 passing
-- post-launch: 0/5 (not yet implemented)
-- v2: 0/3 (not yet implemented)
-```
+Then add regression details from compare-test-runs.sh and any phase-level coverage breakdown.
 
 If all tests pass: "All tests passing. Implementation matches spec."
 

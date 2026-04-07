@@ -172,31 +172,15 @@ bash "$(dirname "$0")/../rs-shared/scripts/write-spec-status.sh" rootspec true
 
 This computes the hash, detects the framework version, and writes `rootspec/spec-status.json` with the current timestamp.
 
-**Create conventions if they don't exist.** If `rootspec/CONVENTIONS/` does not exist, create it. Read `../rs-shared/fragments/conventions.md` for the template and predefined categories.
+**Create conventions if they don't exist.** Run the init script to extract conventions from project config:
 
-If conventions already exist, skip — the implementation is already established and conventions are maintained by `/rs-impl`.
+```bash
+bash "$(dirname "$0")/../rs-shared/scripts/init-conventions.sh" . rootspec
+```
 
-**If HAS_CODE=false (greenfield):** Derive conventions from the spec — L4 systems for architecture, detected FRAMEWORK for ecosystem defaults. For categories without clear guidance, use sensible defaults for the framework and note them.
+This scans `package.json`, `tsconfig.json`, Tailwind config, and source files to auto-detect stack, patterns, routing, testing, and visual conventions. It creates both `technical.md` and `visual.md` with what it can extract. If conventions already exist, it skips silently.
 
-**If HAS_CODE=true (brownfield):** You already read the entire codebase in Step 1. Use that understanding to extract conventions systematically:
-
-1. **Technical conventions** — Read `package.json` for dependencies, config files (tsconfig, eslint, vite, tailwind, etc.) for tooling choices, and source files for patterns. For each category in the template:
-   - Stack: what framework, language, and key libraries are installed and used?
-   - Code patterns: what naming, component style, export, and directory conventions are established? Look at 5+ files to confirm patterns, not just one.
-   - Imports: what ordering and aliasing exists? Check tsconfig paths, existing import statements.
-   - Types: interfaces or types? Validation library? Generated types?
-   - State/routing/API/data: what libraries and patterns are in use?
-   - Testing: what frameworks and patterns exist in test files?
-
-2. **Visual conventions** — Read stylesheets, theme files, component source, and any design token files:
-   - Component library: what UI library is used? How are components customized?
-   - Colors/spacing/typography: extract actual values from CSS, Tailwind config, or theme files.
-   - Layout/responsive: what grid, breakpoint, and navigation patterns are used?
-   - Motion/icons: what transition and icon approaches exist?
-
-Document what IS — not what should be. If a pattern is inconsistent across the codebase, document the dominant pattern and note the inconsistency.
-
-Write both `rootspec/CONVENTIONS/technical.md` and `rootspec/CONVENTIONS/visual.md`. Report: `"Created conventions docs. Review and edit if needed: rootspec/CONVENTIONS/"`
+**After the script runs, fill in gaps** it couldn't detect: colors, typography, spacing values, motion philosophy, specific component patterns. For brownfield projects, read stylesheets and theme files to extract visual tokens. For greenfield, use sensible framework defaults.
 
 Then suggest next steps:
 - "Spec validated. Run `/rs-impl` to start implementing, or `/rs-impl <phase>` for a specific phase."
