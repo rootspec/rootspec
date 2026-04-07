@@ -63,9 +63,28 @@ cp rootspec/tests-status.json rootspec/tests-status.json.bak 2>/dev/null
 
 Check `.rootspec.json` for the `validationScript` prerequisite — use it to run the test suite. If not configured, look for `package.json` scripts (`test`, `test:e2e`, `cypress run`). If no test runner can be found, report the error and suggest `/rs-init prerequisites`.
 
-Run the test suite. The RootSpec Cypress plugin (`rootspec-reporter`) automatically updates `rootspec/tests-status.json` after every run — you don't need to parse results or call any scripts manually.
+Run the test suite and capture its output (e.g., pipe through `tee cypress-output.log`). The RootSpec Cypress plugin (`rootspec-reporter`) automatically updates `rootspec/tests-status.json` after every run.
 
-**If tests produce no results:** diff `rootspec/tests-status.json` against the `.bak` copy. If identical (or the file doesn't exist), report: "No test results recorded. Ensure /rs-impl set up the rootspec-reporter plugin." Exit.
+**If tests produce no results:** diff `rootspec/tests-status.json` against the `.bak` copy. If identical (or the file doesn't exist), the reporter may not have fired. Fall back to writing results yourself:
+
+1. Read the captured Cypress output
+2. Extract story IDs (`US-nnn`) and criterion IDs (`AC-nnn-nnn`) from the test names
+3. Determine pass/fail for each criterion from the test results (✓ = pass, ✗ = fail)
+4. Write `rootspec/tests-status.json`:
+
+```json
+{
+  "lastRun": "<ISO timestamp>",
+  "stories": {
+    "US-101": {
+      "status": "pass",
+      "criteria": { "AC-101-1": "pass", "AC-101-2": "pass" }
+    }
+  }
+}
+```
+
+A story passes only if all its criteria pass. If you can't parse the output at all, report the error and exit.
 
 **If the test runner crashes** (not test failures — actual errors, missing dependencies, server not responding): retry once. If it fails again, report the error and exit.
 

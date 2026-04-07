@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.3] - 2026-04-06
+
+### Fixed
+
+- **rootspec-reporter**: Fixed `flattenSuites` to scan all title elements for story IDs (`US-nnn`), not just `title[0]`. Tests nested under a wrapper describe (e.g., `describe('My App', () => { describe('US-001: ...') })`) were silently producing zero results.
+- **rs-validate fallback**: When the reporter plugin doesn't write `tests-status.json`, the skill now falls back to parsing Cypress console output and writing the file manually instead of exiting with an error.
+
 ## [7.0.2] - 2026-04-06
 
 ### Fixed

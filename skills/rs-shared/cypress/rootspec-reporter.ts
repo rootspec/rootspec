@@ -103,14 +103,18 @@ function flattenSuites(
   // Approach: use tests array grouped by their title hierarchy
   if (!tests || tests.length === 0) return suites;
 
-  // Group tests by their parent suite (first element of title array)
+  // Group tests by the title element containing the story ID (US-nnn).
+  // Tests may be nested under a wrapper describe, so title[0] might not
+  // contain the story ID — scan all title elements to find it.
+  const storyPattern = /US-\d+/;
   const grouped: Record<string, Array<{ title: string[]; state: string }>> = {};
   for (const test of tests) {
-    const suiteTitle = test.title.length > 1 ? test.title[0] : spec?.name || 'unknown';
-    if (!grouped[suiteTitle]) {
-      grouped[suiteTitle] = [];
+    const storyTitle = test.title.find(t => storyPattern.test(t))
+      || (test.title.length > 1 ? test.title[0] : spec?.name || 'unknown');
+    if (!grouped[storyTitle]) {
+      grouped[storyTitle] = [];
     }
-    grouped[suiteTitle].push(test);
+    grouped[storyTitle].push(test);
   }
 
   for (const [title, groupTests] of Object.entries(grouped)) {

@@ -8,6 +8,14 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.3
+
+Summary: Fix rootspec-reporter for nested test describes, rs-validate fallback
+Framework files: Replace (version bump only)
+Prerequisites:
+  CHANGED: cypress/support/rootspec-reporter.ts — updated to handle nested describe blocks. Diff project copy against bundled version and reconcile.
+Manual: Copy updated rootspec-reporter.ts from skills bundle into cypress/support/
+
 ## 7.0.2
 
 Summary: Skill turn efficiency for CI runs, Astro detection
