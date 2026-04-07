@@ -35,6 +35,10 @@ This skill contains shared resources for all RootSpec skills. Do not invoke dire
 - `scripts/verify-init.sh` — Check all expected init files exist
 - `scripts/gap-analysis.sh` — Compare project version against bundled framework version
 
+### Implementation support
+- `scripts/assess.sh` — Front-load all reading for rs-impl in one call (spec, project, stories, conventions, fragments)
+- `scripts/scaffold-cypress.sh` — Create all Cypress infrastructure files in one call (config, support, DSL, reporter)
+
 ### Stories and testing
 - `scripts/filter-stories.sh` — Filter L5 stories by ID, system, priority, or status
 - `scripts/parse-cypress-results.sh` — Parse Cypress JSON output to story/criterion results

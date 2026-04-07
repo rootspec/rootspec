@@ -9,152 +9,206 @@ This is a non-interactive skill. Do not ask the developer questions during imple
 
 **Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start. Track iteration count and per-story attempt counts as you work. At the end (Step 4), call `write-stats.sh`.
 
-## Step 1: Assess and read everything
+**Turn budget:** Target ≤50 turns total. Be aggressive about batching file reads and writes. Every tool call costs one turn.
 
-This step front-loads ALL reading. You will not re-read any of these files during the implementation loop.
+## Step 1: Assess (budget: 1-2 turns)
 
-Run from the project root:
-
-```bash
-bash "$(dirname "$0")/../rs-shared/scripts/scan-spec.sh" .
-bash "$(dirname "$0")/../rs-shared/scripts/scan-project.sh" .
-```
-
-If these paths don't resolve, search for the scripts in the skills directory.
-
-**If STATUS=no_spec:** "No spec found. Run `/rs-init` then `/rs-spec`." Exit.
-
-**Read `rootspec/spec-status.json`.** If `valid` is not true: "Spec not validated. Run `/rs-spec`." Exit.
-
-**Read `rootspec/tests-status.json`** to see what's already been implemented.
-
-**Read all YAML user story files** from `rootspec/05.IMPLEMENTATION/USER_STORIES/`.
-
-**Read conventions docs** — if `rootspec/CONVENTIONS/technical.md` and/or `visual.md` exist, read them now. These define the stack, patterns, and visual tokens to follow.
-
-**Read fragments:**
-- `../rs-shared/fragments/l5-test-dsl.md` for the test DSL step reference
-- `../rs-shared/fragments/conventions.md` for the conventions format (needed for Step 4 maintenance)
-
-**If HAS_CODE=true:** Read 2-3 existing source files to understand established patterns — component structure, routing, naming conventions. Don't explore exhaustively; skim enough to match the project's style.
-
-**Resolve the test command now.** Check `.rootspec.json` for the `validationScript` prerequisite. If not configured, check `package.json` for scripts (`test`, `test:e2e`, `cypress run`). If no test command is found, default to `npx cypress run`. Remember this command — you'll use it for every story in Step 3 without re-checking.
-
-Announce what you found: "Found X stories across N phases. M already passing. I'll implement [focus or: starting with the first phase]."
-
-**You now have all the context you need. Do NOT re-read conventions, story YAML, fragments, or source files during the implementation loop unless a file you wrote has changed.**
-
-## Step 2: Plan and set up
-
-If the developer provided a focus argument, use the filter script:
+Front-load ALL reading in a single script call. Find the scripts directory first — look for `.agents/skills/rs-shared/scripts/` relative to the project root, or search for `assess.sh` under the skills directory.
 
 ```bash
-bash "$(dirname "$0")/../rs-shared/scripts/filter-stories.sh" rootspec [focus]
+STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+SHARED_DIR=$(find . -path "*/rs-shared/scripts/assess.sh" -maxdepth 5 2>/dev/null | head -1 | sed 's|/scripts/assess.sh||')
+bash "$SHARED_DIR/scripts/assess.sh" . "$SHARED_DIR"
 ```
 
-Replace `[focus]` with the argument (e.g., `MVP`, `US-101`, `TASK_SYSTEM`, `failing`). If no focus was given, omit it to get all stories.
+Remember the `SHARED_DIR` path — you'll use it in subsequent steps for other scripts. Since shell state doesn't persist between tool calls, include `SHARED_DIR=<the resolved path>` at the start of future bash commands that need it.
 
-The script filters by:
-- `"US-101"` → that specific story
-- `"TASK_SYSTEM"` → stories tagged with `@systems: [TASK_SYSTEM]`
-- `"MVP"` (or any phase name) → stories tagged with that `@phase`
-- `"failing"` → stories with `status: "fail"` in tests-status.json
+The script outputs all context in labeled sections. Parse them:
 
-Otherwise, work through all stories by phase order (earliest phase first). Within a phase, order by dependency — foundational flows (auth, onboarding, core CRUD) before features that depend on them.
+- **SCAN_SPEC:** If `STATUS=no_spec`, say "No spec found. Run `/rs-init` then `/rs-spec`." Exit.
+- **SPEC_STATUS:** If `valid` is not true, say "Spec not validated. Run `/rs-spec`." Exit.
+- **TESTS_STATUS:** Note which stories already pass — skip them.
+- **YAML:** These are your stories. Count them and note their IDs, phases, and acceptance criteria.
+- **CONVENTIONS:** Stack, patterns, and visual tokens to follow. Memorize these.
+- **ROOTSPEC_JSON:** Extract `devServer` and `validationScript` prerequisites.
+- **PACKAGE_SCRIPTS:** Resolve the test command. Priority: `.rootspec.json` validationScript → `package.json` test scripts → `npx cypress run`.
+- **FRAGMENT:dsl-steps:** Core DSL step names. The full test pattern is in Step 3 of this document.
 
-### Global setup (first implementation only)
+Announce: "Found X stories across N phases. M already passing. Implementing [focus or: all stories starting with first phase]."
 
-**If `rootspec/tests-status.json` has no passing stories**, handle global setup before tackling individual stories. **Complete all setup in ≤5 turns:**
+**You now have all context. Do NOT re-read any of these files during implementation.**
 
-1. **Test infrastructure** — Cypress config, support files, DSL step implementations
-2. **Authentication** — `loginAs` Cypress task if any stories use it
-3. **Database reset** — `beforeEach` hook if stories assume clean state
-4. **Seed data** — `seedItem` Cypress task if stories use it
-5. **Shared fixtures** — test data that appears across multiple stories
+## Step 2: Set up (budget: 3-5 turns)
 
-**Wire the rootspec-reporter** if `cypress.config.ts` doesn't have it:
+### 2a. Filter stories (if focus provided)
 
-```ts
-import { rootspecReporter } from './cypress/support/rootspec-reporter';
-// in setupNodeEvents:
-rootspecReporter(on, { statusPath: 'rootspec/tests-status.json' });
+```bash
+bash "$SHARED_DIR/scripts/filter-stories.sh" rootspec [focus]
 ```
 
-Copy the reporter from `../rs-shared/cypress/rootspec-reporter.ts` into `cypress/support/rootspec-reporter.ts`.
+Replace `[focus]` with the argument (e.g., `MVP`, `US-101`, `TASK_SYSTEM`, `failing`). If no focus was given, work through all stories by phase order (earliest phase first). Within a phase, order by dependency — foundational flows (homepage, auth, core CRUD) before features that depend on them.
 
-**Start the dev server.** Check `.rootspec.json` for the `devServer` prerequisite. If it points to `scripts/dev.sh`, run `./scripts/dev.sh start`. If `.rootspec.json` has no `devServer` entry or doesn't exist, check for `scripts/dev.sh` directly, then fall back to `nohup npm run dev > /dev/null 2>&1 &` and wait a few seconds for startup. The server stays running for the entire session — do not check or restart it between stories.
+### 2b. Scaffold Cypress (first implementation only)
 
-Present the setup plan in your first progress report, then proceed.
+**If `tests-status.json` has no passing stories**, scaffold test infrastructure:
 
-## Step 3: Implement (loop)
+```bash
+bash "$SHARED_DIR/scripts/scaffold-cypress.sh" . "$SHARED_DIR"
+```
 
-**Iteration cap: 50. Per-story cap: 3 test-fix cycles.** Track your count: `Iteration N/50: implementing US-XXX`
+This creates all Cypress files in one call: config, support files, DSL steps, schema, reporter. Review its output to see what was created vs skipped.
 
-**Target pace: 3-6 turns per story** (implement → test → fix if needed → next). If you're spending more than 6 turns on one story, report FAIL and move on.
+**After scaffolding, customize in ONE write turn.** Check your stories for:
+- `loginAs` steps → implement the task body in `cypress.config.ts`
+- `seedItem` steps → implement the task body in `cypress.config.ts`
+- Custom DSL steps not in the core set → extend `steps.ts` and `schema.ts`
+- Framework-specific `visit` behavior (e.g., hydration waits for React islands in Astro)
 
-For each story:
+Write all customizations in a single multi-file operation.
 
-### 3a. Build
+### 2c. Conventions + dev server (combine into 1 turn)
 
-Reference the story you read in Step 1. Do not re-read the YAML file. Follow the conventions and patterns you read in Step 1. Do not re-read conventions docs.
+Start the dev server AND create conventions if needed in the same turn:
+
+```bash
+./scripts/dev.sh start 2>/dev/null || nohup npm run dev > /dev/null 2>&1 &
+sleep 3
+```
+
+If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec and detected framework. Use `## Heading` sections with `- **Label:** value` entries.
+
+## Step 3: Implement (budget: 30-40 turns)
+
+**Iteration cap: 50. Per-story cap: 2 test-fix cycles.** Track your count: `Iteration N/50: implementing US-XXX`
+
+**Target pace: 3-4 turns per story.** If you're spending more than 5 turns on one story, record FAIL and move on.
+
+### Strategy: batch aggressively
+
+1. **Write ALL files for a story in ONE turn** — use multiple parallel Write/Edit tool calls to create/modify several files simultaneously. App code + test file + styles in one turn. Never separate "write app code" and "write test" into different turns.
+2. **Batch test runs.** Run tests after implementing 3+ stories, NOT after each story. For a ~10 story project, aim for 2-3 total test runs.
+3. **Fix failures in ONE turn** — use parallel tool calls to fix multiple files at once.
+4. **Track your turn count.** If you're at turn 30 and fewer than 6 stories are complete, implement ALL remaining stories before running tests again.
+
+### Test file pattern (CRITICAL)
+
+**DO NOT use `cy.readFile()` to load YAML files.** Cypress commands cannot run outside `it()` blocks. Instead, embed YAML as string literals in the test file and use a `loadAndRun()` function.
+
+Use this exact pattern for test files:
+
+```typescript
+import * as yaml from 'js-yaml';
+import { UserStorySchema } from '../support/schema';
+import type { UserStory } from '../support/schema';
+import { runSetupSteps, runAssertionSteps } from '../support/steps';
+
+function loadAndRun(yamlContent: string) {
+  const docs = yaml.loadAll(yamlContent) as UserStory[];
+  for (const doc of docs) {
+    if (!doc || !doc.id) continue;
+    const story = UserStorySchema.parse(doc);
+    const describeFn = story.skip ? describe.skip : story.only ? describe.only : describe;
+    describeFn(`${story.id}: ${story.title}`, () => {
+      for (const ac of story.acceptance_criteria) {
+        const itFn = ac.skip ? it.skip : ac.only ? it.only : it;
+        itFn(`${ac.id}: ${ac.title}`, () => {
+          if (ac.given) runSetupSteps(ac.given);
+          if (ac.when) runSetupSteps(ac.when);
+          if (ac.then) runAssertionSteps(ac.then);
+        });
+      }
+    });
+  }
+}
+
+// Embed stories as YAML string literals, separated by ---
+const contentStories = `
+id: US-101
+title: Story title here
+acceptance_criteria:
+  - id: AC-101-1
+    title: Criterion title
+    given:
+      - visit: '/'
+    when: []
+    then:
+      - shouldExist: { selector: '[data-test=element]' }
+`;
+loadAndRun(contentStories);
+```
+
+**Key rules for test files:**
+- One test file per phase or logical group (e.g., `mvp.cy.ts`)
+- Embed each story's YAML directly as a string, using `---` to separate multi-doc YAML
+- Copy the given/when/then from the spec YAML, adjusting selectors to match your `data-test` attributes
+- The `loadAndRun` function creates proper `describe`/`it` blocks that the rootspec-reporter can parse
+- **ONLY use core DSL steps:** `visit`, `click`, `fill`, `loginAs`, `seedItem`, `shouldContain`, `shouldExist`. Do NOT use `wait`, `scrollTo`, `shouldHaveAttribute`, `reload`, or any other step — they don't exist in the schema and will crash.
+- **NEVER rewrite or shrink the test file during debugging.** Only append new stories or edit specific YAML strings. If you rewrite the file, you lose all existing passing stories.
+- **NEVER create additional test files** (no `debug.cy.ts`, `targeted.cy.ts`, etc.). All tests go in the single test file.
+
+### For each story:
+
+#### 3a. Build (1-2 turns)
+
+Do not re-read YAML, conventions, or fragments. Use the context from Step 1.
 
 **Check the `@phase` annotation.** If `@phase: baseline`, this story describes existing functionality — the code already works. For baseline stories:
 - DO NOT implement application code. The feature exists.
 - Only write or verify the Cypress test.
 - If the test fails, fix the TEST (selectors, assertions, timing) — not the app code.
 - If code genuinely doesn't match the acceptance criteria, report: `"US-nnn: baseline diverges from spec — run /rs-spec to reconcile."` and move to the next story.
-- After writing/verifying the test, go directly to 3b.
 
-For non-baseline stories, follow the decision tree from the test DSL reference you read in Step 1:
+For non-baseline stories, in ONE write turn per story:
+- Create/modify all application files (routes, components, pages, styles)
+- Add the story's YAML to the test file (append to the existing test file)
+- Use `data-test` attributes matching acceptance criteria selectors
+- Follow conventions from Step 1
 
-1. **Does the DSL step exist?** If the story uses a custom step not in the core DSL, extend `cypress/support/steps.ts` and `cypress/support/schema.ts`.
-2. **Does the app feature exist?** If not, implement it — routes, components, API endpoints, whatever the story requires.
-3. **Does the test data exist?** If the story uses `seedItem` or `loginAs`, ensure the corresponding Cypress tasks exist.
+**Batch implementation example:** If implementing US-101 (hero), US-102 (meta banner), and US-103 (problem section) — write ALL their components, update the page layout, AND add all three story YAMLs to the test file in 3 write turns. Then run tests ONCE for the whole batch.
 
-### 3b. Test
+#### 3b. Test (1 turn per batch)
 
-Run the test for this specific story using the test command you resolved in Step 1.
+Run the test suite:
 
-The RootSpec Cypress plugin (`rootspec-reporter`) automatically updates `rootspec/tests-status.json` after every run — you don't need to parse results or call any scripts manually.
+```bash
+npx cypress run 2>&1 | tail -20; cat rootspec/tests-status.json
+```
 
-If the test fails, fix the issue and re-run. **Max 3 test-fix cycles per story.** After 3 failed attempts, record FAIL and move on.
+The rootspec-reporter automatically updates `tests-status.json`. The `cat` shows pass/fail state.
 
-### 3c. Report and continue
+#### 3c. Fix if needed (0-1 turns)
 
-After each story:
-- Pass: `"US-101: PASS (3/12 stories complete)"`
+If tests fail, fix in ONE turn using Edit (not Write) on the specific lines that need changing. Max 2 test-fix cycles per story. After 2 failed attempts, record FAIL and move on — do NOT keep retrying.
+
+**Common fixes:**
+- Wrong selector → update the `data-test` attribute in the component
+- Element not found → check if the component is rendered and the selector matches
+- Zod validation error → you used a DSL step that doesn't exist (only use core steps)
+
+**NEVER do these when fixing:**
+- Rewrite the entire test file (you'll lose passing stories)
+- Create a separate debug/targeted test file
+- Add `wait` or `timeout` steps (not in the DSL)
+- Remove stories from the test file
+
+#### 3d. Report and continue
+
+After each story or batch:
+- Pass: `"US-101: PASS (3/10 stories complete)"`
 - Fail: `"US-101: FAIL — [reason]. Moving to next story."`
 
-Loop to the next story. If all target stories pass, or iteration cap is reached, go to Step 4.
+When all target stories pass, or iteration cap reached, go to Step 4.
 
-## Step 4: Summary, conventions update, and commit
+## Step 4: Summary and commit (budget: 2-3 turns)
 
-### Update conventions (batched)
+### Update conventions (1 turn)
 
-Check if the implementation introduced or changed anything documented in `rootspec/CONVENTIONS/`. Update conventions docs to reflect what you actually built:
+Check if the implementation introduced or changed anything documented in `rootspec/CONVENTIONS/`. Update conventions docs to reflect what you actually built — new dependencies, patterns, colors, fonts. Only update entries that actually changed. Match the format: `## Heading` sections with `- **Label:** value` entries.
 
-- **New dependency** added to `package.json` → update Stack or relevant category in `technical.md`
-- **New file pattern** or directory → update Code Patterns in `technical.md`
-- **New or changed API approach** → update API in `technical.md`
-- **New component library, color, font, spacing** → update the relevant section in `visual.md`
-- **Code didn't match existing conventions** → update the conventions entry to match reality
+### Commit and report (1-2 turns)
 
-Match the existing format exactly: `## Heading` sections with `- **Label:** value` entries. Only update entries that actually changed — don't rewrite the whole file.
-
-### Report
-
-```
-Implementation complete.
-
-PASS: 10 stories
-FAIL: 2 stories
-
-Passing:
-  US-101, US-102, US-103, ...
-
-Failing:
-  US-108: AC-108-2 — element [data-test=feedback] not found
-  US-112: AC-112-1 — timeout on /api/tasks
+```bash
+COMPLETED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 ```
 
 **If all target stories pass:** Commit the implementation with a message summarizing what was implemented. Then suggest `/rs-validate` for a full report.
@@ -164,11 +218,23 @@ Failing:
 **Record stats:**
 
 ```bash
-COMPLETED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-bash "$(dirname "$0")/../rs-shared/scripts/write-stats.sh" rootspec/stats.json rs-impl "$STARTED_AT" "$COMPLETED_AT" <iteration-count> '<stories-json>'
+bash "$SHARED_DIR/scripts/write-stats.sh" rootspec/stats.json rs-impl "$STARTED_AT" "$COMPLETED_AT" <iteration-count> '<stories-json>'
 ```
 
-Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":{"attempts":5}}` tracking how many test cycles each story took.
+Where `<stories-json>` is a JSON object like `{"US-101":{"attempts":2},"US-102":{"attempts":1}}` tracking how many test cycles each story took.
+
+### Report
+
+```
+Implementation complete.
+
+PASS: N stories
+FAIL: M stories
+
+Passing: US-101, US-102, ...
+Failing:
+  US-108: AC-108-2 — [reason]
+```
 
 ## Focus
 

@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.4
+
+Summary: rs-impl turn efficiency — 70 turns down to 35 with new batching scripts
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — skill improvements and new scripts take effect immediately
+
 ## 7.0.3
 
 Summary: Fix rootspec-reporter for nested test describes, rs-validate fallback

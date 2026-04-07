@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.4] - 2026-04-07
+
+### Added
+
+- **assess.sh**: New script that batches all rs-impl context reading (spec scan, project scan, status files, YAML stories, conventions, fragments) into a single call, replacing ~12 individual file reads.
+- **scaffold-cypress.sh**: New script that creates all Cypress infrastructure files (config, support files, DSL steps, schema, reporter) in a single call, replacing ~8 individual file writes. Auto-detects baseUrl from framework config and installs missing dependencies.
+
+### Fixed
+
+- **rs-impl turn efficiency**: Reduced from ~70 turns to ~35 turns for a 12-story project. New scripts batch reads and writes. SKILL.md now prescribes the correct test pattern (embedded YAML + `loadAndRun()`), bans `cy.readFile()` outside tests, bans non-existent DSL steps (`wait`, `scrollTo`, `shouldHaveAttribute`), bans debug test file creation, and enforces batch test runs (after 3+ stories, not per-story).
+
 ## [7.0.3] - 2026-04-06
 
 ### Fixed
