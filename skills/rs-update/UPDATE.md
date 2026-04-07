@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.5
+
+Summary: Deterministic scripts for test files, conventions, and reporting; L4 system file fix; write batching
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — new scripts and skill improvements take effect immediately
+
 ## 7.0.4
 
 Summary: rs-impl turn efficiency — 70 turns down to 35 with new batching scripts

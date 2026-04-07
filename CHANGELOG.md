@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.5] - 2026-04-07
+
+### Added
+
+- **generate-test-file.sh**: Builds Cypress test file from spec YAML with `loadAndRun()` pattern. Handles both multi-doc and array YAML formats. Strips non-core DSL steps automatically. Append-only — never loses existing stories.
+- **init-conventions.sh**: Extracts technical and visual conventions from package.json, tsconfig, Tailwind config, and source code.
+- **generate-test-report.sh**: Parses tests-status.json into formatted pass/fail/not-tested report. Prevents self-assessment inflation by making reporting deterministic.
+- **validate-spec.sh**: Runs all 6 spec validation checks (hierarchy, numerics, duplicate IDs, pillar quality, tradeoffs, coverage) in one call.
+
+### Fixed
+
+- **rs-spec L4 system files**: Now explicitly creates individual system docs for each system in SYSTEMS_OVERVIEW.md. Previously only wrote the overview, leaving individual system files deleted.
+- **rs-impl write batching**: Added explicit batch planning instructions with concrete examples — group components by page for parallel writes, aim for 4-6 write turns total.
+- **rs-impl test-verified reporting**: Report now uses `generate-test-report.sh` instead of self-assessment. Stories without test entries reported as "not tested."
+- **rs-spec non-interactive reads**: Explicit skip of interview fragments in non-interactive mode.
+- **rs-impl turn budgets**: Reframed as efficiency guidance (~3 turns/story) rather than hard caps.
+
 ## [7.0.4] - 2026-04-07
 
 ### Added
