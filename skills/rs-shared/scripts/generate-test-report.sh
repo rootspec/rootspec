@@ -72,7 +72,7 @@ if [[ -n "$SPEC_DIR" ]]; then
   STORIES_DIR="$SPEC_DIR/05.IMPLEMENTATION/USER_STORIES"
   if [[ -d "$STORIES_DIR" ]]; then
     # Get all story IDs from spec YAML files
-    SPEC_IDS=$(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | xargs grep -hE '^id: (US-[0-9]+)' 2>/dev/null | sed 's/id: //' | sort -u)
+    SPEC_IDS=$(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | xargs grep -hE '^\s*-?\s*id:\s*(US-[0-9]+)' 2>/dev/null | grep -oE 'US-[0-9]+' | sort -u)
     # Get all story IDs from tests-status.json
     TESTED_IDS=$(echo "$PARSED" | node -e "
       const d=JSON.parse(require('fs').readFileSync(0,'utf8'));

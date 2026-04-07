@@ -2,14 +2,11 @@
 # generate-test-file.sh — Build a Cypress test file from spec YAML stories
 # Usage: bash generate-test-file.sh <spec-dir> <output-path> [phase-filter]
 #
-# Reads multi-doc YAML story files, embeds them as string literals in a
-# Cypress test file using the loadAndRun() pattern.
+# Reads YAML story files (multi-doc or array format), embeds them as string
+# literals in a Cypress test file using the loadAndRun() pattern.
 #
 # If output file already exists, appends only NEW stories (by ID).
-# Never overwrites or removes existing stories from the test file.
-#
-# Stories without DSL-format given/when/then (prose format) are skipped
-# with a warning.
+# Strips narrative fields and non-core DSL steps from embedded YAML.
 
 set -euo pipefail
 
@@ -24,126 +21,177 @@ if [[ ! -d "$STORIES_DIR" ]]; then
   exit 1
 fi
 
-# Collect YAML files — filter by phase if provided
-yaml_files=()
-if [[ -n "$PHASE" ]]; then
-  PHASE_DIR="$STORIES_DIR/by_phase/$PHASE"
-  if [[ -d "$PHASE_DIR" ]]; then
-    while IFS= read -r f; do yaml_files+=("$f"); done < <(find "$PHASE_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
-  else
-    # Try case-insensitive match
-    while IFS= read -r f; do yaml_files+=("$f"); done < <(find "$STORIES_DIR/by_phase" -maxdepth 1 -iname "$PHASE" -type d 2>/dev/null | head -1 | xargs -I{} find {} \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
-  fi
-else
-  # Use by_phase view to avoid duplicates; fall back to all
-  PHASE_DIR="$STORIES_DIR/by_phase"
-  if [[ -d "$PHASE_DIR" ]]; then
-    while IFS= read -r f; do yaml_files+=("$f"); done < <(find "$PHASE_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
-  else
-    while IFS= read -r f; do yaml_files+=("$f"); done < <(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
-  fi
-fi
-
-if [[ ${#yaml_files[@]} -eq 0 ]]; then
-  echo "ERROR: No YAML files found" >&2
+# Require node and js-yaml
+if ! command -v node &>/dev/null; then
+  echo "ERROR: node is required" >&2
   exit 1
 fi
 
-# Find existing story IDs if output file exists
-existing_ids=()
-if [[ -f "$OUTPUT" ]]; then
-  while IFS= read -r id; do
-    existing_ids+=("$id")
-  done < <(grep -oE 'US-[0-9]+' "$OUTPUT" | sort -u)
+# Find YAML files
+YAML_FILES=()
+if [[ -n "$PHASE" ]]; then
+  PHASE_DIR="$STORIES_DIR/by_phase/$PHASE"
+  if [[ -d "$PHASE_DIR" ]]; then
+    while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$PHASE_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
+  fi
 fi
 
-is_existing() {
-  local id="$1"
-  for eid in "${existing_ids[@]+"${existing_ids[@]}"}"; do
-    [[ "$eid" == "$id" ]] && return 0
-  done
-  return 1
-}
-
-# Extract individual story documents from multi-doc YAML
-# Each doc is separated by --- on its own line
-extract_stories() {
-  local file="$1"
-  local current=""
-  local in_story=false
-
-  while IFS= read -r line || [[ -n "$line" ]]; do
-    # Skip comment-only lines at the top of a document
-    if [[ "$in_story" == false ]] && [[ "$line" =~ ^#.* ]]; then
-      continue
-    fi
-
-    if [[ "$line" == "---" ]]; then
-      if [[ -n "$current" ]]; then
-        echo "===STORY_BOUNDARY==="
-        echo "$current"
-      fi
-      current=""
-      in_story=false
-      continue
-    fi
-
-    # Check if this line starts a story (has id: field)
-    if [[ "$line" =~ ^id:\ * ]]; then
-      in_story=true
-    fi
-
-    if [[ "$in_story" == true ]]; then
-      current+="$line"$'\n'
-    fi
-  done < "$file"
-
-  # Emit last story
-  if [[ -n "$current" ]]; then
-    echo "===STORY_BOUNDARY==="
-    echo "$current"
+# Fallback: by_phase (any), then root stories dir
+if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
+  if [[ -d "$STORIES_DIR/by_phase" ]]; then
+    while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR/by_phase" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
   fi
-}
+fi
+if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
+  while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
+fi
+if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
+  # Deep search
+  while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort -u)
+fi
 
-# Check if a story has DSL-format given/when/then (arrays with step objects)
-has_dsl_steps() {
-  local story="$1"
-  # DSL format has lines like "      - visit:" or "      - shouldExist:" under given/when/then
-  echo "$story" | grep -qE '^\s+- (visit|click|fill|loginAs|seedItem|shouldContain|shouldExist):' 2>/dev/null
-}
+if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
+  echo "ERROR: No YAML files found in $STORIES_DIR" >&2
+  exit 1
+fi
 
-# Strip narrative fields from story YAML (saves space, not needed for tests)
-strip_narratives() {
-  local story="$1"
-  # narrative: is followed by a | block with indented lines
-  # Remove the narrative: line and all subsequent lines that are more indented than
-  # the next sibling field (given:/when:/then:/id:/title:)
-  echo "$story" | awk '
-    /^[[:space:]]+narrative:/ {
-      # Record indentation level of narrative field
-      match($0, /^[[:space:]]+/)
-      narr_indent = RLENGTH
-      in_narrative = 1
-      next
+# Collect existing story IDs from output file
+EXISTING_IDS=""
+if [[ -f "$OUTPUT" ]]; then
+  EXISTING_IDS=$(grep -oE 'US-[0-9]+' "$OUTPUT" 2>/dev/null | sort -u | tr '\n' ',' || true)
+fi
+
+# Use node to parse YAML, extract stories, clean them, and output TypeScript
+FILE_LIST=$(printf '%s\n' "${YAML_FILES[@]}")
+RESULT=$(node -e "
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+const CORE_SETUP_STEPS = new Set(['visit', 'click', 'fill', 'loginAs', 'seedItem']);
+const CORE_ASSERT_STEPS = new Set(['shouldContain', 'shouldExist']);
+const ALL_CORE = new Set([...CORE_SETUP_STEPS, ...CORE_ASSERT_STEPS]);
+
+const existingIds = new Set('${EXISTING_IDS}'.split(',').filter(Boolean));
+const files = \`${FILE_LIST}\`.trim().split('\n').filter(Boolean);
+
+let added = 0, skipped = 0, warnings = [];
+const storyBlocks = [];
+
+for (const file of files) {
+  let content;
+  try { content = fs.readFileSync(file, 'utf8'); } catch { continue; }
+
+  // Parse multi-doc YAML
+  let docs;
+  try { docs = yaml.loadAll(content); } catch { continue; }
+
+  for (const doc of docs) {
+    if (!doc) continue;
+
+    // Handle both formats: direct story object or array of stories
+    const stories = Array.isArray(doc) ? doc : (doc.id ? [doc] : (Array.isArray(doc.stories) ? doc.stories : []));
+
+    for (const story of stories) {
+      if (!story || !story.id || !story.acceptance_criteria) continue;
+      if (existingIds.has(story.id)) continue;
+
+      // Check for DSL format and filter to core steps only
+      let hasDslSteps = false;
+      const cleanedAC = [];
+
+      for (const ac of story.acceptance_criteria) {
+        const cleanAc = { id: ac.id, title: ac.title };
+
+        // Clean given/when/then — keep only core DSL steps
+        for (const phase of ['given', 'when', 'then']) {
+          if (Array.isArray(ac[phase])) {
+            const filtered = ac[phase].filter(step => {
+              if (typeof step !== 'object') return false;
+              const key = Object.keys(step)[0];
+              if (ALL_CORE.has(key)) { hasDslSteps = true; return true; }
+              warnings.push(story.id + ': stripped non-core step \"' + key + '\"');
+              return false;
+            });
+            if (filtered.length > 0) cleanAc[phase] = filtered;
+          }
+        }
+
+        // Ensure at least empty arrays
+        if (!cleanAc.given) cleanAc.given = [{ visit: '/' }];
+        if (!cleanAc.when) cleanAc.when = [];
+        if (!cleanAc.then) cleanAc.then = [];
+
+        cleanedAC.push(cleanAc);
+      }
+
+      if (!hasDslSteps) {
+        warnings.push(story.id + ': no core DSL steps found — skipping');
+        skipped++;
+        continue;
+      }
+
+      // Build clean YAML for this story
+      const cleanStory = {
+        id: story.id,
+        title: story.title,
+        acceptance_criteria: cleanedAC
+      };
+
+      const yamlStr = yaml.dump(cleanStory, { lineWidth: -1, noRefs: true, quotingType: \"'\" });
+      const varName = 'stories_' + story.id.replace('US-', '').replace(/-/g, '_');
+
+      storyBlocks.push({
+        id: story.id,
+        title: story.title,
+        varName,
+        yaml: yamlStr
+      });
+
+      existingIds.add(story.id);
+      added++;
     }
-    in_narrative {
-      # Stay in narrative if line is blank or more indented than narrative field
-      if (/^[[:space:]]*$/) next
-      match($0, /^[[:space:]]*/)
-      if (RLENGTH > narr_indent) next
-      in_narrative = 0
-    }
-    !in_narrative { print }
-  '
+  }
 }
 
-# Make a valid JS variable name from story ID
-to_var_name() {
-  local id="$1"
-  echo "$id" | sed 's/US-/stories_/' | sed 's/-/_/g'
-}
+// Output as JSON for bash to consume
+console.log(JSON.stringify({ added, skipped, warnings, storyBlocks }));
+" 2>&1)
 
-# Build the test file content
+# Check for node errors
+if [[ $? -ne 0 ]]; then
+  echo "ERROR: node processing failed: $RESULT" >&2
+  exit 1
+fi
+
+ADDED=$(echo "$RESULT" | node -e "const d=JSON.parse(require('fs').readFileSync(0,'utf8')); console.log(d.added)")
+SKIPPED=$(echo "$RESULT" | node -e "const d=JSON.parse(require('fs').readFileSync(0,'utf8')); console.log(d.skipped)")
+
+# Print warnings
+echo "$RESULT" | node -e "
+  const d=JSON.parse(require('fs').readFileSync(0,'utf8'));
+  for (const w of d.warnings) console.error('WARNING: ' + w);
+" 2>&1 >&2 || true
+
+if [[ "$ADDED" -eq 0 ]]; then
+  echo "No new stories to add ($SKIPPED skipped)"
+  exit 0
+fi
+
+# Build TypeScript content from story blocks
+TS_CONTENT=$(echo "$RESULT" | node -e "
+  const d=JSON.parse(require('fs').readFileSync(0,'utf8'));
+  const lines = [];
+  for (const s of d.storyBlocks) {
+    lines.push('');
+    lines.push('// ' + s.id + ': ' + s.title);
+    lines.push('const ' + s.varName + ' = \`');
+    lines.push(s.yaml.trimEnd());
+    lines.push('\`;');
+    lines.push('loadAndRun(' + s.varName + ');');
+  }
+  console.log(lines.join('\n'));
+")
+
 HEADER='import * as yaml from '"'"'js-yaml'"'"';
 import { UserStorySchema } from '"'"'../support/schema'"'"';
 import type { UserStory } from '"'"'../support/schema'"'"';
@@ -168,94 +216,11 @@ function loadAndRun(yamlContent: string) {
   }
 }'
 
-# Collect new stories to add
-new_stories=""
-skipped=0
-added=0
-
-for yaml_file in "${yaml_files[@]}"; do
-  # Process each story document in the file
-  current_story=""
-  while IFS= read -r line; do
-    if [[ "$line" == "===STORY_BOUNDARY===" ]]; then
-      if [[ -n "$current_story" ]]; then
-        # Extract story ID
-        story_id=$(echo "$current_story" | grep -oE '^id: (US-[0-9]+)' | head -1 | sed 's/id: //')
-
-        if [[ -z "$story_id" ]]; then
-          continue
-        fi
-
-        # Skip if already in test file
-        if is_existing "$story_id"; then
-          continue
-        fi
-
-        # Check for DSL format
-        if ! has_dsl_steps "$current_story"; then
-          echo "WARNING: $story_id has prose-format given/when/then — skipping (needs manual test)" >&2
-          skipped=$((skipped + 1))
-          current_story=""
-          continue
-        fi
-
-        # Strip narratives and add
-        cleaned=$(strip_narratives "$current_story")
-        var_name=$(to_var_name "$story_id")
-        story_title=$(echo "$current_story" | grep -E '^title:' | head -1 | sed 's/title: //')
-
-        new_stories+="
-// $story_id: $story_title
-const $var_name = \`
-$cleaned\`;
-loadAndRun($var_name);
-"
-        added=$((added + 1))
-      fi
-      current_story=""
-    else
-      current_story+="$line"$'\n'
-    fi
-  done < <(extract_stories "$yaml_file")
-
-  # Handle last story
-  if [[ -n "$current_story" ]]; then
-    story_id=$(echo "$current_story" | grep -oE '^id: (US-[0-9]+)' | head -1 | sed 's/id: //')
-    if [[ -n "$story_id" ]] && ! is_existing "$story_id"; then
-      if has_dsl_steps "$current_story"; then
-        cleaned=$(strip_narratives "$current_story")
-        var_name=$(to_var_name "$story_id")
-        story_title=$(echo "$current_story" | grep -E '^title:' | head -1 | sed 's/title: //')
-        new_stories+="
-// $story_id: $story_title
-const $var_name = \`
-$cleaned\`;
-loadAndRun($var_name);
-"
-        added=$((added + 1))
-      else
-        echo "WARNING: $story_id has prose-format given/when/then — skipping" >&2
-        skipped=$((skipped + 1))
-      fi
-    fi
-  fi
-done
-
-# Write output
 if [[ -f "$OUTPUT" ]]; then
-  # Append new stories to existing file
-  if [[ -n "$new_stories" ]]; then
-    echo "$new_stories" >> "$OUTPUT"
-    echo "Appended $added new stories to $OUTPUT ($skipped skipped)"
-  else
-    echo "No new stories to add ($skipped skipped)"
-  fi
+  echo "$TS_CONTENT" >> "$OUTPUT"
+  echo "Appended $ADDED new stories to $OUTPUT ($SKIPPED skipped)"
 else
-  # Create new file with header + stories
   mkdir -p "$(dirname "$OUTPUT")"
-  {
-    echo "$HEADER"
-    echo "$new_stories"
-  } > "$OUTPUT"
-  echo "Created $OUTPUT with $added stories ($skipped skipped)"
+  printf '%s\n%s\n' "$HEADER" "$TS_CONTENT" > "$OUTPUT"
+  echo "Created $OUTPUT with $ADDED stories ($SKIPPED skipped)"
 fi
