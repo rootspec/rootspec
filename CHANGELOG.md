@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.7] - 2026-04-07
+
+### Fixed
+
+- **rs-impl TDD loop**: Replaced "batch aggressively" with structured cycle: build batch → test targeted → test all → fix regressions. Prevents global regressions (e.g., 10 pass → 0 pass from a broken framework config) from going undetected.
+
 ## [7.0.6] - 2026-04-07
 
 ### Fixed

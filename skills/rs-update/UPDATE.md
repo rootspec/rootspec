@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.7
+
+Summary: rs-impl TDD loop with regression detection
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None
+
 ## 7.0.6
 
 Summary: rs-init handles missing package.json in non-interactive mode
