@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.9] - 2026-04-08
+
+### Fixed
+
+- **package.json bloat**: Added explicit rule to rs-init and rs-impl: never write dependencies/devDependencies directly — always use `npm install`. Prevents agent from listing all transitive deps (460 entries instead of ~10).
+
 ## [7.0.8] - 2026-04-07
 
 ### Added

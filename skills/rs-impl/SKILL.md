@@ -74,6 +74,8 @@ This creates the test file with all stories embedded as YAML string literals usi
 
 Write all customizations in a single multi-file operation.
 
+**Package.json rule:** NEVER write the `dependencies` or `devDependencies` sections of package.json directly. Use `npm install <pkg1> <pkg2> ...` to add packages — npm manages the dependency tree. You may edit the `scripts` section directly. When installing a framework, run a single `npm install` command with all needed packages (e.g., `npm install astro @astrojs/react react react-dom tailwindcss`).
+
 ### 2c. Conventions + dev server (combine into 1 turn)
 
 Start the dev server AND create conventions if needed in the same turn:

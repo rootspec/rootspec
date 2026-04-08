@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.9
+
+Summary: Fix package.json bloat — agent must use npm install, not write deps directly
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None
+
 ## 7.0.8
 
 Summary: Preflight script for rs-impl; YAML scanning dedup; DSL step constraint for rs-spec
