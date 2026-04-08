@@ -42,20 +42,26 @@ SPEC_DIR="${SPEC_DIR:-rootspec}"
 STORIES_DIR="$ROOT/$SPEC_DIR/05.IMPLEMENTATION/USER_STORIES"
 
 if [[ -d "$STORIES_DIR" ]]; then
-  # Use by_phase view to avoid duplicate reads (by_journey and by_system are symlinks/copies)
-  PHASE_DIR="$STORIES_DIR/by_phase"
-  if [[ -d "$PHASE_DIR" ]]; then
-    find "$PHASE_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort | while IFS= read -r f; do
+  # Search ALL story directories and dedup by story ID.
+  # Stories may exist in by_phase/, by_journey/, by_system/ — some dirs may be incomplete.
+  # Read every YAML file, extract story IDs, output each story only once.
+  SEEN_FILE=$(mktemp)
+  trap "rm -f $SEEN_FILE" EXIT
+  while IFS= read -r f; do
+    FILE_IDS=$(grep -oE '^\s*-?\s*id:\s*(US-[0-9]+)' "$f" 2>/dev/null | grep -oE 'US-[0-9]+' || true)
+    is_new=false
+    for fid in $FILE_IDS; do
+      if ! grep -qw "$fid" "$SEEN_FILE" 2>/dev/null; then
+        is_new=true
+        echo "$fid" >> "$SEEN_FILE"
+      fi
+    done
+    if $is_new || [[ -z "$FILE_IDS" ]]; then
       section "YAML:$(echo "$f" | sed "s|$ROOT/||")"
       cat "$f"
-    done
-  else
-    # Fallback: read all YAML files, dedup by content hash
-    find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort -u | while IFS= read -r f; do
-      section "YAML:$(echo "$f" | sed "s|$ROOT/||")"
-      cat "$f"
-    done
-  fi
+    fi
+  done < <(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
+  rm -f "$SEEN_FILE"
 fi
 
 # 7. Conventions docs

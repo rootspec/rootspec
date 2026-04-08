@@ -89,11 +89,27 @@ If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual
 
 **Per-story cap: 2 test-fix cycles.** If you're spending more than 5 turns on one story, record FAIL and move on.
 
-**Target pace: ~3 turns per story.** Implement as many stories as the spec requires — don't cut corners to save turns.
+**Target pace: ~3 turns per story.** Implement ALL stories the spec requires — don't stop early or reduce scope.
 
-### Before implementing: plan your write batches
+### Before implementing: preflight all stories
 
-Before writing any code, plan how to group files into turns using parallel Write calls:
+Run the preflight script to see exactly what needs to be built:
+
+```bash
+bash "$SHARED_DIR/scripts/preflight-story.sh" rootspec/05.IMPLEMENTATION/USER_STORIES .
+```
+
+This outputs:
+- `ROUTES_NEEDED` / `ROUTES_MISSING` — pages/routes to create
+- `SELECTORS_NEEDED` / `SELECTORS_MISSING` — `data-test` attributes to add
+- `CUSTOM_STEPS_NEEDED` / `CUSTOM_STEPS_MISSING` — DSL steps to implement in steps.ts
+- `TASKS_NEEDED` / `TASKS_MISSING` — Cypress tasks to implement in cypress.config.ts
+
+Use this to plan your work — you now know the full scope before writing a single line.
+
+### Plan your write batches
+
+Group files into turns using parallel Write calls:
 - **Page components:** Group components on the same page (e.g., Hero + MetaBanner + ProblemSection → 3 parallel Writes = 1 turn)
 - **Infrastructure:** Layout + global styles + Header + Footer → 1 turn
 - **Data/config:** All data files and configs → 1 turn
@@ -102,13 +118,19 @@ Before writing any code, plan how to group files into turns using parallel Write
 
 Aim for **4-6 write turns total** for all app code, not one file per turn.
 
-### Implementation loop: build → test targeted → test all
+### Implementation loop: plumbing → build → test targeted → test all
 
-Repeat this cycle for each batch of stories:
+#### Phase 0: Wire plumbing (before any app code)
+
+Handle mechanical wiring from the preflight output in ONE turn:
+- `CUSTOM_STEPS_MISSING` → extend `steps.ts` and `schema.ts`
+- `TASKS_MISSING` → add Cypress task implementations in `cypress.config.ts`
+
+This is mechanical — add the type, add the implementation skeleton. Do it once for all stories.
 
 #### Phase A: Build a batch
 
-Pick 2-4 related stories. Write all their code + test YAML in as few turns as possible using parallel Write calls.
+Pick 2-4 related stories. Write all their code + test YAML in as few turns as possible using parallel Write calls. Every `data-test` attribute in the preflight's `SELECTORS_NEEDED` list must appear in your component code.
 
 #### Phase B: Test targeted stories
 
@@ -118,7 +140,14 @@ Run tests for just the stories you implemented:
 npx cypress run --spec cypress/e2e/mvp.cy.ts 2>&1 | tail -20; cat rootspec/tests-status.json
 ```
 
-If targeted stories fail, fix in ONE turn. Max 2 fix cycles per batch. Then move on.
+If targeted stories fail, diagnose using the preflight output — don't guess:
+- **Selector not found** → check the exact `data-test=` attribute matches the preflight's `SELECTORS_NEEDED`
+- **Route 404** → check the page file path matches the preflight's `ROUTES_NEEDED`
+- **Task not found** → check `cypress.config.ts` has the task from `TASKS_NEEDED`
+- **Zod validation error** → you used a non-core DSL step
+- **Assertion value wrong** → this is actual feature logic — fix the app code
+
+Fix in ONE turn. Max 2 fix cycles per batch. Then move on.
 
 #### Phase C: Test ALL stories (regression check)
 
@@ -128,7 +157,7 @@ After the targeted tests pass (or you've moved on), run the full suite:
 npx cypress run 2>&1 | tail -20; cat rootspec/tests-status.json
 ```
 
-Compare against what was passing before this batch. **If previously passing stories now fail, that's a regression.** Fix the regression before implementing more stories — it's usually a config/build issue (e.g., missing framework integration), not a per-story bug.
+Compare against what was passing before this batch. **If previously passing stories now fail, that's a regression.** Fix the regression before implementing more stories.
 
 **Regression response:**
 - If all tests broke at once → build/config problem. Check framework config, imports, build errors. Fix the root cause.
@@ -213,10 +242,11 @@ For non-baseline stories, in ONE write turn per story:
 
 Fix in ONE turn using Edit on specific lines. Max 2 fix cycles per batch.
 
-**Common fixes:**
-- Wrong selector → update `data-test` in component
-- Element not found → check component renders and selector matches
-- Zod validation error → you used a non-core DSL step
+If you're stuck, re-run preflight to verify plumbing is correct:
+```bash
+bash "$SHARED_DIR/scripts/preflight-story.sh" rootspec/05.IMPLEMENTATION/USER_STORIES .
+```
+If `SELECTORS_MISSING` or `ROUTES_MISSING` is non-empty, fix those first — the test can't pass without them.
 
 **NEVER do these:**
 - Rewrite the entire test file (you'll lose passing stories)

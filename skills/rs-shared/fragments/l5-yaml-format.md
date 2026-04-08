@@ -60,6 +60,23 @@ acceptance_criteria:
       - shouldExist: { selector: '[data-test=feedback-animation]' }
 ```
 
+## Core DSL Steps (use ONLY these)
+
+The `given`/`when`/`then` arrays in acceptance criteria use a fixed DSL. Only use these steps — anything else will fail Zod validation at test time and be stripped by tooling.
+
+**Setup steps (given / when):**
+- `visit: '/path'` — navigate to a page
+- `click: { selector: '[data-test=btn]' }` — click an element
+- `fill: { selector: '[data-test=input]', value: 'text' }` — type into an input
+- `loginAs: 'role'` — authenticate as a user role (requires Cypress task)
+- `seedItem: { slug: 'id', status: 'active' }` — create test data (requires Cypress task)
+
+**Assertion steps (then):**
+- `shouldContain: { selector: '[data-test=el]', text: 'expected' }` — verify text content
+- `shouldExist: { selector: '[data-test=el]' }` — verify element exists
+
+**Do NOT use:** `scrollTo`, `shouldNavigateToUrl`, `shouldHaveAttribute`, `wait`, `reload`, `hover`, `dragTo`, or any other step name. These do not exist in the schema. If a behavior can't be tested with the core steps above, simplify the acceptance criterion to use `shouldExist` or `shouldContain` on the observable result.
+
 ## YAML Syntax Rules
 
 **Multi-line text** — use pipe operator (`|`):

@@ -27,27 +27,33 @@ if ! command -v node &>/dev/null; then
   exit 1
 fi
 
-# Find YAML files
+# Find YAML files — search ALL directories, dedup by story ID in node
+# If a phase filter is given, prefer by_phase/$PHASE but also search everywhere
 YAML_FILES=()
 if [[ -n "$PHASE" ]]; then
+  # Phase-specific: search by_phase/$PHASE first, then all dirs for that phase annotation
   PHASE_DIR="$STORIES_DIR/by_phase/$PHASE"
   if [[ -d "$PHASE_DIR" ]]; then
     while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$PHASE_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
   fi
+  # Also search all other dirs for stories tagged with this phase (catches incomplete by_phase/)
+  while IFS= read -r f; do
+    # Skip files already found in by_phase
+    already=false
+    for existing in "${YAML_FILES[@]}"; do
+      [[ "$f" == "$existing" ]] && already=true && break
+    done
+    $already && continue
+    # Check if file has the phase annotation
+    if grep -qi "@phase:.*${PHASE}" "$f" 2>/dev/null; then
+      YAML_FILES+=("$f")
+    fi
+  done < <(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
 fi
 
-# Fallback: by_phase (any), then root stories dir
+# No phase filter or no results: search everything
 if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
-  if [[ -d "$STORIES_DIR/by_phase" ]]; then
-    while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR/by_phase" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
-  fi
-fi
-if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
-  while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
-fi
-if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
-  # Deep search
-  while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort -u)
+  while IFS= read -r f; do YAML_FILES+=("$f"); done < <(find "$STORIES_DIR" \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | sort)
 fi
 
 if [[ ${#YAML_FILES[@]} -eq 0 ]]; then

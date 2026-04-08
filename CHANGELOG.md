@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.8] - 2026-04-07
+
+### Added
+
+- **preflight-story.sh**: Extracts routes, selectors, DSL steps, and Cypress tasks from YAML stories and cross-references against project source. Outputs structured checklist of what exists vs. what's missing — eliminates guesswork before writing code.
+
+### Fixed
+
+- **rs-impl preflight-first workflow**: Restructured implementation loop to run preflight before writing code. Agent now knows exact routes, selectors, and plumbing needed upfront instead of discovering them from test failures.
+- **YAML scanning dedup**: assess.sh and generate-test-file.sh now search ALL story directories (by_phase, by_journey, by_system) and deduplicate by story ID. Previously only searched by_phase/ and stopped — missed stories in other directories.
+- **rs-spec DSL step constraint**: l5-yaml-format.md now explicitly lists valid DSL steps and bans non-core steps (scrollTo, shouldNavigateToUrl, shouldHaveAttribute). Prevents spec agent from creating untestable acceptance criteria.
+
 ## [7.0.7] - 2026-04-07
 
 ### Fixed
