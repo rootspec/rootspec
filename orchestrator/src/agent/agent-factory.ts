@@ -1,4 +1,5 @@
-import type { Phase, PhaseResult, Reporter, OrchestratorEvent } from "../types.js";
+import { spawn } from "node:child_process";
+import type { Phase, PhaseResult, Reporter } from "../types.js";
 import type { OrchestratorConfig } from "../config.js";
 import type { OrchestratorState } from "../types.js";
 import { buildPrompt } from "./prompt-builder.js";
@@ -17,6 +18,34 @@ export interface ExecutePhaseOptions {
   config: OrchestratorConfig;
   state: OrchestratorState;
   reporter: Reporter;
+}
+
+/**
+ * Spawn the Claude Code process in its own process group so that ALL
+ * descendant processes (dev servers, Cypress, etc.) can be killed
+ * reliably by sending a signal to the group leader.
+ *
+ * Returns the ChildProcess (which satisfies SpawnedProcess) and the PGID.
+ */
+function spawnInProcessGroup(options: {
+  command: string;
+  args: string[];
+  cwd?: string;
+  env: Record<string, string | undefined>;
+  signal: AbortSignal;
+}) {
+  const child = spawn(options.command, options.args, {
+    cwd: options.cwd,
+    env: options.env as NodeJS.ProcessEnv,
+    stdio: ["pipe", "pipe", "pipe"],
+    detached: true, // Creates a new process group; child.pid === PGID
+  });
+
+  return {
+    // ChildProcess satisfies SpawnedProcess per the SDK docs
+    process: child,
+    pgid: child.pid,
+  };
 }
 
 export async function executePhase(
@@ -63,6 +92,9 @@ export async function executePhase(
   let resultStatus: PhaseResult["status"] = "error";
   const errors: string[] = [];
 
+  // Track PGID so we can kill the entire process tree on cleanup
+  let pgid: number | undefined;
+
   try {
     const resumeId = state.attempt[phase] > 0 ? state.sessionIds[phase] : undefined;
 
@@ -83,6 +115,11 @@ export async function executePhase(
         },
         settingSources: ["project" as const],
         hooks,
+        spawnClaudeCodeProcess: (spawnOpts) => {
+          const result = spawnInProcessGroup(spawnOpts);
+          pgid = result.pgid;
+          return result.process;
+        },
         ...(resumeId ? { resume: resumeId } : {}),
       },
     });
@@ -143,6 +180,17 @@ export async function executePhase(
   } catch (err) {
     resultStatus = "error";
     errors.push(err instanceof Error ? err.message : String(err));
+  } finally {
+    // Kill the entire process group — dev servers, Cypress, everything.
+    // Because we spawned with detached: true, the PGID equals the
+    // Claude Code process PID. Negative signal targets the group.
+    if (pgid) {
+      try {
+        process.kill(-pgid, "SIGTERM");
+      } catch {
+        // Group already exited — normal for clean completions
+      }
+    }
   }
 
   const durationMs = Date.now() - startTime;

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Orchestrator spec gate**: Story count now searches USER_STORIES recursively — handles nested directory layouts (by_phase/, by_journey/, by_system/).
+- **Orchestrator process cleanup**: Dev server and Cypress processes are now killed after each phase ends — prevents orphaned processes accumulating across retries.
 
 ## [7.0.10] - 2026-04-08
 
