@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Agentic orchestrator** (`orchestrator/`): Claude Agent SDK pipeline that turns a SEED.md into a working, tested app. Wraps existing skills with quality gates, scope enforcement hooks, dynamic budget allocation, and session resumability. Init phase is programmatic (instant, $0); spec/impl/validate use Agent SDK. Tested end-to-end on greenfield demo — 7/7 stories passing from ~100-line SEED.md.
 
+### Fixed
+
+- **Orchestrator spec gate**: Story count now searches USER_STORIES recursively — handles nested directory layouts (by_phase/, by_journey/, by_system/).
+
 ## [7.0.10] - 2026-04-08
 
 ### Fixed

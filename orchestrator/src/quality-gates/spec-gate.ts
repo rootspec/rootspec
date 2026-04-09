@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { GateResult, GateCheck } from "../types.js";
@@ -54,23 +54,19 @@ export async function runSpecGate(
     message: systemsOverview ? "Found" : "Missing 04.SYSTEMS/SYSTEMS_OVERVIEW.md",
   });
 
-  // Check L5 user stories exist
+  // Check L5 user stories exist — search recursively since stories
+  // may be in subdirectories (by_phase/MVP/, by_journey/, etc.)
   const storiesDir = join(specDir, "05.IMPLEMENTATION", "USER_STORIES");
   let storyCount = 0;
   if (existsSync(storiesDir)) {
-    const files = readdirSync(storiesDir).filter(
-      (f) => f.endsWith(".yaml") || f.endsWith(".yml")
-    );
-    storyCount = files.length;
+    const yamlFiles = findYamlFilesRecursive(storiesDir);
 
-    // Count actual stories by scanning for "id: US-" patterns
-    let totalStories = 0;
-    for (const file of files) {
-      const content = readFileSync(join(storiesDir, file), "utf-8");
-      const matches = content.match(/^id:\s+US-/gm);
-      if (matches) totalStories += matches.length;
+    // Count actual stories by scanning for "id:" patterns
+    for (const file of yamlFiles) {
+      const content = readFileSync(file, "utf-8");
+      const matches = content.match(/^id:\s+\S+/gm);
+      if (matches) storyCount += matches.length;
     }
-    storyCount = totalStories;
   }
 
   const minStories = config.gates.spec.minStoryCount;
@@ -119,6 +115,19 @@ export async function runSpecGate(
     checks,
     action: passed ? "proceed" : attempt < maxRetries ? "retry" : "abort",
   };
+}
+
+function findYamlFilesRecursive(dir: string): string[] {
+  const results: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      results.push(...findYamlFilesRecursive(full));
+    } else if (entry.endsWith(".yaml") || entry.endsWith(".yml")) {
+      results.push(full);
+    }
+  }
+  return results;
 }
 
 function findValidateScript(config: OrchestratorConfig): string | null {
