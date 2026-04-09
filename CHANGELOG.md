@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.10] - 2026-04-08
+
+### Fixed
+
+- **rs-impl package.json hard rule**: Elevated package.json constraint to preamble-level hard rule and added to Scope section as CANNOT. Previous soft guidance (v7.0.9) was ignored by the agent.
+
 ## [7.0.9] - 2026-04-08
 
 ### Fixed

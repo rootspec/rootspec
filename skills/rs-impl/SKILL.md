@@ -11,6 +11,8 @@ This is a non-interactive skill. Do not ask the developer questions during imple
 
 **Turn efficiency:** Every tool call costs one turn. Be aggressive about batching file reads and writes. Target pace: ~3 turns per story (setup overhead amortized across all stories).
 
+**HARD RULE — package.json:** You MUST NOT write or modify the `dependencies` or `devDependencies` fields of package.json. EVER. Not when creating it, not when updating it, not when installing a framework. Use `npm install <pkg1> <pkg2> ...` to add packages — npm writes the deps. You may only edit the `scripts` field directly. If you need a framework, run one command: `npm install astro @astrojs/react react react-dom tailwindcss` (or equivalent). Never use the Write tool on dependencies.
+
 ## Step 1: Assess (~2 turns)
 
 Front-load ALL reading in a single script call. Find the scripts directory first — look for `.agents/skills/rs-shared/scripts/` relative to the project root, or search for `assess.sh` under the skills directory.
@@ -73,8 +75,6 @@ This creates the test file with all stories embedded as YAML string literals usi
 - Framework-specific `visit` behavior (e.g., hydration waits for React islands in Astro)
 
 Write all customizations in a single multi-file operation.
-
-**Package.json rule:** NEVER write the `dependencies` or `devDependencies` sections of package.json directly. Use `npm install <pkg1> <pkg2> ...` to add packages — npm manages the dependency tree. You may edit the `scripts` section directly. When installing a framework, run a single `npm install` command with all needed packages (e.g., `npm install astro @astrojs/react react react-dom tailwindcss`).
 
 ### 2c. Conventions + dev server (combine into 1 turn)
 
@@ -312,3 +312,4 @@ Arguments narrow what the skill works on:
 - **CAN write:** `rootspec/CONVENTIONS/` (technical.md, visual.md)
 - **CAN update:** `rootspec/tests-status.json`
 - **CANNOT write:** Any other file in `rootspec/` (spec files, spec-status.json, 00.AXIOMS.md, 00.FRAMEWORK.md)
+- **CANNOT write:** `dependencies` or `devDependencies` in package.json (use `npm install`)

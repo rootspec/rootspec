@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.0.10
+
+Summary: Stronger package.json hard rule in rs-impl preamble and Scope
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None
+
 ## 7.0.9
 
 Summary: Fix package.json bloat — agent must use npm install, not write deps directly
