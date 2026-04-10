@@ -86,5 +86,5 @@ export const DEFAULT_TURN_LIMITS: Record<Phase, number> = {
   spec: 50,
   impl: 100,
   validate: 25,
-  review: 30,
+  review: 50,
 };

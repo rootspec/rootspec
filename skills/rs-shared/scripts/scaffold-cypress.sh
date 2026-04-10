@@ -70,12 +70,39 @@ export default defineConfig({
 "
 
 # --- 2. cypress/support/e2e.ts ---
-write_if_missing "cypress/support/e2e.ts" "// Global test setup
+# The afterEach screenshot hook is critical for /rs-review.
+# If the impl agent creates e2e.ts before scaffold runs, the hook is missing.
+# Strategy: write full file if missing, or append hook if file exists without it.
+# The screenshot hook content — written via heredoc to avoid quoting hell
+SCREENSHOT_HOOK_FILE="$ROOT/cypress/support/screenshot-hook.ts"
+
+write_e2e_with_hook() {
+  local fullpath="$ROOT/cypress/support/e2e.ts"
+  if [[ -f "$fullpath" ]]; then
+    SKIPPED+=("cypress/support/e2e.ts")
+  else
+    mkdir -p "$(dirname "$fullpath")"
+    cat > "$fullpath" <<'EOTS'
+// Global test setup
 beforeEach(() => {
   cy.clearLocalStorage();
   cy.clearCookies();
 });
+EOTS
+    CREATED+=("cypress/support/e2e.ts")
+  fi
 
+  # Always ensure screenshot hook import is present
+  if ! grep -q "screenshot-hook" "$fullpath" 2>/dev/null; then
+    printf '\nimport "./screenshot-hook";\n' >> "$fullpath"
+  fi
+}
+
+# Write the screenshot hook as a separate file — immune to e2e.ts being
+# overwritten by the impl agent. Always overwrite to pick up changes.
+write_screenshot_hook() {
+  mkdir -p "$(dirname "$SCREENSHOT_HOOK_FILE")"
+  cat > "$SCREENSHOT_HOOK_FILE" <<'EOTS'
 // Capture a full-page screenshot after each passing criterion.
 // Screenshots land at cypress/screenshots/<spec>/US-101--AC-101-1.png
 // Used by /rs-review for visual quality inspection.
@@ -83,17 +110,21 @@ afterEach(function () {
   if (this.currentTest?.state === 'passed') {
     const titles: string[] = (this.currentTest as any).titlePath?.() ?? [];
     const joined = titles.join(' ');
-    const storyMatch = joined.match(/US-\\d+/);
-    const critMatch = joined.match(/AC-\\d+-\\d+/);
+    const storyMatch = joined.match(/US-\d+/);
+    const critMatch = joined.match(/AC-\d+-\d+/);
     if (storyMatch) {
       const name = critMatch
-        ? \`\${storyMatch[0]}--\${critMatch[0]}\`
+        ? `${storyMatch[0]}--${critMatch[0]}`
         : storyMatch[0];
       cy.screenshot(name, { capture: 'fullPage' });
     }
   }
 });
-"
+EOTS
+}
+
+write_e2e_with_hook
+write_screenshot_hook
 
 # --- 3. cypress/support/steps.ts ---
 write_if_missing "cypress/support/steps.ts" "import type { Step } from './schema';

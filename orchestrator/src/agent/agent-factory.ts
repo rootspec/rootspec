@@ -70,7 +70,12 @@ export async function executePhase(
   const phasePct = totalRemainingPct > 0
     ? config.budgetAllocation[phase] / totalRemainingPct
     : 1 / remainingPhases.length;
-  const phaseBudget = Math.max(remainingBudget * phasePct, 0.5);
+  // Clamp to remaining budget — proportional calc can over-allocate
+  // during review-fix retries when phases are already in completedPhases
+  const phaseBudget = Math.min(
+    Math.max(remainingBudget * phasePct, 0.5),
+    remainingBudget
+  );
   const maxTurns = config.turnLimits[phase];
 
   // Dynamic import to avoid issues if SDK not installed yet
@@ -182,14 +187,40 @@ export async function executePhase(
     resultStatus = "error";
     errors.push(err instanceof Error ? err.message : String(err));
   } finally {
-    // Kill the entire process group — dev servers, Cypress, everything.
-    // Because we spawned with detached: true, the PGID equals the
-    // Claude Code process PID. Negative signal targets the group.
+    // Kill the entire process tree spawned by this phase.
+    // detached: true creates a new session + process group (PGID = SID = child PID).
+    // SIGTERM to the group handles direct children. But Cypress/Electron
+    // apps may create their own process groups within the same session —
+    // SIGTERM to our group won't reach them. So we:
+    //   1. SIGTERM the process group (graceful)
+    //   2. Wait briefly for cleanup
+    //   3. SIGKILL the entire session (non-ignorable, catches escapees)
     if (pgid) {
       try {
         process.kill(-pgid, "SIGTERM");
       } catch {
         // Group already exited — normal for clean completions
+      }
+
+      // Give processes a moment for graceful shutdown, then force kill
+      // the entire session to catch Cypress/Electron child processes
+      // that created their own process groups.
+      // macOS pkill lacks -s (session), so query ps and kill individually.
+      await new Promise((r) => setTimeout(r, 2000));
+      try {
+        const { execSync } = await import("node:child_process");
+        const pids = execSync(
+          `ps -eo pid=,sess= | awk '$2 == ${pgid} {print $1}'`,
+          { timeout: 5000, encoding: "utf-8" }
+        ).trim();
+        if (pids) {
+          execSync(`kill -9 ${pids.split("\n").join(" ")}`, {
+            timeout: 5000,
+            stdio: "ignore",
+          });
+        }
+      } catch {
+        // No remaining processes in session — expected after clean exit
       }
     }
   }
