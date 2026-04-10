@@ -15,6 +15,13 @@ import {
   loadState,
   saveReport,
 } from "./agent/session-store.js";
+import {
+  existsSync,
+  writeFileSync,
+  readFileSync,
+  appendFileSync,
+} from "node:fs";
+import { join } from "node:path";
 
 export async function orchestrate(
   config: OrchestratorConfig,
@@ -420,10 +427,6 @@ async function bootstrap(
  * pick up framework changes.
  */
 function injectScreenshotHook(projectDir: string): void {
-  const { existsSync, mkdirSync, writeFileSync, readFileSync, appendFileSync } =
-    require("node:fs") as typeof import("node:fs");
-  const { join } = require("node:path") as typeof import("node:path");
-
   const supportDir = join(projectDir, "cypress", "support");
   if (!existsSync(supportDir)) return; // No Cypress setup — nothing to inject
 
