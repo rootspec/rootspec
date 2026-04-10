@@ -74,27 +74,11 @@ function phaseContext(
     lines.push("");
   }
 
-  // When impl re-runs after review found blockers, inject the review findings
+  // When impl re-runs after review found blockers, inject the review findings.
+  // This is handled specially in buildPrompt — we return early with a focused
+  // fix prompt instead of the full SKILL.md. Set a flag here for buildPrompt.
   if (phase === "impl" && state.gateResults.review && !state.gateResults.review.passed) {
-    lines.push("## Review Feedback — Fix These Issues");
-    lines.push("");
-    lines.push("The review phase found quality issues in your implementation.");
-    lines.push("Your job this cycle is to fix ONLY these issues — do NOT re-implement everything.");
-    lines.push("Make targeted fixes to the specific files and lines identified.");
-    lines.push("");
-    lines.push("Read `rootspec/review-status.json` for the full structured issue list.");
-    lines.push("Focus on issues with severity `blocker` — these must be fixed.");
-    lines.push("Warnings are nice-to-fix but not required.");
-    lines.push("");
-    lines.push("Common fix patterns:");
-    lines.push("- **placeholder_text**: Replace literal text with actual icons/symbols (→ not 'Next Arrow')");
-    lines.push("- **broken_links**: Fix URLs to match SEED.md or remove hallucinated links");
-    lines.push("- **impl_error**: Update copy to match what SEED.md/spec says");
-    lines.push("- **visual_quality**: Fix CSS/layout issues visible in screenshots");
-    lines.push("- **accessibility**: Add alt text, semantic HTML, ARIA labels");
-    lines.push("");
-    lines.push("After fixing, run the full test suite to confirm nothing broke.");
-    lines.push("");
+    lines.push("__REVIEW_FIX_MODE__");
   }
 
   if (phase === "review" && state.completedPhases.includes("validate")) {
@@ -117,13 +101,82 @@ You are running inside an automated orchestrator. No human is present.
 - If you encounter ambiguity, make your best judgment and proceed.
 `;
 
+function buildReviewFixPrompt(
+  config: OrchestratorConfig,
+  state: OrchestratorState
+): string {
+  const parts: string[] = [ORCHESTRATOR_PREAMBLE];
+
+  parts.push("## Review Fix Mode");
+  parts.push("");
+  parts.push("The review phase found quality issues. Your ONLY job is to fix these issues.");
+  parts.push("Do NOT re-assess stories, re-scaffold, or re-implement from scratch.");
+  parts.push("Make targeted edits to the specific files listed below, then run tests.");
+  parts.push("");
+
+  // Read review-status.json and inject blocker details directly
+  const reviewPath = join(config.projectDir, "rootspec", "review-status.json");
+  if (existsSync(reviewPath)) {
+    try {
+      const review = JSON.parse(readFileSync(reviewPath, "utf-8"));
+      const blockers = (review.issues ?? []).filter(
+        (i: Record<string, unknown>) => i.severity === "blocker"
+      );
+      const warnings = (review.issues ?? []).filter(
+        (i: Record<string, unknown>) => i.severity === "warning"
+      );
+
+      if (blockers.length > 0) {
+        parts.push("### BLOCKERS — Must Fix\n");
+        for (const b of blockers) {
+          parts.push(`**${b.id}** — ${b.description}`);
+          parts.push(`- File: \`${b.file}\` line ${b.line}`);
+          if (b.expected) parts.push(`- Expected: ${b.expected}`);
+          if (b.actual) parts.push(`- Actual: ${b.actual}`);
+          if (b.suggestion) parts.push(`- Fix: ${b.suggestion}`);
+          parts.push("");
+        }
+      }
+
+      if (warnings.length > 0) {
+        parts.push("### WARNINGS — Fix if time permits\n");
+        for (const w of warnings) {
+          parts.push(`**${w.id}** — ${w.description}`);
+          parts.push(`- File: \`${w.file}\` line ${w.line}`);
+          if (w.suggestion) parts.push(`- Fix: ${w.suggestion}`);
+          parts.push("");
+        }
+      }
+    } catch {
+      parts.push("Could not read review-status.json — check the file manually.");
+      parts.push("");
+    }
+  }
+
+  parts.push("### Instructions");
+  parts.push("");
+  parts.push("1. Read each file mentioned above");
+  parts.push("2. Make the specific fix described for each blocker");
+  parts.push("3. Run `npx cypress run --spec cypress/e2e/mvp.cy.ts` to confirm tests still pass");
+  parts.push("4. If tests break, fix the test or revert the change — never leave tests failing");
+  parts.push("");
+
+  return parts.join("\n");
+}
+
 export function buildPrompt(
   phase: Phase,
   config: OrchestratorConfig,
   state: OrchestratorState
 ): string {
-  const skillMd = readSkillMd(config.rootspecDir, phase);
   const context = phaseContext(phase, state);
+
+  // Review-fix mode: skip SKILL.md entirely, use focused fix prompt
+  if (context.includes("__REVIEW_FIX_MODE__")) {
+    return buildReviewFixPrompt(config, state);
+  }
+
+  const skillMd = readSkillMd(config.rootspecDir, phase);
   const parts: string[] = [ORCHESTRATOR_PREAMBLE];
 
   // Phase-specific seed content

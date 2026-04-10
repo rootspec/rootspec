@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Cypress screenshot hook**: Orchestrator now injects `screenshot-hook.ts` and its import into `e2e.ts` before every validate phase — immune to impl agent overwriting `e2e.ts`.
 - **Dev server cleanup**: Phase teardown now calls `scripts/dev.sh stop` to kill nohup'd dev servers that escape session kills.
 - **Review turn limit**: Bumped from 30 to 50 — review consistently hit max_turns before producing output.
+- **Review-fix prompt**: Fix cycles now use a focused prompt with actual blocker details (file, line, fix) instead of the full SKILL.md — agent makes targeted edits instead of re-running the full impl flow.
 
 ## [7.0.10] - 2026-04-08
 
