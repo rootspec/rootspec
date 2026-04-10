@@ -97,6 +97,11 @@ export async function orchestrate(
       return result;
     }
 
+    // Inject screenshot hook before validate — impl may have overwritten e2e.ts
+    if (phase === "validate") {
+      injectScreenshotHook(config.projectDir);
+    }
+
     // Execute phase — init is programmatic, others use Agent SDK
     const phaseResult =
       phase === "init"
@@ -303,6 +308,7 @@ export async function orchestrate(
       state.totalCostUsd += implFixResult.costUsd - (prevImpl?.costUsd ?? 0);
 
       // Re-validate (make sure tests still pass)
+      injectScreenshotHook(config.projectDir);
       const revalidateResult = await executePhase({
         phase: "validate",
         config,
@@ -404,5 +410,53 @@ async function bootstrap(
       timestamp: new Date().toISOString(),
       data: { text: "WARNING: Could not install skills — shared scripts will be unavailable" },
     });
+  }
+}
+
+/**
+ * Write the Cypress screenshot hook and ensure e2e.ts imports it.
+ * Called before each validate phase — impl may have overwritten e2e.ts,
+ * so we re-inject every time. The hook file is always overwritten to
+ * pick up framework changes.
+ */
+function injectScreenshotHook(projectDir: string): void {
+  const { existsSync, mkdirSync, writeFileSync, readFileSync, appendFileSync } =
+    require("node:fs") as typeof import("node:fs");
+  const { join } = require("node:path") as typeof import("node:path");
+
+  const supportDir = join(projectDir, "cypress", "support");
+  if (!existsSync(supportDir)) return; // No Cypress setup — nothing to inject
+
+  // Write screenshot-hook.ts (always overwrite)
+  const hookPath = join(supportDir, "screenshot-hook.ts");
+  writeFileSync(
+    hookPath,
+    `// Capture a full-page screenshot after each passing criterion.
+// Screenshots land at cypress/screenshots/<spec>/US-101--AC-101-1.png
+// Used by /rs-review for visual quality inspection.
+afterEach(function () {
+  if (this.currentTest?.state === 'passed') {
+    const titles: string[] = (this.currentTest as any).titlePath?.() ?? [];
+    const joined = titles.join(' ');
+    const storyMatch = joined.match(/US-\\d+/);
+    const critMatch = joined.match(/AC-\\d+-\\d+/);
+    if (storyMatch) {
+      const name = critMatch
+        ? \`\${storyMatch[0]}--\${critMatch[0]}\`
+        : storyMatch[0];
+      cy.screenshot(name, { capture: 'fullPage' });
+    }
+  }
+});
+`
+  );
+
+  // Ensure e2e.ts imports it
+  const e2ePath = join(supportDir, "e2e.ts");
+  if (existsSync(e2ePath)) {
+    const content = readFileSync(e2ePath, "utf-8");
+    if (!content.includes("screenshot-hook")) {
+      appendFileSync(e2ePath, '\nimport "./screenshot-hook";\n');
+    }
   }
 }

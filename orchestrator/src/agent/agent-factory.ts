@@ -222,6 +222,19 @@ export async function executePhase(
       } catch {
         // No remaining processes in session — expected after clean exit
       }
+
+      // Kill dev server — started with nohup by scripts/dev.sh, so it has
+      // its own session and escapes both process group and session kills.
+      try {
+        const { execSync } = await import("node:child_process");
+        execSync("./scripts/dev.sh stop", {
+          cwd: config.projectDir,
+          timeout: 5000,
+          stdio: "ignore",
+        });
+      } catch {
+        // No dev server running or script missing — fine
+      }
     }
   }
 

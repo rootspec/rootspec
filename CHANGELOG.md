@@ -20,7 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Orchestrator spec gate**: Story count now searches USER_STORIES recursively — handles nested directory layouts (by_phase/, by_journey/, by_system/).
 - **Orchestrator process cleanup**: Phase cleanup now kills entire session (SIGTERM + 2s grace + SIGKILL by session ID) — catches Cypress/Electron child processes that escaped the original process group.
 - **Orchestrator budget overflow**: Phase budget now clamped to remaining budget — prevents review-fix retries from allocating more than the total budget when proportional calculation breaks on already-completed phases.
-- **Cypress screenshot hook**: Screenshot afterEach hook now written to separate `screenshot-hook.ts` file imported by `e2e.ts` — immune to impl agent overwriting `e2e.ts` before scaffold runs.
+- **Cypress screenshot hook**: Orchestrator now injects `screenshot-hook.ts` and its import into `e2e.ts` before every validate phase — immune to impl agent overwriting `e2e.ts`.
+- **Dev server cleanup**: Phase teardown now calls `scripts/dev.sh stop` to kill nohup'd dev servers that escape session kills.
 - **Review turn limit**: Bumped from 30 to 50 — review consistently hit max_turns before producing output.
 
 ## [7.0.10] - 2026-04-08
