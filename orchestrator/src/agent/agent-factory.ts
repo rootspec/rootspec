@@ -11,6 +11,7 @@ const PHASE_TOOLS: Record<Phase, string[]> = {
   spec: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
   impl: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
   validate: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+  review: ["Read", "Write", "Bash", "Glob", "Grep"],
 };
 
 export interface ExecutePhaseOptions {

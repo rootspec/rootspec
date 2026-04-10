@@ -24,6 +24,11 @@ const GateConfigSchema = z.object({
       minPassRate: z.number().default(0.8),
     })
     .default({}),
+  review: z
+    .object({
+      maxFixCycles: z.number().default(2),
+    })
+    .default({}),
 });
 
 const ConfigFileSchema = z.object({
@@ -31,8 +36,8 @@ const ConfigFileSchema = z.object({
   maxBudgetUsd: z.number().default(5.0),
   model: z.string().default("claude-sonnet-4-6"),
   phases: z
-    .array(z.enum(["init", "spec", "impl", "validate"]))
-    .default(["init", "spec", "impl", "validate"]),
+    .array(z.enum(["init", "spec", "impl", "validate", "review"]))
+    .default(["init", "spec", "impl", "validate", "review"]),
   maxRetries: z.number().default(2),
   budgetAllocation: z
     .object({
@@ -40,6 +45,7 @@ const ConfigFileSchema = z.object({
       spec: z.number().default(DEFAULT_BUDGET_ALLOCATION.spec),
       impl: z.number().default(DEFAULT_BUDGET_ALLOCATION.impl),
       validate: z.number().default(DEFAULT_BUDGET_ALLOCATION.validate),
+      review: z.number().default(DEFAULT_BUDGET_ALLOCATION.review),
     })
     .default({}),
   turnLimits: z
@@ -48,6 +54,7 @@ const ConfigFileSchema = z.object({
       spec: z.number().default(DEFAULT_TURN_LIMITS.spec),
       impl: z.number().default(DEFAULT_TURN_LIMITS.impl),
       validate: z.number().default(DEFAULT_TURN_LIMITS.validate),
+      review: z.number().default(DEFAULT_TURN_LIMITS.review),
     })
     .default({}),
   gates: GateConfigSchema.default({}),

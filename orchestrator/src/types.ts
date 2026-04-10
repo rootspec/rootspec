@@ -1,6 +1,6 @@
-export type Phase = "init" | "spec" | "impl" | "validate";
+export type Phase = "init" | "spec" | "impl" | "validate" | "review";
 
-export const PHASE_ORDER: Phase[] = ["init", "spec", "impl", "validate"];
+export const PHASE_ORDER: Phase[] = ["init", "spec", "impl", "validate", "review"];
 
 export interface PhaseResult {
   phase: Phase;
@@ -70,13 +70,15 @@ export interface BudgetAllocation {
   spec: number;
   impl: number;
   validate: number;
+  review: number;
 }
 
 export const DEFAULT_BUDGET_ALLOCATION: BudgetAllocation = {
-  init: 0.1,
-  spec: 0.3,
-  impl: 0.45,
-  validate: 0.15,
+  init: 0.08,
+  spec: 0.25,
+  impl: 0.40,
+  validate: 0.12,
+  review: 0.15,
 };
 
 export const DEFAULT_TURN_LIMITS: Record<Phase, number> = {
@@ -84,4 +86,5 @@ export const DEFAULT_TURN_LIMITS: Record<Phase, number> = {
   spec: 50,
   impl: 100,
   validate: 25,
+  review: 30,
 };

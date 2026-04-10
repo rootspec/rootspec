@@ -70,9 +70,13 @@ export async function orchestrate(
     await bootstrap(config, reporter);
   }
 
-  // Run phases
-  for (let i = startIndex; i < phases.length; i++) {
-    const phase = phases[i];
+  // Review runs in its own loop after the main phases — exclude it here
+  const mainPhases = phases.filter((p) => p !== "review");
+  const includeReview = phases.includes("review" as Phase);
+
+  // Run main phases (init → spec → impl → validate)
+  for (let i = startIndex; i < mainPhases.length; i++) {
+    const phase = mainPhases[i];
     state.currentPhase = phase;
     saveState(config.outputDir, state);
 
@@ -213,6 +217,113 @@ export async function orchestrate(
     saveState(config.outputDir, state);
   }
 
+  // --- Review-fix loop ---
+  // After main phases complete, run review. If blockers found,
+  // feed them back to impl, re-validate, re-review. Max N cycles.
+  // Review NEVER fails the build — it improves quality but doesn't gate.
+  if (includeReview && state.completedPhases.includes("validate")) {
+    const maxFixCycles = config.gates.review?.maxFixCycles ?? 2;
+
+    for (let cycle = 0; cycle <= maxFixCycles; cycle++) {
+      // Check budget
+      if (config.maxBudgetUsd - state.totalCostUsd <= 0) break;
+
+      // Run review
+      state.currentPhase = "review";
+      saveState(config.outputDir, state);
+
+      const reviewResult = await executePhase({
+        phase: "review",
+        config,
+        state,
+        reporter,
+      });
+
+      // Accumulate review costs
+      const prevReview = state.phaseResults.review;
+      if (prevReview) {
+        reviewResult.costUsd += prevReview.costUsd;
+        reviewResult.numTurns += prevReview.numTurns;
+        reviewResult.durationMs += prevReview.durationMs;
+        reviewResult.errors = [...prevReview.errors, ...reviewResult.errors];
+      }
+      state.phaseResults.review = reviewResult;
+      state.totalCostUsd += reviewResult.costUsd - (prevReview?.costUsd ?? 0);
+
+      // Run review gate
+      reporter.emit({
+        type: "gate_started",
+        phase: "review",
+        timestamp: new Date().toISOString(),
+        data: {},
+      });
+      const gateResult = await runGate("review", config, cycle);
+      state.gateResults.review = gateResult;
+      reporter.emit({
+        type: "gate_completed",
+        phase: "review",
+        timestamp: new Date().toISOString(),
+        data: {
+          passed: gateResult.passed,
+          checks: gateResult.checks,
+          action: gateResult.action,
+        },
+      });
+
+      if (gateResult.passed || cycle >= maxFixCycles) {
+        // Either no blockers, or we've exhausted fix cycles.
+        // Either way, the build succeeds — review doesn't gate.
+        state.completedPhases.push("review");
+        break;
+      }
+
+      // Blockers found — feed to impl for targeted fixes
+      reporter.emit({
+        type: "retry",
+        phase: "impl",
+        timestamp: new Date().toISOString(),
+        data: { attempt: cycle + 1, reason: "review_blockers" },
+      });
+
+      // Re-run impl (targeted fix)
+      const implFixResult = await executePhase({
+        phase: "impl",
+        config,
+        state,
+        reporter,
+      });
+      const prevImpl = state.phaseResults.impl;
+      if (prevImpl) {
+        implFixResult.costUsd += prevImpl.costUsd;
+        implFixResult.numTurns += prevImpl.numTurns;
+        implFixResult.durationMs += prevImpl.durationMs;
+        implFixResult.errors = [...prevImpl.errors, ...implFixResult.errors];
+      }
+      state.phaseResults.impl = implFixResult;
+      state.totalCostUsd += implFixResult.costUsd - (prevImpl?.costUsd ?? 0);
+
+      // Re-validate (make sure tests still pass)
+      const revalidateResult = await executePhase({
+        phase: "validate",
+        config,
+        state,
+        reporter,
+      });
+      const prevValidate = state.phaseResults.validate;
+      if (prevValidate) {
+        revalidateResult.costUsd += prevValidate.costUsd;
+        revalidateResult.numTurns += prevValidate.numTurns;
+        revalidateResult.durationMs += prevValidate.durationMs;
+        revalidateResult.errors = [...prevValidate.errors, ...revalidateResult.errors];
+      }
+      state.phaseResults.validate = revalidateResult;
+      state.totalCostUsd += revalidateResult.costUsd - (prevValidate?.costUsd ?? 0);
+
+      saveState(config.outputDir, state);
+      // Loop back for re-review
+    }
+  }
+
   const result: OrchestratorResult = { status: "success", state };
   reporter.emit({
     type: "run_completed",
@@ -274,7 +385,7 @@ async function bootstrap(
   if (existsSync(srcSkills)) {
     const destSkills = join(config.projectDir, ".agents", "skills");
     mkdirSync(destSkills, { recursive: true });
-    const skillDirs = ["rs-init", "rs-spec", "rs-impl", "rs-validate", "rs-shared"];
+    const skillDirs = ["rs-init", "rs-spec", "rs-impl", "rs-validate", "rs-review", "rs-shared"];
     for (const dir of skillDirs) {
       const src = join(srcSkills, dir);
       const dest = join(destSkills, dir);

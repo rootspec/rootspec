@@ -9,6 +9,7 @@ const SKILL_DIRS: Record<Phase, string> = {
   spec: "rs-spec",
   impl: "rs-impl",
   validate: "rs-validate",
+  review: "rs-review",
 };
 
 function resolveSharedDir(config: OrchestratorConfig): string | null {
@@ -70,6 +71,36 @@ function phaseContext(
     if (implResult?.errors.length) {
       lines.push(`Note: impl had some errors: ${implResult.errors.join("; ")}`);
     }
+    lines.push("");
+  }
+
+  // When impl re-runs after review found blockers, inject the review findings
+  if (phase === "impl" && state.gateResults.review && !state.gateResults.review.passed) {
+    lines.push("## Review Feedback — Fix These Issues");
+    lines.push("");
+    lines.push("The review phase found quality issues in your implementation.");
+    lines.push("Your job this cycle is to fix ONLY these issues — do NOT re-implement everything.");
+    lines.push("Make targeted fixes to the specific files and lines identified.");
+    lines.push("");
+    lines.push("Read `rootspec/review-status.json` for the full structured issue list.");
+    lines.push("Focus on issues with severity `blocker` — these must be fixed.");
+    lines.push("Warnings are nice-to-fix but not required.");
+    lines.push("");
+    lines.push("Common fix patterns:");
+    lines.push("- **placeholder_text**: Replace literal text with actual icons/symbols (→ not 'Next Arrow')");
+    lines.push("- **broken_links**: Fix URLs to match SEED.md or remove hallucinated links");
+    lines.push("- **impl_error**: Update copy to match what SEED.md/spec says");
+    lines.push("- **visual_quality**: Fix CSS/layout issues visible in screenshots");
+    lines.push("- **accessibility**: Add alt text, semantic HTML, ARIA labels");
+    lines.push("");
+    lines.push("After fixing, run the full test suite to confirm nothing broke.");
+    lines.push("");
+  }
+
+  if (phase === "review" && state.completedPhases.includes("validate")) {
+    lines.push("## Prior Phase: Validate");
+    lines.push("All tests pass. Your job is to review the implementation quality.");
+    lines.push("Screenshots are available in cypress/screenshots/ for visual inspection.");
     lines.push("");
   }
 
@@ -153,6 +184,18 @@ export function buildPrompt(
     parts.push("- Run the full test suite and produce a report.");
     parts.push("- Do NOT modify application code or spec files.");
     parts.push("- Only write to rootspec/tests-status.json.");
+    parts.push("");
+  }
+
+  if (phase === "review") {
+    parts.push("## Review Phase Directives");
+    parts.push("- Review the IMPLEMENTATION, not the spec. The spec is truth.");
+    parts.push("- Read each passing story's YAML to understand what was specified.");
+    parts.push("- Read each story's screenshots to see what was actually built.");
+    parts.push("- Judge: did impl faithfully deliver what the story specifies?");
+    parts.push("- Check source files for broken links, placeholder text, accessibility.");
+    parts.push("- Write rootspec/review-status.json with categorized issues and quality score.");
+    parts.push("- Do NOT modify application code, spec files, or test files.");
     parts.push("");
   }
 

@@ -57,6 +57,10 @@ const WRITE_SCOPE: Record<Phase, { allowed: RegExp[]; denied: RegExp[] }> = {
     allowed: [/^rootspec\/tests-status\.json$/, /^rootspec\/stats\.json$/],
     denied: [/^src\//, /^app\//, /^cypress\//, /^rootspec\/(?!tests-status|stats)/],
   },
+  review: {
+    allowed: [/^rootspec\/review-status\.json$/, /^rootspec\/stats\.json$/],
+    denied: [/^src\//, /^app\//, /^cypress\//, /^rootspec\/(?!review-status|stats)/],
+  },
 };
 
 export function createScopeEnforcer(phase: Phase, projectDir: string) {

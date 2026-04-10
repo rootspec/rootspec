@@ -5,6 +5,7 @@ const PHASE_LABELS: Record<string, string> = {
   spec: "Spec",
   impl: "Impl",
   validate: "Validate",
+  review: "Review",
 };
 
 export class ConsoleReporter implements Reporter {

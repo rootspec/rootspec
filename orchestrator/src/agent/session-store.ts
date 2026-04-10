@@ -13,7 +13,7 @@ export function createInitialState(): OrchestratorState {
     phaseResults: {},
     gateResults: {},
     totalCostUsd: 0,
-    attempt: { init: 0, spec: 0, impl: 0, validate: 0 },
+    attempt: { init: 0, spec: 0, impl: 0, validate: 0, review: 0 },
   };
 }
 

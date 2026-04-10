@@ -3,6 +3,7 @@ import type { OrchestratorConfig } from "../config.js";
 import { runSpecGate } from "./spec-gate.js";
 import { runImplGate } from "./impl-gate.js";
 import { runValidateGate } from "./validate-gate.js";
+import { runReviewGate } from "./review-gate.js";
 
 export async function runGate(
   phase: Phase,
@@ -18,6 +19,8 @@ export async function runGate(
       return runImplGate(config);
     case "validate":
       return runValidateGate(config);
+    case "review":
+      return runReviewGate(config);
     default:
       return { passed: true, phase, checks: [], action: "proceed" };
   }

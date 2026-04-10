@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Agentic orchestrator** (`orchestrator/`): Claude Agent SDK pipeline that turns a SEED.md into a working, tested app. Wraps existing skills with quality gates, scope enforcement hooks, dynamic budget allocation, and session resumability. Init phase is programmatic (instant, $0); spec/impl/validate use Agent SDK. Tested end-to-end on greenfield demo — 7/7 stories passing from ~100-line SEED.md.
 
+- **rs-review skill** (`skills/rs-review/`): AI quality review agent that inspects Cypress screenshots and source code against user stories. Catches visual bugs (literal "Next Arrow" text), broken links, placeholder content, and spec drift that functional tests miss. Produces `review-status.json` with categorized issues and a quality score (0-100).
+- **Orchestrator review-fix loop**: After validate, runs rs-review. If blockers found, feeds issues back to impl for targeted fixes, re-validates, re-reviews. Max 2 fix cycles. Review never fails the build — improves quality but doesn't gate.
+- **Cypress screenshot capture**: `afterEach` hook in scaffolded `e2e.ts` captures full-page screenshots for each passing acceptance criterion. Used by rs-review for visual inspection.
+
 ### Fixed
 
 - **Orchestrator spec gate**: Story count now searches USER_STORIES recursively — handles nested directory layouts (by_phase/, by_journey/, by_system/).
