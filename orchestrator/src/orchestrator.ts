@@ -138,7 +138,7 @@ export async function orchestrate(
       // Don't retry budget-exhausted phases — same budget will fail the same way
       const retryable = phaseResult.status !== "max_budget";
       const canRetry = retryable && state.attempt[phase] < config.maxRetries;
-      if (canRetry && phase !== "validate") {
+      if (canRetry) {
         state.attempt[phase]++;
         reporter.emit({
           type: "retry",
