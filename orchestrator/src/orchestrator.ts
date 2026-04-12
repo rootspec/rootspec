@@ -472,15 +472,9 @@ afterEach(function () {
 function writeStats(projectDir: string, state: OrchestratorState): void {
   const statsPath = join(projectDir, "rootspec", "stats.json");
 
-  let stats: { runs: unknown[] } = { runs: [] };
-  if (existsSync(statsPath)) {
-    try {
-      stats = JSON.parse(readFileSync(statsPath, "utf-8"));
-      if (!Array.isArray(stats.runs)) stats.runs = [];
-    } catch {
-      stats = { runs: [] };
-    }
-  }
+  // Overwrite — skill agents may have written partial entries during the run;
+  // the orchestrator's entry is the single source of truth.
+  const stats: { runs: unknown[] } = { runs: [] };
 
   // Build phase breakdown
   const phases: Record<string, unknown> = {};
@@ -494,14 +488,24 @@ function writeStats(projectDir: string, state: OrchestratorState): void {
     };
   }
 
-  // Read quality score from review-status.json if available
+  // Read quality score — try review-status.json, then gate check message
   let qualityScore: number | null = null;
   const reviewPath = join(projectDir, "rootspec", "review-status.json");
   if (existsSync(reviewPath)) {
     try {
       const review = JSON.parse(readFileSync(reviewPath, "utf-8"));
-      qualityScore = review.score ?? null;
+      qualityScore = review.qualityScore?.score ?? review.score ?? null;
     } catch {}
+  }
+  // Fallback: parse from gate check message ("Score: 78/100")
+  if (qualityScore === null && state.gateResults.review) {
+    const check = state.gateResults.review.checks.find(
+      (c) => c.name === "Review completed"
+    );
+    if (check) {
+      const match = check.message.match(/Score:\s*(\d+)/);
+      if (match) qualityScore = parseInt(match[1], 10);
+    }
   }
 
   stats.runs.push({

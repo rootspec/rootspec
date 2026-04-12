@@ -104,7 +104,52 @@ exit $EXIT_CODE
       0o755
     );
 
-    // 3.3 Cypress reporter — copy bundled rootspec-reporter.ts
+    // 3.3 Pre-commit hook
+    const githooksDir = join(dir, ".githooks");
+    mkdirSync(githooksDir, { recursive: true });
+    writeIfMissing(
+      join(githooksDir, "pre-commit"),
+      `#!/usr/bin/env bash
+# Pre-commit hook — validate spec and run tests
+set -euo pipefail
+
+# Validate spec if spec files changed
+if git diff --cached --name-only | grep -q '^rootspec/'; then
+  echo "Spec files changed — validating..."
+  if [ -x "./scripts/validate-spec.sh" ]; then
+    ./scripts/validate-spec.sh
+  fi
+fi
+
+# Run tests if source files changed
+if git diff --cached --name-only | grep -qE '^(src/|public/|cypress/)'; then
+  echo "Source files changed — running tests..."
+  if [ -x "./scripts/test.sh" ]; then
+    ./scripts/test.sh
+  fi
+fi
+`,
+      0o755
+    );
+
+    // 3.4 Release script
+    writeIfMissing(
+      join(scriptsDir, "release.sh"),
+      `#!/usr/bin/env bash
+# Simple release — tag and push
+set -euo pipefail
+
+VERSION=\${1:?Usage: ./scripts/release.sh <version>}
+
+echo "Releasing v\${VERSION}..."
+git tag -a "v\${VERSION}" -m "Version \${VERSION}"
+git push origin "v\${VERSION}"
+echo "Released v\${VERSION}"
+`,
+      0o755
+    );
+
+    // 3.5 Cypress reporter — copy bundled rootspec-reporter.ts
     const reporterSrc = join(sharedDir, "cypress", "rootspec-reporter.ts");
     if (existsSync(reporterSrc)) {
       const cypressSupport = join(dir, "cypress", "support");
@@ -137,8 +182,8 @@ exit $EXIT_CODE
       specDirectory: "rootspec",
       prerequisites: {
         devServer: "./scripts/dev.sh",
-        preCommitHook: null,
-        releaseScript: null,
+        preCommitHook: ".githooks/pre-commit",
+        releaseScript: "./scripts/release.sh",
         validationScript: "./scripts/test.sh",
       },
     };
