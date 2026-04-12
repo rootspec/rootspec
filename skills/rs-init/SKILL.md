@@ -27,25 +27,21 @@ Based on the output, determine the situation:
 
 Report what you found before proceeding.
 
-## Step 2: Create the spec directory and base files
+## Step 2: Bootstrap the project
 
-Create whatever is missing:
+Run the bootstrap script to create the spec directory, base files, prerequisites, and `.rootspec.json`:
 
-1. **`rootspec/` directory** — `mkdir -p rootspec`
-2. **`rootspec/00.AXIOMS.md`** — copy from the bundled version at `../rs-shared/00.AXIOMS.md` (relative to this skill's directory). Read the source file and write it to the project.
-3. **`rootspec/00.FRAMEWORK.md`** — copy from `../rs-shared/00.FRAMEWORK.md`. Same approach.
-4. **`rootspec/spec-status.json`**:
-   ```json
-   { "hash": null, "validatedAt": null, "valid": false, "version": "7.1.3" }
-   ```
-5. **`rootspec/tests-status.json`**:
-   ```json
-   { "lastRun": null, "stories": {} }
-   ```
+```bash
+bash "$(dirname "$0")/../rs-shared/scripts/bootstrap-init.sh" . "$(dirname "$0")/../rs-shared"
+```
 
-## Step 3: Detect or create prerequisites
+If this path doesn't resolve, find the script by searching for `bootstrap-init.sh` in the skills directory.
 
-Run the detection script:
+This creates everything needed for a greenfield project: `rootspec/` with framework files, `scripts/dev.sh`, `scripts/test.sh`, `.githooks/pre-commit`, `scripts/release.sh`, Cypress reporter, `.rootspec.json`, and `package.json`. Files that already exist are skipped.
+
+## Step 3: Detect and adapt prerequisites
+
+Run the detection script to check what the bootstrap created vs what the project already had:
 
 ```bash
 bash "$(dirname "$0")/../rs-shared/scripts/detect-prerequisites.sh" .
@@ -55,63 +51,25 @@ The script outputs `DEV_SERVER=`, `PRE_COMMIT_HOOK=`, `RELEASE_SCRIPT=`, `VALIDA
 
 Read `../rs-shared/fragments/prerequisites.md` for the full reference on what each prerequisite is.
 
-**Non-interactive mode:** If no `package.json` exists, create one with `npm init -y` before proceeding with prerequisites. The agent needs a package.json to install dev dependencies and configure scripts.
-
 **Package.json rule:** NEVER write the `dependencies` or `devDependencies` sections of package.json directly. Always use `npm install <pkg>` or `npm install --save-dev <pkg>` to add packages — npm manages the dependency tree. You may edit the `scripts` section directly (e.g., to add `dev:start`).
 
-Report what was found. For missing prerequisites, tell the developer you'll create all templates and proceed unless they object:
+Report what was detected. For brownfield projects, adapt the bootstrap defaults:
 
-"I'll create templates for [list missing]. These are lightweight and needed by `/rs-impl` and `/rs-validate`. Let me know if you'd rather skip any."
-
-Then create them all. Do not present a menu of options or ask which ones to create — just create them. The developer can always delete what they don't want. `/rs-impl` needs the dev server and validation script. `/rs-validate` needs both. The pre-commit hook catches problems early. The release script is the only truly optional one, but it's cheap to create.
-
-For each prerequisite:
-- **Found** → confirm with developer, record the path
-- **Not found** → create the template
-- **Skipped (only if developer explicitly asks)** → record `null`
-
-### Dev server template
-
-When creating the dev server template:
-
-1. **Copy the bundled template** from `../rs-shared/scripts/dev.sh` to `scripts/dev.sh` in the project. Make it executable. Read the source and write it — don't generate from scratch.
-2. **Edit the `DEV_CMD` variable** at the top of the copied script to match the project's actual dev command (e.g., `npm run dev`, `npx vite`, etc.).
-3. **Add package.json scripts** if `package.json` exists — add `dev:start`, `dev:stop`, and `dev:restart` entries that delegate to `scripts/dev.sh`:
-   ```json
-   "dev:start": "./scripts/dev.sh start",
-   "dev:stop": "./scripts/dev.sh stop",
-   "dev:restart": "./scripts/dev.sh restart"
-   ```
-   If `package.json` doesn't exist, tell the developer: "No package.json found — run `npm init` first if you want convenience scripts."
-4. **Update .gitignore** — if `.gitignore` exists, add `.dev-server.pid` and `.dev-server.log` if not already present.
+- **Dev server** — edit the `DEV_CMD` variable in `scripts/dev.sh` to match the project's actual dev command (e.g., `npm run dev`, `npx vite`).
+- **Existing prerequisites** — if the project already had a dev server, test runner, etc., update `.rootspec.json` to point to them instead of the bootstrap defaults.
+- **Package.json scripts** — add `dev:start`, `dev:stop`, `dev:restart` entries if not already present.
 
 ### Cypress plugin setup
 
-When creating the validation script template, also set up the RootSpec Cypress reporter:
+Set up the RootSpec Cypress reporter (bootstrap already copied the file):
 
-1. **Copy the reporter** from `../rs-shared/cypress/rootspec-reporter.ts` to `cypress/support/rootspec-reporter.ts` in the project.
-2. **Wire it into `cypress.config.ts`** — if the config exists, add the `setupNodeEvents` hook with the reporter. If creating a new config, include it from the start. See `../rs-shared/fragments/prerequisites.md` for the exact wiring.
+1. **Wire it into `cypress.config.ts`** — if the config exists, add the `setupNodeEvents` hook with the reporter. If creating a new config, include it from the start. See `../rs-shared/fragments/prerequisites.md` for the exact wiring.
 
 This plugin automatically updates `rootspec/tests-status.json` after every Cypress run — the agent doesn't need to parse results or call scripts.
 
-## Step 4: Write `.rootspec.json`
+## Step 4: Update `.rootspec.json`
 
-Create (or update) `.rootspec.json` at the project root:
-
-```json
-{
-  "version": "7.1.3",
-  "specDirectory": "rootspec",
-  "prerequisites": {
-    "devServer": null,
-    "preCommitHook": null,
-    "releaseScript": null,
-    "validationScript": null
-  }
-}
-```
-
-Fill in prerequisite values with paths or commands discovered in Step 3.
+If Step 3 detected existing prerequisites that differ from the bootstrap defaults, update `.rootspec.json` with the correct paths.
 
 ## Step 5: Verify and hand off
 

@@ -1,32 +1,21 @@
-import {
-  existsSync,
-  mkdirSync,
-  cpSync,
-  writeFileSync,
-  readFileSync,
-  appendFileSync,
-} from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { execSync } from "node:child_process";
 import type { PhaseResult, Reporter } from "../types.js";
 import type { OrchestratorConfig } from "../config.js";
 
 /**
- * Init phase — done programmatically, no Agent SDK needed.
+ * Init phase — runs the shared bootstrap-init.sh script.
  *
- * Mirrors rs-init/SKILL.md steps:
- *   Step 1: Scan (skipped — greenfield assumed)
- *   Step 2: Create spec dir + base files
- *   Step 3: Detect/create prerequisites (bundled templates)
- *   Step 4: Write .rootspec.json
- *   Step 5: Verify (delegated to init gate)
+ * The script handles all file creation (spec dir, framework files,
+ * prerequisites, .rootspec.json, package.json). Single source of truth
+ * shared with the rs-init skill.
  *
- * Agentic tasks we skip (only matter for brownfield):
+ * What the skill adds beyond this:
  *   - Project scanning (scan-spec.sh, scan-project.sh)
- *   - Framework detection (choosing dev command from existing code)
- *   - Re-init / partial-init detection
- *
- * TODO: Add brownfield path — when project already has src/, use Agent SDK
- * to run scan-project.sh, detect framework, and adapt dev.sh DEV_CMD.
+ *   - Brownfield detection and framework adaptation
+ *   - Interactive confirmation of prerequisites
+ *   - Verification with verify-init.sh
  */
 export async function executeInit(
   config: OrchestratorConfig,
@@ -37,185 +26,31 @@ export async function executeInit(
   const errors: string[] = [];
 
   try {
-    // Resolve shared skills directory (project-installed or framework repo)
+    // Resolve shared skills directory
     const projectShared = join(dir, ".agents", "skills", "rs-shared");
     const sharedDir = existsSync(projectShared)
       ? projectShared
       : join(config.rootspecDir, "skills", "rs-shared");
 
-    // --- Step 2: Create spec directory and base files ---
-
-    const specDir = join(dir, "rootspec");
-    mkdirSync(specDir, { recursive: true });
-
-    // 2.1 Copy 00.AXIOMS.md
-    copyBundledFile(sharedDir, "00.AXIOMS.md", specDir, errors);
-
-    // 2.2 Copy 00.FRAMEWORK.md
-    copyBundledFile(sharedDir, "00.FRAMEWORK.md", specDir, errors);
-
-    // 2.3 Create spec-status.json (initial state — not yet validated)
-    const frameworkVersion = readFrameworkVersion(sharedDir);
-    writeIfMissing(
-      join(specDir, "spec-status.json"),
-      JSON.stringify(
-        { hash: null, validatedAt: null, valid: false, version: frameworkVersion },
-        null,
-        2
-      )
-    );
-
-    // 2.4 Create tests-status.json (no tests run yet)
-    writeIfMissing(
-      join(specDir, "tests-status.json"),
-      JSON.stringify({ lastRun: null, stories: {} }, null, 2)
-    );
-
-    // --- Step 3: Create prerequisites ---
-
-    const scriptsDir = join(dir, "scripts");
-    mkdirSync(scriptsDir, { recursive: true });
-
-    // 3.1 Dev server — copy bundled template from rs-shared/scripts/dev.sh
-    const bundledDevSh = join(sharedDir, "scripts", "dev.sh");
-    if (!existsSync(join(scriptsDir, "dev.sh"))) {
-      if (existsSync(bundledDevSh)) {
-        cpSync(bundledDevSh, join(scriptsDir, "dev.sh"));
-        // Make executable
-        const { chmodSync } = await import("node:fs");
-        chmodSync(join(scriptsDir, "dev.sh"), 0o755);
-      } else {
-        errors.push("Bundled dev.sh not found — will need manual setup");
-      }
+    const bootstrapScript = join(sharedDir, "scripts", "bootstrap-init.sh");
+    if (!existsSync(bootstrapScript)) {
+      throw new Error(`bootstrap-init.sh not found at ${bootstrapScript}`);
     }
 
-    // 3.2 Validation script (test.sh)
-    writeIfMissing(
-      join(scriptsDir, "test.sh"),
-      `#!/usr/bin/env bash
-# Test runner — starts dev server, runs Cypress, stops server
-set -euo pipefail
-./scripts/dev.sh start
-npx cypress run --config-file cypress.config.ts 2>&1
-EXIT_CODE=$?
-./scripts/dev.sh stop
-exit $EXIT_CODE
-`,
-      0o755
-    );
+    // Run the shared bootstrap script
+    const output = execSync(`bash "${bootstrapScript}" "${dir}" "${sharedDir}"`, {
+      timeout: 30_000,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
 
-    // 3.3 Pre-commit hook
-    const githooksDir = join(dir, ".githooks");
-    mkdirSync(githooksDir, { recursive: true });
-    writeIfMissing(
-      join(githooksDir, "pre-commit"),
-      `#!/usr/bin/env bash
-# Pre-commit hook — validate spec and run tests
-set -euo pipefail
-
-# Validate spec if spec files changed
-if git diff --cached --name-only | grep -q '^rootspec/'; then
-  echo "Spec files changed — validating..."
-  if [ -x "./scripts/validate-spec.sh" ]; then
-    ./scripts/validate-spec.sh
-  fi
-fi
-
-# Run tests if source files changed
-if git diff --cached --name-only | grep -qE '^(src/|public/|cypress/)'; then
-  echo "Source files changed — running tests..."
-  if [ -x "./scripts/test.sh" ]; then
-    ./scripts/test.sh
-  fi
-fi
-`,
-      0o755
-    );
-
-    // 3.4 Release script
-    writeIfMissing(
-      join(scriptsDir, "release.sh"),
-      `#!/usr/bin/env bash
-# Simple release — tag and push
-set -euo pipefail
-
-VERSION=\${1:?Usage: ./scripts/release.sh <version>}
-
-echo "Releasing v\${VERSION}..."
-git tag -a "v\${VERSION}" -m "Version \${VERSION}"
-git push origin "v\${VERSION}"
-echo "Released v\${VERSION}"
-`,
-      0o755
-    );
-
-    // 3.5 Cypress reporter — copy bundled rootspec-reporter.ts
-    const reporterSrc = join(sharedDir, "cypress", "rootspec-reporter.ts");
-    if (existsSync(reporterSrc)) {
-      const cypressSupport = join(dir, "cypress", "support");
-      mkdirSync(cypressSupport, { recursive: true });
-      cpSync(reporterSrc, join(cypressSupport, "rootspec-reporter.ts"));
-    }
-
-    // 3.4 .gitignore entries
-    const gitignorePath = join(dir, ".gitignore");
-    const gitignoreEntries = [
-      "node_modules/",
-      "dist/",
-      ".dev-server.pid",
-      ".dev-server.log",
-    ];
-    if (existsSync(gitignorePath)) {
-      const existing = readFileSync(gitignorePath, "utf-8");
-      const missing = gitignoreEntries.filter((e) => !existing.includes(e));
-      if (missing.length > 0) {
-        appendFileSync(gitignorePath, "\n" + missing.join("\n") + "\n");
-      }
-    } else {
-      writeFileSync(gitignorePath, gitignoreEntries.join("\n") + "\n");
-    }
-
-    // --- Step 4: Write .rootspec.json ---
-
-    const rootspecJson = {
-      version: frameworkVersion,
-      specDirectory: "rootspec",
-      prerequisites: {
-        devServer: "./scripts/dev.sh",
-        preCommitHook: ".githooks/pre-commit",
-        releaseScript: "./scripts/release.sh",
-        validationScript: "./scripts/test.sh",
-      },
-    };
-    writeFileSync(
-      join(dir, ".rootspec.json"),
-      JSON.stringify(rootspecJson, null, 2)
-    );
-
-    // --- Package.json ---
-
-    if (!existsSync(join(dir, "package.json"))) {
-      writeFileSync(
-        join(dir, "package.json"),
-        JSON.stringify(
-          {
-            name: "rootspec-project",
-            version: "0.1.0",
-            private: true,
-            type: "module",
-            scripts: {
-              dev: "./scripts/dev.sh start",
-              "dev:start": "./scripts/dev.sh start",
-              "dev:stop": "./scripts/dev.sh stop",
-              "dev:restart": "./scripts/dev.sh restart",
-              build: "echo 'No build configured yet'",
-              test: "./scripts/test.sh",
-            },
-          },
-          null,
-          2
-        )
-      );
+    // Log output for debugging
+    if (output.trim()) {
+      reporter.emit({
+        type: "message",
+        timestamp: new Date().toISOString(),
+        data: { text: output.trim() },
+      });
     }
 
     reporter.emit({
@@ -232,53 +67,22 @@ echo "Released v\${VERSION}"
 
     return {
       phase: "init",
-      status: errors.length > 0 ? "error" : "success",
+      status: "success",
       costUsd: 0,
       numTurns: 0,
       durationMs: Date.now() - startTime,
       errors,
     };
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    errors.push(message);
     return {
       phase: "init",
       status: "error",
       costUsd: 0,
       numTurns: 0,
       durationMs: Date.now() - startTime,
-      errors: [err instanceof Error ? err.message : String(err)],
+      errors,
     };
-  }
-}
-
-function readFrameworkVersion(sharedDir: string): string {
-  const fw = join(sharedDir, "00.FRAMEWORK.md");
-  if (existsSync(fw)) {
-    const match = readFileSync(fw, "utf-8").match(/\*\*Version:\*\*\s+(\S+)/);
-    if (match) return match[1];
-  }
-  return "0.0.0";
-}
-
-function copyBundledFile(
-  sharedDir: string,
-  filename: string,
-  destDir: string,
-  errors: string[]
-): void {
-  const src = join(sharedDir, filename);
-  if (existsSync(src)) {
-    cpSync(src, join(destDir, filename));
-  } else {
-    errors.push(`${filename} not found in ${sharedDir}`);
-  }
-}
-
-function writeIfMissing(
-  path: string,
-  content: string,
-  mode?: number
-): void {
-  if (!existsSync(path)) {
-    writeFileSync(path, content, mode ? { mode } : undefined);
   }
 }

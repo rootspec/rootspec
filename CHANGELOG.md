@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Shared bootstrap script**: Extracted init file creation into `skills/rs-shared/scripts/bootstrap-init.sh`. Both the orchestrator and rs-init skill call the same script — single source of truth, no drift.
+- **rs-init skill**: Steps 2-4 now delegate to `bootstrap-init.sh` for file creation. Skill adds scanning, brownfield detection, and interactive adaptation on top.
+
 ### Fixed
 
 - **Stats output**: Orchestrator writes `rootspec/stats.json` at run completion with per-phase costs, turns, durations, and quality score. Overwrites skill agent entries.
-- **Init prerequisites**: Programmatic init now creates pre-commit hook and release script in addition to dev.sh and test.sh.
 - **Quality score fallback**: Parse score from review gate check message when review-status.json lacks `qualityScore.score`.
 - **Init version**: Read framework version from `00.FRAMEWORK.md` instead of hardcoding.
 - **rootspecDir resolution**: 3 dirnames from `dist/src/` to reach repo root (was 2).
