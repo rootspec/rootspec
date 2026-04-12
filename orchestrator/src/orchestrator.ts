@@ -346,6 +346,7 @@ export async function orchestrate(
   reporter.summary(result);
   saveState(config.outputDir, state);
   saveReport(config.outputDir, state as unknown as Record<string, unknown>);
+  writeStats(config.projectDir, state);
   return result;
 }
 
@@ -462,4 +463,55 @@ afterEach(function () {
       appendFileSync(e2ePath, '\nimport "./screenshot-hook";\n');
     }
   }
+}
+
+/**
+ * Write rootspec/stats.json with run results.
+ * Appends to existing runs array if the file exists.
+ */
+function writeStats(projectDir: string, state: OrchestratorState): void {
+  const statsPath = join(projectDir, "rootspec", "stats.json");
+
+  let stats: { runs: unknown[] } = { runs: [] };
+  if (existsSync(statsPath)) {
+    try {
+      stats = JSON.parse(readFileSync(statsPath, "utf-8"));
+      if (!Array.isArray(stats.runs)) stats.runs = [];
+    } catch {
+      stats = { runs: [] };
+    }
+  }
+
+  // Build phase breakdown
+  const phases: Record<string, unknown> = {};
+  for (const [phase, r] of Object.entries(state.phaseResults)) {
+    if (!r) continue;
+    phases[phase] = {
+      status: r.status,
+      costUsd: Math.round(r.costUsd * 100) / 100,
+      turns: r.numTurns,
+      durationSeconds: Math.round(r.durationMs / 1000),
+    };
+  }
+
+  // Read quality score from review-status.json if available
+  let qualityScore: number | null = null;
+  const reviewPath = join(projectDir, "rootspec", "review-status.json");
+  if (existsSync(reviewPath)) {
+    try {
+      const review = JSON.parse(readFileSync(reviewPath, "utf-8"));
+      qualityScore = review.score ?? null;
+    } catch {}
+  }
+
+  stats.runs.push({
+    runId: state.runId,
+    startedAt: state.startedAt,
+    completedAt: new Date().toISOString(),
+    totalCostUsd: Math.round(state.totalCostUsd * 100) / 100,
+    phases,
+    qualityScore,
+  });
+
+  writeFileSync(statsPath, JSON.stringify(stats, null, 2));
 }
