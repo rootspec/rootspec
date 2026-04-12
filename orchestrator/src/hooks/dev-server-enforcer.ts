@@ -10,6 +10,8 @@ const DIRECT_SERVER_PATTERNS = [
   /\bnode_modules\/\.bin\/(serve|astro|vite|next|nuxt)\b/,
   /\bnpm\s+run\s+dev\b/,
   /\bnpx\s+http-server\b/,
+  /\bnode\s+-e\b.*\blisten\s*\(/,
+  /\bnode\s+-e\b.*\bcreateServer\b/,
 ];
 
 // Commands that ARE allowed (dev.sh itself, or stopping servers)

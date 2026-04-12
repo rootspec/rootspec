@@ -113,8 +113,9 @@ export function loadConfig(opts: {
   const seedContent = readFileSync(seedPath, "utf-8");
 
   // Resolve rootspec dir (framework repo with skills)
+  // dist layout: orchestrator/dist/src/config.js → 3 dirnames to repo root
   const rootspecDir = resolve(
-    opts.rootspecDir ?? dirname(dirname(import.meta.dirname ?? "."))
+    opts.rootspecDir ?? dirname(dirname(dirname(import.meta.dirname ?? ".")))
   );
 
   return {

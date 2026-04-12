@@ -24,7 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dev server cleanup**: Phase teardown now calls `scripts/dev.sh stop` to kill nohup'd dev servers that escape session kills.
 - **Review turn limit**: Bumped from 30 to 50 — review consistently hit max_turns before producing output.
 - **Review-fix prompt**: Fix cycles now use a focused prompt with actual blocker details (file, line, fix) instead of the full SKILL.md — agent makes targeted edits instead of re-running the full impl flow.
-- **Dev server enforcer**: PreToolUse hook blocks direct server commands (`npx serve`, `npx astro dev`, etc.) and requires `scripts/dev.sh start` — ensures PID tracking for reliable cleanup.
+- **Dev server enforcer**: PreToolUse hook blocks direct server commands (`npx serve`, `npx astro dev`, `node -e` with `listen`/`createServer`, etc.) and requires `scripts/dev.sh start` — ensures PID tracking for reliable cleanup.
+- **rootspecDir resolution**: Fixed dirname calculation — dist layout is `orchestrator/dist/src/`, needs 3 dirnames to reach repo root (was 2).
 
 ## [7.0.10] - 2026-04-08
 
