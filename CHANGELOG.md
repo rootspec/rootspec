@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.1.0] - 2026-04-12
+
 ### Added
 
 - **Agentic orchestrator** (`orchestrator/`): Claude Agent SDK pipeline that turns a SEED.md into a working, tested app. Wraps existing skills with quality gates, scope enforcement hooks, dynamic budget allocation, and session resumability. Init phase is programmatic (instant, $0); spec/impl/validate use Agent SDK. Tested end-to-end on greenfield demo — 7/7 stories passing from ~100-line SEED.md.
@@ -26,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Review-fix prompt**: Fix cycles now use a focused prompt with actual blocker details (file, line, fix) instead of the full SKILL.md — agent makes targeted edits instead of re-running the full impl flow.
 - **Dev server enforcer**: PreToolUse hook blocks direct server commands (`npx serve`, `npx astro dev`, `node -e` with `listen`/`createServer`, etc.) and requires `scripts/dev.sh start` — ensures PID tracking for reliable cleanup.
 - **rootspecDir resolution**: Fixed dirname calculation — dist layout is `orchestrator/dist/src/`, needs 3 dirnames to reach repo root (was 2).
+- **Init phase version**: Reads framework version from `00.FRAMEWORK.md` instead of hardcoding — stays in sync with releases automatically.
 
 ## [7.0.10] - 2026-04-08
 

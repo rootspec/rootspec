@@ -55,10 +55,11 @@ export async function executeInit(
     copyBundledFile(sharedDir, "00.FRAMEWORK.md", specDir, errors);
 
     // 2.3 Create spec-status.json (initial state — not yet validated)
+    const frameworkVersion = readFrameworkVersion(sharedDir);
     writeIfMissing(
       join(specDir, "spec-status.json"),
       JSON.stringify(
-        { hash: null, validatedAt: null, valid: false, version: "7.0.10" },
+        { hash: null, validatedAt: null, valid: false, version: frameworkVersion },
         null,
         2
       )
@@ -132,7 +133,7 @@ exit $EXIT_CODE
     // --- Step 4: Write .rootspec.json ---
 
     const rootspecJson = {
-      version: "7.0.10",
+      version: frameworkVersion,
       specDirectory: "rootspec",
       prerequisites: {
         devServer: "./scripts/dev.sh",
@@ -202,6 +203,15 @@ exit $EXIT_CODE
       errors: [err instanceof Error ? err.message : String(err)],
     };
   }
+}
+
+function readFrameworkVersion(sharedDir: string): string {
+  const fw = join(sharedDir, "00.FRAMEWORK.md");
+  if (existsSync(fw)) {
+    const match = readFileSync(fw, "utf-8").match(/\*\*Version:\*\*\s+(\S+)/);
+    if (match) return match[1];
+  }
+  return "0.0.0";
 }
 
 function copyBundledFile(
