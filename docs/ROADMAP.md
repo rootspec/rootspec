@@ -4,7 +4,7 @@
 
 ---
 
-## Current — v7.1.3
+## Current — v7.2.0
 
 ### Completed
 
