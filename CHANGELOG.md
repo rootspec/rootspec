@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Shared bootstrap script**: Extracted init file creation into `skills/rs-shared/scripts/bootstrap-init.sh`. Both the orchestrator and rs-init skill call the same script — single source of truth, no drift.
+- **Review skill — user perspective**: Rewritten to review from rendered HTML + screenshots instead of source files. Broken links are only blockers if provably wrong (404, placeholder URL), not just "not in SEED.md verbatim."
 - **rs-init skill**: Steps 2-4 now delegate to `bootstrap-init.sh` for file creation. Skill adds scanning, brownfield detection, and interactive adaptation on top.
 
 ### Fixed

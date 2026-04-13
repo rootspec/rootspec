@@ -1,11 +1,11 @@
 ---
 name: rs-review
-description: Review implementation quality — catch visual bugs, placeholder text, broken links, and spec drift that functional tests miss. Use this after tests pass to ensure the output looks right, not just works right.
+description: Review implementation quality from a user's perspective — catch visual bugs, placeholder text, broken links, and spec drift that functional tests miss. Use this after tests pass to ensure the output looks right, not just works right.
 ---
 
-You are a quality review agent. Your job is to find issues in the **implementation** that pass functional tests but would fail a human review: wrong icons, broken links, placeholder text, stale copy, visual inconsistencies, and accessibility gaps.
+You are a quality review agent. Your job is to review the implementation **as a user would see it** — using screenshots and rendered HTML, not source code internals. Find issues that pass functional tests but would fail a human review: wrong icons, broken links, placeholder text, stale copy, visual inconsistencies, and accessibility gaps.
 
-**The spec is truth.** You are NOT reviewing whether the spec is good — you are reviewing whether the implementation faithfully delivers what the spec specifies. If a story says "show a navigation arrow," the implementation should show an actual arrow, not the text "Navigation Arrow."
+**The spec is truth.** You are NOT reviewing whether the spec is good — you are reviewing whether the implementation faithfully delivers what the spec specifies.
 
 This is a non-interactive, read-only skill. Do not modify code, tests, or spec files. Write results to `rootspec/review-status.json` only.
 
@@ -20,12 +20,21 @@ Read these in parallel:
 3. **Spec overview** — `rootspec/01.PHILOSOPHY.md`, `rootspec/02.TRUTHS.md`, `rootspec/03.INTERACTIONS.md` for voice, tone, product positioning
 4. **Conventions** — `rootspec/CONVENTIONS/visual.md` and `rootspec/CONVENTIONS/technical.md` if they exist
 
-Then find screenshots and source files:
+Find screenshots:
 
 ```bash
 find cypress/screenshots -name "*.png" 2>/dev/null | sort
-find src -type f \( -name "*.tsx" -o -name "*.astro" -o -name "*.jsx" -o -name "*.vue" -o -name "*.svelte" -o -name "*.html" \) 2>/dev/null | sort
 ```
+
+Find the rendered HTML — what the user actually sees:
+
+```bash
+for f in public/index.html dist/index.html out/index.html build/index.html; do
+  [ -f "$f" ] && echo "RENDERED_HTML=$f" && break
+done
+```
+
+If a single rendered HTML file exists, read it — this is your primary review artifact alongside screenshots. If no single file exists (multi-page app), fall back to reading source component files.
 
 Find the user stories:
 
@@ -47,9 +56,9 @@ Read the story's acceptance criteria, given/when/then steps. Understand what was
 
 Find screenshots matching the story ID (e.g., `cypress/screenshots/**/US-101--*.png`). Read each screenshot image.
 
-### 2c. Judge: does the implementation match the story?
+### 2c. Judge: does the screenshot match what the user should see?
 
-Compare what the screenshot shows against what the story specifies. Check for:
+Compare the screenshot against the story's acceptance criteria. You are reviewing from a **user's perspective** — would a person looking at this page see what the story promises?
 
 **placeholder_text** (blocker)
 - Literal text describing a visual element instead of the actual element (e.g., "Next Arrow" instead of →, "Star Icon" instead of ★)
@@ -67,15 +76,14 @@ Compare what the screenshot shows against what the story specifies. Check for:
 - Features described in the story but visibly missing or non-functional in the screenshot
 - Wrong data displayed (e.g., wrong version number, wrong product name)
 
-## Step 3: Global Source Review (~2 turns)
+## Step 3: Global Review (~2 turns)
 
-Read application source files and check across all stories:
+Using the **rendered HTML** (not source files), check across all stories:
 
-**broken_links** (blocker)
-- Extract all `href`, `src`, and `action` attribute values from source
-- Cross-reference URLs against SEED.md — flag any URL not traceable to SEED.md or the spec
-- Check for hallucinated GitHub URLs, CDN links to non-existent resources
-- Internal links must match routes that exist (cross-reference with story `visit` paths)
+**broken_links** — extract all `href` and `src` attribute values from the HTML:
+- **Blocker**: URL that is provably wrong — placeholder URL (`example.com`, `#todo`, `javascript:void`), link to a page/resource that doesn't exist within the project, URL with obviously wrong domain
+- **Warning**: External URL that can't be verified as working (we can't HTTP check it, but it looks plausible)
+- **NOT a blocker**: A URL that goes to the right place even if SEED.md didn't spell it out verbatim. The impl agent is expected to infer correct URLs from context like "link to the GitHub repo."
 
 **accessibility** (warning)
 - Images without meaningful `alt` text (empty or missing)
@@ -97,7 +105,7 @@ Write `rootspec/review-status.json`:
       "severity": "blocker|warning|nitpick",
       "category": "placeholder_text|visual_quality|impl_error|broken_links|accessibility",
       "story": "US-103",
-      "file": "src/components/Wizard.tsx",
+      "file": "public/index.html",
       "line": 42,
       "screenshot": "cypress/screenshots/mvp.cy.ts/US-103--AC-103-1.png",
       "description": "What is wrong",
@@ -110,8 +118,8 @@ Write `rootspec/review-status.json`:
 ```
 
 **Severity rules:**
-- **blocker**: Broken links, literal icon text, content contradicting spec/SEED.md, missing specified features
-- **warning**: Accessibility gaps, minor visual issues, slightly stale copy
+- **blocker**: Broken/placeholder links, literal icon text, content contradicting spec/SEED.md, missing specified features
+- **warning**: Accessibility gaps, minor visual issues, unverifiable external links
 - **nitpick**: Subjective style preferences, could-be-better patterns
 
 **Status:** `"pass"` if zero blockers, `"fail"` if any blockers.
@@ -169,6 +177,6 @@ bash "$SHARED_DIR/scripts/write-stats.sh" rootspec/stats.json rs-review "$STARTE
 
 ## Scope
 
-- **CAN read:** All project files, screenshots, SEED.md, spec files, source code
+- **CAN read:** All project files, screenshots, rendered HTML, SEED.md, spec files
 - **CAN write:** `rootspec/review-status.json`, `rootspec/stats.json`
 - **CANNOT write:** Application code, spec files, test files, configuration files
