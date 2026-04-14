@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.2.4] - 2026-04-14
+
 ### Fixed
 
 - **Heartbeat timeout**: Kill hung SDK processes after 5 minutes of no messages instead of waiting indefinitely. Prevents wasting 40+ minutes on a stuck process.
