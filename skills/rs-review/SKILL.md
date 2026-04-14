@@ -11,54 +11,94 @@ This is a non-interactive, read-only skill. Do not modify code, tests, or spec f
 
 **Stats tracking:** Record `STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")` at the very start.
 
-## Step 1: Gather Context (~3 turns)
+**Turn efficiency:** Your turns are limited — the system will cut you off silently when you hit the limit. You will NOT be warned. Plan your approach upfront and work efficiently.
 
-Read these in parallel:
+- Every tool call costs one turn. Batch parallel reads aggressively — read multiple files in a single turn using parallel tool calls. Never read one file per turn when you could read four.
+- Budget: ~10 base turns + ~2 turns per story section (YAML file). A 4-section app should finish in ~18 turns. A 10-section app in ~30.
+- **Always write review-status.json incrementally** after each section. If you are cut off, the file must contain valid results for all completed sections.
 
-1. **SEED.md** — canonical source for URLs, product positioning, external references
-2. **rootspec/tests-status.json** — which stories pass (only review passing stories)
-3. **Spec overview** — `rootspec/01.PHILOSOPHY.md`, `rootspec/02.TRUTHS.md`, `rootspec/03.INTERACTIONS.md` for voice, tone, product positioning
-4. **Conventions** — `rootspec/CONVENTIONS/visual.md` and `rootspec/CONVENTIONS/technical.md` if they exist
+## Step 1: Gather Context and Initialize (~4 turns)
 
-Find screenshots:
+### Turn 1: Discover project structure
+
+Run a single bash command to discover all review artifacts at once:
 
 ```bash
+STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+echo "=== TESTS_STATUS ==="
+cat rootspec/tests-status.json 2>/dev/null || echo '{}'
+echo ""
+echo "=== SCREENSHOTS ==="
 find cypress/screenshots -name "*.png" 2>/dev/null | sort
-```
-
-Find the rendered HTML — what the user actually sees:
-
-```bash
-for f in public/index.html dist/index.html out/index.html build/index.html; do
-  [ -f "$f" ] && echo "RENDERED_HTML=$f" && break
-done
-```
-
-If a single rendered HTML file exists, read it — this is your primary review artifact alongside screenshots. If no single file exists (multi-page app), fall back to reading source component files.
-
-Find the user stories:
-
-```bash
+echo ""
+echo "=== STORY_FILES ==="
 find rootspec/05.IMPLEMENTATION/USER_STORIES -name "*.yaml" -o -name "*.yml" 2>/dev/null | sort
+echo ""
+echo "=== RENDERED_HTML ==="
+find public dist out build -name "*.html" 2>/dev/null | head -20
 ```
 
-Announce: "Reviewing N passing stories with M screenshots."
+Parse the output to identify:
+- Which stories pass (only review passing stories)
+- All screenshot paths, grouped by story ID prefix (e.g., `US-101--*.png`)
+- All story YAML files — these are your **sections**
+- All rendered HTML pages
 
-## Step 2: Per-Story Review
+### Turn 2: Read context files (parallel reads)
 
-For each **passing** story:
+Read ALL of these in one turn using parallel tool calls:
 
-### 2a. Read the story's YAML
+1. **SEED.md** — canonical URLs, product positioning, external references
+2. **rootspec/01.PHILOSOPHY.md** — voice, tone, design pillars
+3. **rootspec/02.TRUTHS.md** — product truths and strategies
+4. **rootspec/03.INTERACTIONS.md** — behavioral patterns and interaction loops
+5. **rootspec/CONVENTIONS/visual.md** (if it exists)
+6. **rootspec/CONVENTIONS/technical.md** (if it exists)
 
-Read the story's acceptance criteria, given/when/then steps. Understand what was specified — what should the user see? What interactions should work? What content should appear?
+This is 4-6 parallel reads = 1 turn.
 
-### 2b. Read the story's screenshots
+### Turn 3: Read rendered HTML
 
-Find screenshots matching the story ID (e.g., `cypress/screenshots/**/US-101--*.png`). Read each screenshot image.
+If a single rendered HTML file exists (single-page app), read it. If multiple HTML files exist (multi-page app), read the main entry point (index.html). You will use this for the global review in Step 3.
 
-### 2c. Judge: does the screenshot match what the user should see?
+### Turn 4: Initialize review-status.json
 
-Compare the screenshot against the story's acceptance criteria. You are reviewing from a **user's perspective** — would a person looking at this page see what the story promises?
+Write the initial `rootspec/review-status.json` with an empty issues array. This ensures the file exists even if you are cut off later:
+
+```json
+{
+  "lastReview": "<ISO timestamp>",
+  "status": "pass",
+  "summary": { "blockers": 0, "warnings": 0, "nitpicks": 0 },
+  "issues": []
+}
+```
+
+Announce: "Reviewing N passing stories across M sections with P screenshots."
+
+## Step 2: Section-Based Review (~2 turns per section)
+
+Group stories by their YAML file. Each YAML file is a **section** (e.g., `content.yaml`, `interactive.yaml`, `responsive.yaml`, `theme.yaml`). Review all stories in a section together.
+
+For each section:
+
+### Turn A: Read the section's YAML + all its screenshots (parallel reads)
+
+In a single turn, read:
+- The section's YAML file (contains all stories for this section)
+- ALL screenshots for ALL passing stories in this section
+
+Example: if `content.yaml` contains US-101 through US-105, and those have 8 screenshots total, read the YAML + all 8 screenshots as parallel tool calls = 1 turn.
+
+Match screenshots to stories using the naming convention: `cypress/screenshots/**/US-{id}--*.png`.
+
+Only read screenshots for stories that are **passing** in tests-status.json. Skip failed/missing stories entirely.
+
+### Turn B: Judge all stories in the section + write findings
+
+For each passing story in the section, compare its screenshots against its acceptance criteria. Judge from a **user's perspective** — would a person looking at this page see what the story promises?
+
+**Issue categories and severity:**
 
 **placeholder_text** (blocker)
 - Literal text describing a visual element instead of the actual element (e.g., "Next Arrow" instead of →, "Star Icon" instead of ★)
@@ -76,9 +116,18 @@ Compare the screenshot against the story's acceptance criteria. You are reviewin
 - Features described in the story but visibly missing or non-functional in the screenshot
 - Wrong data displayed (e.g., wrong version number, wrong product name)
 
+After judging all stories in the section, **immediately update** `rootspec/review-status.json`:
+1. Read the current file
+2. Append new issues with sequential IDs (REV-001, REV-002, etc.)
+3. Update summary counts (blockers, warnings, nitpicks)
+4. Update status ("fail" if any blockers, "pass" otherwise)
+5. Write the updated file
+
+**This incremental write is critical.** If you are cut off after completing 3 of 4 sections, the gate will have valid results for those 3 sections.
+
 ## Step 3: Global Review (~2 turns)
 
-Using the **rendered HTML** (not source files), check across all stories:
+Using the **rendered HTML** (already read in Step 1), check across all stories:
 
 **broken_links** — extract all `href` and `src` attribute values from the HTML:
 - **Blocker**: URL that is provably wrong — placeholder URL (`example.com`, `#todo`, `javascript:void`), link to a page/resource that doesn't exist within the project, URL with obviously wrong domain
@@ -90,41 +139,9 @@ Using the **rendered HTML** (not source files), check across all stories:
 - Interactive elements (buttons, links) without accessible labels
 - Non-semantic HTML for interactive content (div with onClick instead of button)
 
-## Step 4: Write Results
+After checking, update `rootspec/review-status.json` with any new issues (same read-append-rewrite pattern as Step 2).
 
-Write `rootspec/review-status.json`:
-
-```json
-{
-  "lastReview": "<ISO timestamp>",
-  "status": "pass|fail",
-  "summary": { "blockers": 0, "warnings": 0, "nitpicks": 0 },
-  "issues": [
-    {
-      "id": "REV-001",
-      "severity": "blocker|warning|nitpick",
-      "category": "placeholder_text|visual_quality|impl_error|broken_links|accessibility",
-      "story": "US-103",
-      "file": "public/index.html",
-      "line": 42,
-      "screenshot": "cypress/screenshots/mvp.cy.ts/US-103--AC-103-1.png",
-      "description": "What is wrong",
-      "expected": "What spec/story says it should be",
-      "actual": "What it currently is",
-      "suggestion": "How to fix"
-    }
-  ]
-}
-```
-
-**Severity rules:**
-- **blocker**: Broken/placeholder links, literal icon text, content contradicting spec/SEED.md, missing specified features
-- **warning**: Accessibility gaps, minor visual issues, unverifiable external links
-- **nitpick**: Subjective style preferences, could-be-better patterns
-
-**Status:** `"pass"` if zero blockers, `"fail"` if any blockers.
-
-## Step 5: Quality Score
+## Step 4: Quality Score and Final Status (~2 turns)
 
 Compute a quality score (0-100) using this rubric:
 
@@ -138,7 +155,7 @@ Compute a quality score (0-100) using this rubric:
 
 Score = 100 - total deductions (floor at 0).
 
-Add to `review-status.json`:
+Read `rootspec/review-status.json` one final time, add the quality score, and write:
 
 ```json
 {
@@ -155,7 +172,14 @@ Add to `review-status.json`:
 }
 ```
 
-## Step 6: Report
+**Severity rules:**
+- **blocker**: Broken/placeholder links, literal icon text, content contradicting spec/SEED.md, missing specified features
+- **warning**: Accessibility gaps, minor visual issues, unverifiable external links
+- **nitpick**: Subjective style preferences, could-be-better patterns
+
+**Status:** `"pass"` if zero blockers, `"fail"` if any blockers.
+
+## Step 5: Report and Stats (~1 turn)
 
 If pass: "Review passed (score: N/100). M warnings, K nitpicks — no blockers."
 

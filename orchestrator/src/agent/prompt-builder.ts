@@ -242,12 +242,13 @@ export function buildPrompt(
 
   if (phase === "review") {
     parts.push("## Review Phase Directives");
+    parts.push(`- Turn budget: ~${config.turnLimits[phase]} turns. Plan to finish well within this limit.`);
     parts.push("- Review the IMPLEMENTATION, not the spec. The spec is truth.");
-    parts.push("- Read each passing story's YAML to understand what was specified.");
-    parts.push("- Read each story's screenshots to see what was actually built.");
-    parts.push("- Judge: did impl faithfully deliver what the story specifies?");
-    parts.push("- Check source files for broken links, placeholder text, accessibility.");
-    parts.push("- Write rootspec/review-status.json with categorized issues and quality score.");
+    parts.push("- Group stories by YAML file (section). Review each section as a batch.");
+    parts.push("- Read all screenshots for a section in one parallel read, then judge all stories together.");
+    parts.push("- Check rendered HTML for broken links, placeholder text, accessibility.");
+    parts.push("- Write rootspec/review-status.json INCREMENTALLY — after each section, not just at the end.");
+    parts.push("- If you are cut off mid-review, the file must contain valid results for completed sections.");
     parts.push("- Do NOT modify application code, spec files, or test files.");
     parts.push("");
   }
