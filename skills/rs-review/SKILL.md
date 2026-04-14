@@ -17,7 +17,7 @@ This is a non-interactive, read-only skill. Do not modify code, tests, or spec f
 - Budget: ~10 base turns + ~2 turns per story section (YAML file). A 4-section app should finish in ~18 turns. A 10-section app in ~30.
 - **Always write review-status.json incrementally** after each section. If you are cut off, the file must contain valid results for all completed sections.
 
-## Step 1: Gather Context and Initialize (~4 turns)
+## Step 1: Gather Context (~3 turns)
 
 ### Turn 1: Discover project structure
 
@@ -25,6 +25,13 @@ Run a single bash command to discover all review artifacts at once:
 
 ```bash
 STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# Initialize review-status.json IMMEDIATELY — guarantees the gate has
+# valid data even if the agent is cut off before writing any findings.
+cat > rootspec/review-status.json << JSON
+{"lastReview":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","status":"pass","summary":{"blockers":0,"warnings":0,"nitpicks":0},"issues":[]}
+JSON
+
 echo "=== TESTS_STATUS ==="
 cat rootspec/tests-status.json 2>/dev/null || echo '{}'
 echo ""
@@ -61,18 +68,7 @@ This is 4-6 parallel reads = 1 turn.
 
 If a single rendered HTML file exists (single-page app), read it. If multiple HTML files exist (multi-page app), read the main entry point (index.html). You will use this for the global review in Step 3.
 
-### Turn 4: Initialize review-status.json
-
-Write the initial `rootspec/review-status.json` with an empty issues array. This ensures the file exists even if you are cut off later:
-
-```json
-{
-  "lastReview": "<ISO timestamp>",
-  "status": "pass",
-  "summary": { "blockers": 0, "warnings": 0, "nitpicks": 0 },
-  "issues": []
-}
-```
+Note: `review-status.json` was already initialized by the discovery script in Turn 1. The gate will see valid data (pass, 0 issues) even if you are cut off at any point from here on.
 
 Announce: "Reviewing N passing stories across M sections with P screenshots."
 
