@@ -131,9 +131,24 @@ export async function executePhase(
         settingSources: ["project" as const],
         hooks,
         spawnClaudeCodeProcess: (spawnOpts) => {
+          reporter.emit({
+            type: "message",
+            phase,
+            timestamp: new Date().toISOString(),
+            data: { text: `Spawning: ${spawnOpts.command} ${spawnOpts.args.join(" ")} (cwd: ${spawnOpts.cwd})` },
+          });
           const result = spawnInProcessGroup(spawnOpts);
           pgid = result.pgid;
           getStderr = result.getStderr;
+          // Log when the process exits
+          result.process.on("exit", (code, signal) => {
+            reporter.emit({
+              type: "message",
+              phase,
+              timestamp: new Date().toISOString(),
+              data: { text: `Process exited: code=${code} signal=${signal} stderr=${result.getStderr().slice(-500) || "(empty)"}` },
+            });
+          });
           return result.process;
         },
         ...(resumeId ? { resume: resumeId } : {}),

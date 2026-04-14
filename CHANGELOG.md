@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **SDK stderr capture**: Log stderr from hung/crashed Claude Code processes for diagnostics. Previously, SDK crashes produced no error output — only "0 turns, $0" with no explanation.
+- **SDK process diagnostics**: Log spawn command, exit code/signal, and stderr from Claude Code processes. Previously, hung processes produced no error output — only "0 turns, $0" with no explanation.
 
 ## [7.2.5] - 2026-04-14
 
