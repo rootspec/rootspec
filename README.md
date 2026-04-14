@@ -155,4 +155,4 @@ See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for detailed walkthroughs of each sce
 
 ---
 
-**Version v7.2.1** — See [CHANGELOG.md](CHANGELOG.md) for history. MIT [License](LICENSE). [Contributing](CONTRIBUTING.md).
+**Version v7.2.2** — See [CHANGELOG.md](CHANGELOG.md) for history. MIT [License](LICENSE). [Contributing](CONTRIBUTING.md).
