@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Review gate false pass**: Initialize review-status.json with `"status": "incomplete"` instead of `"pass"`. Gate now detects when the review agent crashed without writing results and retries instead of silently passing.
+
 ## [7.2.4] - 2026-04-14
 
 ### Fixed

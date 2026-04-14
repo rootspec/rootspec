@@ -27,9 +27,10 @@ Run a single bash command to discover all review artifacts at once:
 STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Initialize review-status.json IMMEDIATELY — guarantees the gate has
-# valid data even if the agent is cut off before writing any findings.
+# a parseable file even if the agent crashes. Status "incomplete" tells
+# the gate the review hasn't actually run yet.
 cat > rootspec/review-status.json << JSON
-{"lastReview":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","status":"pass","summary":{"blockers":0,"warnings":0,"nitpicks":0},"issues":[]}
+{"lastReview":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","status":"incomplete","summary":{"blockers":0,"warnings":0,"nitpicks":0},"issues":[]}
 JSON
 
 echo "=== TESTS_STATUS ==="
