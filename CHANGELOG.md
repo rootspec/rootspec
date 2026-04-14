@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.2.3] - 2026-04-13
+
 ### Fixed
 
 - **Review gate resilience**: Initialize `review-status.json` in the discovery bash command (Turn 1) instead of relying on the agent to write it later. Prevents empty gate result when review hits max_turns before writing.
