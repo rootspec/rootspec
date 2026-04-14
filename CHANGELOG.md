@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.2.2] - 2026-04-13
+
 ### Changed
 
 - **Shared bootstrap script**: Extracted init file creation into `skills/rs-shared/scripts/bootstrap-init.sh`. Both the orchestrator and rs-init skill call the same script — single source of truth, no drift.

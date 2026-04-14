@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.2.2
+
+Summary: Review skill turn efficiency — section-based batching, incremental output, turn budget awareness
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None
+
 ## 7.0.10
 
 Summary: Stronger package.json hard rule in rs-impl preamble and Scope
