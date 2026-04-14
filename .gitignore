@@ -91,3 +91,5 @@ CLAUDE.local.md
 # (Optional) Ignore local history/session logs if your plugin stores them in-repo
 .claude/history/
 .claude/sessions/
+ROADMAP_IDEAS.md
+VARIANT_PITCH.md
