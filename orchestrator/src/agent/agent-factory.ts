@@ -42,10 +42,18 @@ function spawnInProcessGroup(options: {
     detached: true, // Creates a new process group; child.pid === PGID
   });
 
+  // Capture stderr for diagnostics — hung processes often emit errors
+  // to stderr that the SDK stream silently swallows.
+  const stderrChunks: string[] = [];
+  child.stderr?.on("data", (chunk: Buffer) => {
+    stderrChunks.push(chunk.toString());
+  });
+
   return {
     // ChildProcess satisfies SpawnedProcess per the SDK docs
     process: child,
     pgid: child.pid,
+    getStderr: () => stderrChunks.join(""),
   };
 }
 
@@ -100,6 +108,7 @@ export async function executePhase(
 
   // Track PGID so we can kill the entire process tree on cleanup
   let pgid: number | undefined;
+  let getStderr: (() => string) | undefined;
 
   try {
     const resumeId = state.attempt[phase] > 0 ? state.sessionIds[phase] : undefined;
@@ -124,6 +133,7 @@ export async function executePhase(
         spawnClaudeCodeProcess: (spawnOpts) => {
           const result = spawnInProcessGroup(spawnOpts);
           pgid = result.pgid;
+          getStderr = result.getStderr;
           return result.process;
         },
         ...(resumeId ? { resume: resumeId } : {}),
@@ -213,6 +223,16 @@ export async function executePhase(
         `SDK stream ended without result message (saw ${assistantMessageCount} assistant messages). ` +
         `Cost for this attempt is not tracked — check Anthropic dashboard for actual spend.`
       );
+    }
+
+    // Append stderr if available — critical for diagnosing hung/crashed processes
+    if (getStderr) {
+      const stderr = getStderr().trim();
+      if (stderr) {
+        // Limit to last 2000 chars to avoid bloating logs
+        const truncated = stderr.length > 2000 ? `…${stderr.slice(-2000)}` : stderr;
+        errors.push(`Process stderr:\n${truncated}`);
+      }
     }
   } catch (err) {
     resultStatus = "error";
