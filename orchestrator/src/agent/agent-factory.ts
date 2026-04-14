@@ -130,7 +130,32 @@ export async function executePhase(
       },
     });
 
+    // Heartbeat: if no message arrives in 5 minutes, the SDK is hung.
+    // Kill the process group and bail instead of wasting 40+ minutes.
+    const HEARTBEAT_TIMEOUT_MS = 5 * 60 * 1000;
+    let heartbeatTimer: ReturnType<typeof setTimeout> | null = null;
+    let heartbeatExpired = false;
+
+    const resetHeartbeat = () => {
+      if (heartbeatTimer) clearTimeout(heartbeatTimer);
+      heartbeatTimer = setTimeout(() => {
+        heartbeatExpired = true;
+        reporter.emit({
+          type: "message",
+          phase,
+          timestamp: new Date().toISOString(),
+          data: { text: `No messages for ${HEARTBEAT_TIMEOUT_MS / 60000}m — killing hung process` },
+        });
+        if (pgid) {
+          try { process.kill(-pgid, "SIGKILL"); } catch {}
+        }
+      }, HEARTBEAT_TIMEOUT_MS);
+    };
+    resetHeartbeat();
+
     for await (const message of messageStream) {
+      resetHeartbeat();
+
       // Capture session ID from init message
       if (message.type === "system" && "session_id" in message) {
         sessionId = message.session_id as string;
@@ -172,6 +197,12 @@ export async function executePhase(
           }
         }
       }
+    }
+
+    if (heartbeatTimer) clearTimeout(heartbeatTimer);
+    if (heartbeatExpired) {
+      resultStatus = "error";
+      errors.push(`Killed after ${HEARTBEAT_TIMEOUT_MS / 60000}m with no messages (process hung)`);
     }
 
     // Stream ended without a result message — the SDK process likely exited
