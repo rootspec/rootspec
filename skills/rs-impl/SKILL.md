@@ -85,7 +85,7 @@ Start the dev server AND create conventions if needed in the same turn:
 sleep 3
 ```
 
-If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec and detected framework. Use `## Heading` sections with `- **Label:** value` entries.
+If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec, detected framework, and existing source code. For brownfield projects (existing code, no prior conventions), audit the codebase and document observed patterns — stack, file organization, styling approach, API patterns, component structure. Use `## Heading` sections with `- **Label:** value` entries.
 
 ## Step 3: Implement (~3 turns per story)
 

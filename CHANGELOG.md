@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **SDK process diagnostics**: Log spawn command, exit code/signal, and stderr from Claude Code processes. Previously, hung processes produced no error output — only "0 turns, $0" with no explanation.
+- **Brownfield CONVENTIONS**: Impl skill now instructs the agent to audit existing source code and document observed patterns for brownfield projects, not just derive from the spec.
 
 ## [7.2.5] - 2026-04-14
 
