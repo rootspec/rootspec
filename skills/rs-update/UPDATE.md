@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.3.0
+
+Summary: Hybrid review — deterministic static stage owns blockers, LLM stage advisory only
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — orchestrator-side change. The `rs-review` skill now writes only under `llmFindings` in `review-status.json`; the `summary` and `issues` keys are owned by the orchestrator's static review pass. Existing project files are unaffected.
+
 ## 7.2.4
 
 Summary: Heartbeat timeout — kill hung SDK processes after 5min of silence
