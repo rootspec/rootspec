@@ -153,6 +153,10 @@ your-project/
 
 See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for detailed walkthroughs of each scenario.
 
+### Unattended runs (orchestrator)
+
+For CI, scheduled rebuilds, or any hands-off pipeline, the [**RootSpec Orchestrator**](orchestrator/README.md) chains all phases (`init → spec → impl → validate → review`) into a single `rs-orchestrate` command — with budget caps, retries, quality gates, and resumable state. Same skills, just driven autonomously instead of interactively.
+
 ---
 
 **Version v7.2.8** — See [CHANGELOG.md](CHANGELOG.md) for history. MIT [License](LICENSE). [Contributing](CONTRIBUTING.md).
