@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.3.1
+
+Summary: Static review now runs after a project build; LLM screenshot picker dedupes
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — orchestrator-side change only.
+
 ## 7.3.0
 
 Summary: Hybrid review — deterministic static stage owns blockers, LLM stage advisory only
