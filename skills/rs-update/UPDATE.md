@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.3.2
+
+Summary: Framework-agnostic build output detection; rs-impl wires the build script
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — projects whose impl phase already wired a real `build` script need no change. Future runs of `rs-impl` will replace the `rs-init` stub automatically.
+
 ## 7.3.1
 
 Summary: Static review now runs after a project build; LLM screenshot picker dedupes
