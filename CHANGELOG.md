@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.0] - 2026-04-15
+
 ### Changed
 
 - **Hybrid review architecture**: Review phase split into two stages. Stage 1 is a deterministic JS scanner in the orchestrator (`static-review.ts`) that owns `summary.staticBlockers` and `issues` in `review-status.json` — detects template syntax (`{{...}}`), Lorem ipsum, `TODO:`/`FIXME:` markers, literal icon descriptions, placeholder URLs, missing alt text, and test-coverage gaps. Stage 2 is the LLM agent, now slim and advisory: reads a curated screenshot subset and writes only under `llmFindings`.
