@@ -22,6 +22,7 @@ import {
   readFileSync,
   appendFileSync,
 } from "node:fs";
+import { execSync } from "node:child_process";
 import { join } from "node:path";
 
 export async function orchestrate(
@@ -238,6 +239,11 @@ export async function orchestrate(
     const maxFixCycles = config.gates.review?.maxFixCycles ?? 1;
     const runLlmStage = config.gates.review?.runLlmStage ?? true;
 
+    // Build the project once so static review has rendered HTML to scan.
+    // Cypress runs against the dev server; without this, dist/ is empty in CI
+    // and static review degenerates to 0 pages scanned.
+    runProjectBuild(config.projectDir, reporter);
+
     for (let cycle = 0; cycle <= maxFixCycles; cycle++) {
       if (config.maxBudgetUsd - state.totalCostUsd <= 0) break;
 
@@ -437,6 +443,57 @@ async function bootstrap(
       type: "message",
       timestamp: new Date().toISOString(),
       data: { text: "WARNING: Could not install skills — shared scripts will be unavailable" },
+    });
+  }
+}
+
+/**
+ * Build the project so static review has rendered HTML to scan.
+ * Best-effort: skips silently if there's no `build` script, and a build
+ * failure is non-fatal — review proceeds against whatever HTML exists.
+ */
+function runProjectBuild(projectDir: string, reporter: Reporter): void {
+  const pkgPath = join(projectDir, "package.json");
+  if (!existsSync(pkgPath)) return;
+
+  let hasBuildScript = false;
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+    hasBuildScript = typeof pkg?.scripts?.build === "string";
+  } catch {
+    return;
+  }
+  if (!hasBuildScript) return;
+
+  reporter.emit({
+    type: "message",
+    phase: "review",
+    timestamp: new Date().toISOString(),
+    data: { text: "Building project for static review (npm run build)..." },
+  });
+
+  const start = Date.now();
+  try {
+    execSync("npm run build", {
+      cwd: projectDir,
+      timeout: 5 * 60 * 1000,
+      stdio: "pipe",
+      encoding: "utf-8",
+    });
+    reporter.emit({
+      type: "message",
+      phase: "review",
+      timestamp: new Date().toISOString(),
+      data: { text: `Build complete (${Math.round((Date.now() - start) / 1000)}s)` },
+    });
+  } catch (err) {
+    reporter.emit({
+      type: "message",
+      phase: "review",
+      timestamp: new Date().toISOString(),
+      data: {
+        text: `WARNING: build failed (${Math.round((Date.now() - start) / 1000)}s) — proceeding to review with existing HTML. Error: ${(err as Error).message.slice(0, 200)}`,
+      },
     });
   }
 }

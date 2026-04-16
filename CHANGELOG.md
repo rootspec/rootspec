@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.1] - 2026-04-16
+
+### Fixed
+
+- **Static review scanned 0 pages in CI**: Orchestrator now runs `npm run build` (when defined) before the review-fix loop, so the static scanner has rendered HTML to inspect. In CI the impl agent runs Cypress against the dev server and never builds; the deterministic stage was effectively a no-op. Build failure is non-fatal — review proceeds with whatever HTML exists.
+- **LLM screenshot curation produced near-duplicates**: `pickLlmScreenshots` now groups by story ID, prefers the lowest AC number per story, and hash-dedupes the picks (Cypress full-page screenshots of the same DOM state are byte-identical). Single-page apps now collapse to one screenshot instead of three nearly-identical ones.
+
 ## [7.3.0] - 2026-04-15
 
 ### Changed

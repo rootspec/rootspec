@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join, relative, resolve, dirname, extname } from "node:path";
 import type { OrchestratorConfig } from "../config.js";
 
@@ -363,19 +364,45 @@ function scanTestCoverage(
 function pickLlmScreenshots(projectDir: string): string[] {
   const root = join(projectDir, "cypress", "screenshots");
   if (!existsSync(root)) return [];
-  const all = Array.from(collectAllFiles(root))
-    .filter((p) => p.endsWith(".png"))
-    .map((p) => relative(projectDir, p))
-    .sort();
+  const all = Array.from(collectAllFiles(root)).filter((p) => p.endsWith(".png"));
   if (all.length === 0) return [];
 
-  // Heuristic curation: first screenshot from the lowest-numbered story,
-  // plus up to two more spaced across the list. Keeps LLM payload small.
-  const picks = new Set<string>();
-  picks.add(all[0]);
-  if (all.length > 2) picks.add(all[Math.floor(all.length / 2)]);
-  if (all.length > 1) picks.add(all[all.length - 1]);
-  return Array.from(picks);
+  // Group by story ID (US-{n}); within each group prefer the lowest AC number.
+  // Cypress fullPage screenshots of the same route+state are byte-identical,
+  // so hash-dedup catches single-page apps where every story renders the same view.
+  const STORY_RE = /US-(\d+)/;
+  const AC_RE = /AC-\d+-(\d+)/;
+
+  type Pick = { abs: string; story: number; ac: number };
+  const byStory = new Map<number, Pick>();
+  for (const abs of all) {
+    const sm = abs.match(STORY_RE);
+    if (!sm) continue;
+    const story = parseInt(sm[1], 10);
+    const am = abs.match(AC_RE);
+    const ac = am ? parseInt(am[1], 10) : Number.MAX_SAFE_INTEGER;
+    const existing = byStory.get(story);
+    if (!existing || ac < existing.ac) {
+      byStory.set(story, { abs, story, ac });
+    }
+  }
+
+  const orderedPicks = Array.from(byStory.values()).sort((a, b) => a.story - b.story);
+
+  const seenHashes = new Set<string>();
+  const picks: string[] = [];
+  for (const { abs } of orderedPicks) {
+    const hash = hashFile(abs);
+    if (seenHashes.has(hash)) continue;
+    seenHashes.add(hash);
+    picks.push(relative(projectDir, abs));
+    if (picks.length >= 3) break;
+  }
+  return picks;
+}
+
+function hashFile(path: string): string {
+  return createHash("sha1").update(readFileSync(path)).digest("hex");
 }
 
 function stripScriptsAndStyles(html: string): string {
