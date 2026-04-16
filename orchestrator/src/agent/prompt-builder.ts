@@ -129,11 +129,9 @@ function buildReviewFixPrompt(
       if (blockers.length > 0) {
         parts.push("### BLOCKERS — Must Fix\n");
         for (const b of blockers) {
-          parts.push(`**${b.id}** — ${b.description}`);
-          parts.push(`- File: \`${b.file}\` line ${b.line}`);
-          if (b.expected) parts.push(`- Expected: ${b.expected}`);
-          if (b.actual) parts.push(`- Actual: ${b.actual}`);
-          if (b.suggestion) parts.push(`- Fix: ${b.suggestion}`);
+          parts.push(`**${b.id}** [${b.category}] — ${b.message}`);
+          parts.push(`- File: \`${b.file}\``);
+          if (b.excerpt) parts.push(`- Excerpt: \`${b.excerpt}\``);
           parts.push("");
         }
       }
@@ -141,9 +139,9 @@ function buildReviewFixPrompt(
       if (warnings.length > 0) {
         parts.push("### WARNINGS — Fix if time permits\n");
         for (const w of warnings) {
-          parts.push(`**${w.id}** — ${w.description}`);
-          parts.push(`- File: \`${w.file}\` line ${w.line}`);
-          if (w.suggestion) parts.push(`- Fix: ${w.suggestion}`);
+          parts.push(`**${w.id}** [${w.category}] — ${w.message}`);
+          parts.push(`- File: \`${w.file}\``);
+          if (w.excerpt) parts.push(`- Excerpt: \`${w.excerpt}\``);
           parts.push("");
         }
       }
@@ -243,12 +241,10 @@ export function buildPrompt(
   if (phase === "review") {
     parts.push("## Review Phase Directives");
     parts.push(`- Turn budget: ~${config.turnLimits[phase]} turns. Plan to finish well within this limit.`);
-    parts.push("- Review the IMPLEMENTATION, not the spec. The spec is truth.");
-    parts.push("- Group stories by YAML file (section). Review each section as a batch.");
-    parts.push("- Read all screenshots for a section in one parallel read, then judge all stories together.");
-    parts.push("- Check rendered HTML for broken links, placeholder text, accessibility.");
-    parts.push("- Write rootspec/review-status.json INCREMENTALLY — after each section, not just at the end.");
-    parts.push("- If you are cut off mid-review, the file must contain valid results for completed sections.");
+    parts.push("- Static review has ALREADY run. Its findings are authoritative and live in rootspec/review-status.json under `summary` and `issues` — DO NOT overwrite them.");
+    parts.push("- Your job: read the curated screenshots listed in `llmInputs.screenshots` and render an advisory visual assessment.");
+    parts.push("- Write ONLY under the `llmFindings` key: `{ assessment: 'clean'|'needs_review'|'broken', observations: string[] }`.");
+    parts.push("- 1–5 observations max. Each observation a single sentence. No quality score.");
     parts.push("- Do NOT modify application code, spec files, or test files.");
     parts.push("");
   }

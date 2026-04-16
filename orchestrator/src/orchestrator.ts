@@ -9,6 +9,7 @@ import type { OrchestratorConfig } from "./config.js";
 import { executePhase } from "./agent/agent-factory.js";
 import { executeInit } from "./phases/init.js";
 import { runGate } from "./quality-gates/gate.js";
+import { writeStaticReviewStatus } from "./quality-gates/static-review.js";
 import {
   createInitialState,
   saveState,
@@ -230,39 +231,60 @@ export async function orchestrate(
   }
 
   // --- Review-fix loop ---
-  // After main phases complete, run review. If blockers found,
-  // feed them back to impl, re-validate, re-review. Max N cycles.
-  // Review NEVER fails the build — it improves quality but doesn't gate.
+  // Two-stage: static review (deterministic, authoritative) → optional LLM
+  // review (advisory). Only static blockers can trigger a fix-cycle.
+  // Review NEVER fails the build.
   if (includeReview && state.completedPhases.includes("validate")) {
-    const maxFixCycles = config.gates.review?.maxFixCycles ?? 2;
+    const maxFixCycles = config.gates.review?.maxFixCycles ?? 1;
+    const runLlmStage = config.gates.review?.runLlmStage ?? true;
 
     for (let cycle = 0; cycle <= maxFixCycles; cycle++) {
-      // Check budget
       if (config.maxBudgetUsd - state.totalCostUsd <= 0) break;
 
-      // Run review
       state.currentPhase = "review";
       saveState(config.outputDir, state);
 
-      const reviewResult = await executePhase({
+      // Stage 1: static review writes review-status.json authoritatively
+      const staticStart = Date.now();
+      const staticResult = await writeStaticReviewStatus(config);
+      reporter.emit({
+        type: "message",
         phase: "review",
-        config,
-        state,
-        reporter,
+        timestamp: new Date().toISOString(),
+        data: {
+          text: `Static review: ${staticResult.blockers.length} blocker(s), ${staticResult.warnings.length} warning(s), ${staticResult.pages.length} page(s)`,
+        },
       });
 
-      // Accumulate review costs
-      const prevReview = state.phaseResults.review;
-      if (prevReview) {
-        reviewResult.costUsd += prevReview.costUsd;
-        reviewResult.numTurns += prevReview.numTurns;
-        reviewResult.durationMs += prevReview.durationMs;
-        reviewResult.errors = [...prevReview.errors, ...reviewResult.errors];
+      // Stage 2: optional LLM advisory review — only on first cycle to save cost
+      if (runLlmStage && cycle === 0) {
+        const reviewResult = await executePhase({
+          phase: "review",
+          config,
+          state,
+          reporter,
+        });
+        const prevReview = state.phaseResults.review;
+        if (prevReview) {
+          reviewResult.costUsd += prevReview.costUsd;
+          reviewResult.numTurns += prevReview.numTurns;
+          reviewResult.durationMs += prevReview.durationMs;
+          reviewResult.errors = [...prevReview.errors, ...reviewResult.errors];
+        }
+        state.phaseResults.review = reviewResult;
+        state.totalCostUsd += reviewResult.costUsd - (prevReview?.costUsd ?? 0);
+      } else if (!state.phaseResults.review) {
+        // Record a synthetic phase result so reporting knows review ran
+        state.phaseResults.review = {
+          phase: "review",
+          status: "success",
+          costUsd: 0,
+          numTurns: 0,
+          durationMs: Date.now() - staticStart,
+          errors: [],
+        };
       }
-      state.phaseResults.review = reviewResult;
-      state.totalCostUsd += reviewResult.costUsd - (prevReview?.costUsd ?? 0);
 
-      // Run review gate
       reporter.emit({
         type: "gate_started",
         phase: "review",
@@ -283,13 +305,13 @@ export async function orchestrate(
       });
 
       if (gateResult.passed || cycle >= maxFixCycles) {
-        // Either no blockers, or we've exhausted fix cycles.
-        // Either way, the build succeeds — review doesn't gate.
-        state.completedPhases.push("review");
+        if (!state.completedPhases.includes("review")) {
+          state.completedPhases.push("review");
+        }
         break;
       }
 
-      // Blockers found — feed to impl for targeted fixes
+      // Static blockers found — feed to impl for targeted fixes
       reporter.emit({
         type: "retry",
         phase: "impl",
@@ -297,7 +319,6 @@ export async function orchestrate(
         data: { attempt: cycle + 1, reason: "review_blockers" },
       });
 
-      // Re-run impl (targeted fix)
       const implFixResult = await executePhase({
         phase: "impl",
         config,
@@ -314,7 +335,6 @@ export async function orchestrate(
       state.phaseResults.impl = implFixResult;
       state.totalCostUsd += implFixResult.costUsd - (prevImpl?.costUsd ?? 0);
 
-      // Re-validate (make sure tests still pass)
       injectScreenshotHook(config.projectDir);
       const revalidateResult = await executePhase({
         phase: "validate",
@@ -333,7 +353,7 @@ export async function orchestrate(
       state.totalCostUsd += revalidateResult.costUsd - (prevValidate?.costUsd ?? 0);
 
       saveState(config.outputDir, state);
-      // Loop back for re-review
+      // Loop back: static review re-runs on next iteration
     }
   }
 
@@ -488,24 +508,22 @@ function writeStats(projectDir: string, state: OrchestratorState): void {
     };
   }
 
-  // Read quality score — try review-status.json, then gate check message
-  let qualityScore: number | null = null;
+  // Read review summary (static + LLM) from review-status.json
+  let reviewSummary: {
+    staticBlockers: number;
+    staticWarnings: number;
+    llmAssessment: string;
+  } | null = null;
   const reviewPath = join(projectDir, "rootspec", "review-status.json");
   if (existsSync(reviewPath)) {
     try {
       const review = JSON.parse(readFileSync(reviewPath, "utf-8"));
-      qualityScore = review.qualityScore?.score ?? review.score ?? null;
+      reviewSummary = {
+        staticBlockers: review.summary?.staticBlockers ?? 0,
+        staticWarnings: review.summary?.staticWarnings ?? 0,
+        llmAssessment: review.llmFindings?.assessment ?? "skipped",
+      };
     } catch {}
-  }
-  // Fallback: parse from gate check message ("Score: 78/100")
-  if (qualityScore === null && state.gateResults.review) {
-    const check = state.gateResults.review.checks.find(
-      (c) => c.name === "Review completed"
-    );
-    if (check) {
-      const match = check.message.match(/Score:\s*(\d+)/);
-      if (match) qualityScore = parseInt(match[1], 10);
-    }
   }
 
   stats.runs.push({
@@ -514,7 +532,7 @@ function writeStats(projectDir: string, state: OrchestratorState): void {
     completedAt: new Date().toISOString(),
     totalCostUsd: Math.round(state.totalCostUsd * 100) / 100,
     phases,
-    qualityScore,
+    review: reviewSummary,
   });
 
   writeFileSync(statsPath, JSON.stringify(stats, null, 2));

@@ -26,7 +26,8 @@ const GateConfigSchema = z.object({
     .default({}),
   review: z
     .object({
-      maxFixCycles: z.number().default(2),
+      maxFixCycles: z.number().default(1),
+      runLlmStage: z.boolean().default(true),
     })
     .default({}),
 });
@@ -84,6 +85,7 @@ export function loadConfig(opts: {
   reporter?: string;
   verbose?: boolean;
   config?: string;
+  runLlmReview?: boolean;
 }): OrchestratorConfig {
   const projectDir = resolve(opts.projectDir ?? ".");
 
@@ -102,6 +104,13 @@ export function loadConfig(opts: {
   if (opts.reporter) fileConfig.reporter = opts.reporter;
   if (opts.verbose) fileConfig.verbose = true;
   if (opts.seed) fileConfig.seed = opts.seed;
+  if (opts.runLlmReview === false) {
+    const gates = (fileConfig.gates as Record<string, unknown>) ?? {};
+    const review = (gates.review as Record<string, unknown>) ?? {};
+    review.runLlmStage = false;
+    gates.review = review;
+    fileConfig.gates = gates;
+  }
 
   const parsed = ConfigFileSchema.parse(fileConfig);
 

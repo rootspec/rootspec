@@ -76,9 +76,9 @@ export interface BudgetAllocation {
 export const DEFAULT_BUDGET_ALLOCATION: BudgetAllocation = {
   init: 0.08,
   spec: 0.25,
-  impl: 0.40,
+  impl: 0.47,
   validate: 0.12,
-  review: 0.15,
+  review: 0.08,
 };
 
 export const DEFAULT_TURN_LIMITS: Record<Phase, number> = {
@@ -86,5 +86,5 @@ export const DEFAULT_TURN_LIMITS: Record<Phase, number> = {
   spec: 50,
   impl: 100,
   validate: 25,
-  review: 50,
+  review: 15,
 };

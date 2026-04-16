@@ -25,6 +25,7 @@ const program = new Command()
   .option("--reporter <type>", "Output format: console, json (default: console)")
   .option("--verbose", "Show detailed agent output")
   .option("--config <path>", "Config file path")
+  .option("--no-llm-review", "Skip the LLM advisory stage of review (static review still runs)")
   .action(async (seed: string | undefined, opts: Record<string, unknown>) => {
     try {
       const config = loadConfig({
@@ -39,6 +40,7 @@ const program = new Command()
         reporter: opts.reporter as string | undefined,
         verbose: opts.verbose as boolean | undefined,
         config: opts.config as string | undefined,
+        runLlmReview: opts.llmReview as boolean | undefined,
       });
 
       const reporter =

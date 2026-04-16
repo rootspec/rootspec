@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Hybrid review architecture**: Review phase split into two stages. Stage 1 is a deterministic JS scanner in the orchestrator (`static-review.ts`) that owns `summary.staticBlockers` and `issues` in `review-status.json` — detects template syntax (`{{...}}`), Lorem ipsum, `TODO:`/`FIXME:` markers, literal icon descriptions, placeholder URLs, missing alt text, and test-coverage gaps. Stage 2 is the LLM agent, now slim and advisory: reads a curated screenshot subset and writes only under `llmFindings`.
+- **Review-fix loop**: Cap reduced from 2 cycles to 1, and only static blockers can trigger a fix-cycle. LLM findings never gate or trigger retries. LLM stage is skipped on the retry cycle to save cost.
+- **Review budget tightened**: Turn limit 50→15, budget allocation 0.15→0.08 (reallocated to impl). The slim LLM contract should finish in ~5 turns.
+
+### Added
+
+- `--no-llm-review` CLI flag and `gates.review.runLlmStage` config option to skip the advisory LLM stage entirely.
+
+### Fixed
+
+- **Review false-pass on crash**: Static review writes `review-status.json` authoritatively before the LLM runs. If the LLM crashes or hits max_turns, the gate still has valid deterministic results — no more silent passes from the bash placeholder hack.
+
 ## [7.2.8] - 2026-04-14
 
 ### Fixed
