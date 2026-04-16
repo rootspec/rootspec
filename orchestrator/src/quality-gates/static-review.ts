@@ -28,7 +28,11 @@ export interface StaticReviewResult {
   llmInputs: { screenshots: string[] };
 }
 
-const BUILD_DIRS = ["dist", "build", "out", ".next", "public"] as const;
+// Fallback list when the orchestrator can't tell us which dir the build wrote to.
+// Covers Astro/Vite (dist), Next-export/Eleventy/Jekyll (out, _site), CRA/SvelteKit (build).
+// Notably excludes `public/` (source dir in Astro/Vite/Vue) and `.next/` (build cache,
+// not user-facing HTML) — both produce false positives.
+const FALLBACK_BUILD_DIRS = ["dist", "build", "out", "_site", ".output/public"] as const;
 
 const PLACEHOLDER_PATTERNS: Array<{ re: RegExp; message: string }> = [
   { re: /\{\{[^}]+\}\}/, message: "Unrendered template syntax {{...}}" },
@@ -51,11 +55,17 @@ const BROKEN_URL_PATTERNS: Array<{ re: RegExp; message: string }> = [
 const ICON_NOUN_RE = /^(?:[A-Z][a-z]+\s){0,3}(Icon|Arrow|Chevron|Logo|Star|Checkmark)$/;
 
 export async function runStaticReview(
-  config: Pick<OrchestratorConfig, "projectDir">
+  config: Pick<OrchestratorConfig, "projectDir">,
+  buildOutputDir?: string | null
 ): Promise<StaticReviewResult> {
   const dir = config.projectDir;
 
-  const buildRoot = BUILD_DIRS.map((d) => join(dir, d)).find((p) => existsSync(p));
+  // Prefer the output dir the orchestrator just discovered from the build.
+  // Fall back to a small allowlist for standalone use (e.g. running review
+  // against a project whose build output already exists).
+  const buildRoot = buildOutputDir && existsSync(buildOutputDir)
+    ? buildOutputDir
+    : FALLBACK_BUILD_DIRS.map((d) => join(dir, d)).find((p) => existsSync(p));
   const pages = buildRoot ? collectHtml(buildRoot) : [];
 
   const issues: StaticIssue[] = [];
@@ -97,9 +107,10 @@ export async function runStaticReview(
  * but `summary.staticBlockers` and `issues` are owned by static review.
  */
 export async function writeStaticReviewStatus(
-  config: Pick<OrchestratorConfig, "projectDir">
+  config: Pick<OrchestratorConfig, "projectDir">,
+  buildOutputDir?: string | null
 ): Promise<StaticReviewResult> {
-  const result = await runStaticReview(config);
+  const result = await runStaticReview(config, buildOutputDir);
   const path = join(config.projectDir, "rootspec", "review-status.json");
 
   // Preserve llmFindings from a prior run if present (unlikely but safe)

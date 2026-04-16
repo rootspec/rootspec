@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.2] - 2026-04-16
+
+### Fixed
+
+- **Build output detection is now framework-agnostic**: Orchestrator snapshots top-level dirs before `npm run build`, then picks the dir that was created or whose mtime advanced and which contains HTML. Previously hardcoded to `dist/`/`build/`/`out/`/`.next/`/`public/` — brittle, and `.next/` (build cache) and `public/` (source dir in Astro/Vite/Vue) produced false positives. Detects stub build scripts as a side effect: if no dir changed, log a warning and skip static review's per-page checks.
+- **`rs-impl` skill wires the build script**: When the agent installs a framework, it must replace the `rs-init` stub `"build": "echo 'No build configured yet'"` with the framework's real build command (e.g. `astro build`, `vite build`). Without this, the review-phase build was silently a no-op even when a framework was correctly installed.
+
 ## [7.3.1] - 2026-04-16
 
 ### Fixed

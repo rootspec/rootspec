@@ -21,9 +21,11 @@ import {
   writeFileSync,
   readFileSync,
   appendFileSync,
+  readdirSync,
+  statSync,
 } from "node:fs";
 import { execSync } from "node:child_process";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 export async function orchestrate(
   config: OrchestratorConfig,
@@ -240,9 +242,10 @@ export async function orchestrate(
     const runLlmStage = config.gates.review?.runLlmStage ?? true;
 
     // Build the project once so static review has rendered HTML to scan.
-    // Cypress runs against the dev server; without this, dist/ is empty in CI
-    // and static review degenerates to 0 pages scanned.
-    runProjectBuild(config.projectDir, reporter);
+    // Cypress runs against the dev server; without this, the build output
+    // is empty in CI and static review degenerates to 0 pages scanned.
+    // The returned dir is framework-detected from what the build produced.
+    const buildOutputDir = runProjectBuild(config.projectDir, reporter);
 
     for (let cycle = 0; cycle <= maxFixCycles; cycle++) {
       if (config.maxBudgetUsd - state.totalCostUsd <= 0) break;
@@ -252,7 +255,7 @@ export async function orchestrate(
 
       // Stage 1: static review writes review-status.json authoritatively
       const staticStart = Date.now();
-      const staticResult = await writeStaticReviewStatus(config);
+      const staticResult = await writeStaticReviewStatus(config, buildOutputDir);
       reporter.emit({
         type: "message",
         phase: "review",
@@ -449,21 +452,42 @@ async function bootstrap(
 
 /**
  * Build the project so static review has rendered HTML to scan.
- * Best-effort: skips silently if there's no `build` script, and a build
- * failure is non-fatal — review proceeds against whatever HTML exists.
+ *
+ * Snapshots top-level dirs before the build, runs `npm run build`, then
+ * returns the dir that the build wrote to (new or mtime-advanced). This
+ * is framework-agnostic — works for Astro/Vite (`dist/`), Next-export
+ * (`out/`), SvelteKit (`build/`), Eleventy (`_site/`), etc. — and
+ * detects stub build scripts as a side effect (no dir changed).
+ *
+ * Returns the absolute path to the discovered output dir, or null if
+ * none was produced. Build failure is non-fatal.
  */
-function runProjectBuild(projectDir: string, reporter: Reporter): void {
+function runProjectBuild(
+  projectDir: string,
+  reporter: Reporter
+): string | null {
   const pkgPath = join(projectDir, "package.json");
-  if (!existsSync(pkgPath)) return;
+  if (!existsSync(pkgPath)) return null;
 
   let hasBuildScript = false;
   try {
     const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
     hasBuildScript = typeof pkg?.scripts?.build === "string";
   } catch {
-    return;
+    return null;
   }
-  if (!hasBuildScript) return;
+  if (!hasBuildScript) return null;
+
+  // Top-level dirs to ignore when looking for build output. Source dirs,
+  // tooling caches, and runtime artifacts that aren't user-facing HTML.
+  const IGNORE = new Set([
+    "node_modules", ".git", ".github", "cypress", "coverage",
+    "src", "app", "pages", "components", "lib", "test", "tests",
+    "scripts", "rootspec", ".agents", ".claude",
+    ".cache", ".parcel-cache", ".rootspec-orchestrator",
+  ]);
+
+  const snapshot = snapshotDirs(projectDir, IGNORE);
 
   reporter.emit({
     type: "message",
@@ -480,12 +504,6 @@ function runProjectBuild(projectDir: string, reporter: Reporter): void {
       stdio: "pipe",
       encoding: "utf-8",
     });
-    reporter.emit({
-      type: "message",
-      phase: "review",
-      timestamp: new Date().toISOString(),
-      data: { text: `Build complete (${Math.round((Date.now() - start) / 1000)}s)` },
-    });
   } catch (err) {
     reporter.emit({
       type: "message",
@@ -496,6 +514,103 @@ function runProjectBuild(projectDir: string, reporter: Reporter): void {
       },
     });
   }
+
+  const changed = findChangedDirs(projectDir, IGNORE, snapshot);
+  const outputDir = pickBuildOutputDir(changed);
+  const elapsed = Math.round((Date.now() - start) / 1000);
+
+  if (!outputDir) {
+    reporter.emit({
+      type: "message",
+      phase: "review",
+      timestamp: new Date().toISOString(),
+      data: {
+        text: `WARNING: build (${elapsed}s) produced no new output dir — likely a stub script or framework misconfiguration. Static review will scan existing HTML only.`,
+      },
+    });
+    return null;
+  }
+
+  reporter.emit({
+    type: "message",
+    phase: "review",
+    timestamp: new Date().toISOString(),
+    data: { text: `Build complete (${elapsed}s) — output dir: ${relative(projectDir, outputDir) || "."}` },
+  });
+  return outputDir;
+}
+
+function snapshotDirs(
+  root: string,
+  ignore: Set<string>
+): Map<string, number> {
+  const out = new Map<string, number>();
+  let entries: string[] = [];
+  try {
+    entries = readdirSync(root);
+  } catch {
+    return out;
+  }
+  for (const name of entries) {
+    if (ignore.has(name) || name.startsWith(".")) continue;
+    const abs = join(root, name);
+    try {
+      const st = statSync(abs);
+      if (st.isDirectory()) out.set(abs, st.mtimeMs);
+    } catch {
+      // ignore
+    }
+  }
+  return out;
+}
+
+function findChangedDirs(
+  root: string,
+  ignore: Set<string>,
+  before: Map<string, number>
+): string[] {
+  const after = snapshotDirs(root, ignore);
+  const changed: string[] = [];
+  for (const [abs, mtime] of after) {
+    const prior = before.get(abs);
+    if (prior === undefined || mtime > prior) changed.push(abs);
+  }
+  return changed;
+}
+
+function pickBuildOutputDir(candidates: string[]): string | null {
+  if (candidates.length === 0) return null;
+  // Prefer a candidate that actually contains an index.html.
+  const withIndex = candidates.filter((d) => existsSync(join(d, "index.html")));
+  if (withIndex.length > 0) {
+    // If multiple, pick the shortest path (likely the canonical output root)
+    return withIndex.sort((a, b) => a.length - b.length)[0];
+  }
+  // Otherwise pick any candidate that contains *some* HTML somewhere.
+  for (const dir of candidates) {
+    if (containsHtml(dir)) return dir;
+  }
+  return null;
+}
+
+function containsHtml(dir: string): boolean {
+  let entries: string[] = [];
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return false;
+  }
+  for (const e of entries) {
+    if (e.endsWith(".html")) return true;
+    const abs = join(dir, e);
+    try {
+      const st = statSync(abs);
+      if (st.isDirectory() && containsHtml(abs)) return true;
+    } catch {
+      // ignore
+    }
+  }
+  return false;
 }
 
 /**

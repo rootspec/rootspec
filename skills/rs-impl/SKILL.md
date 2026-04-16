@@ -87,6 +87,23 @@ sleep 3
 
 If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec, detected framework, and existing source code. For brownfield projects (existing code, no prior conventions), audit the codebase and document observed patterns — stack, file organization, styling approach, API patterns, component structure. Use `## Heading` sections with `- **Label:** value` entries.
 
+### 2d. Wire the `build` script
+
+`rs-init` creates package.json with a stub `"build": "echo 'No build configured yet'"`. When you install a framework that has a build command, replace this stub in the same turn as your `npm install`. The downstream review phase runs `npm run build` to scan rendered HTML — a stub script silently produces no output and the review degrades.
+
+Common build commands:
+
+| Framework | `scripts.build` |
+|---|---|
+| Astro | `astro build` |
+| Vite | `vite build` |
+| SvelteKit | `vite build` |
+| Next.js | `next build` |
+| Eleventy | `eleventy` |
+| Remix | `remix vite:build` |
+
+Brownfield: if `package.json` already has a real `build` script, leave it alone.
+
 ## Step 3: Implement (~3 turns per story)
 
 **Per-story cap: 2 test-fix cycles.** If you're spending more than 5 turns on one story, record FAIL and move on.
