@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.3.3
+
+Summary: Runtime checks (console errors, 404s) + deploy-path cross-check in review
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — orchestrator-side change only.
+
 ## 7.3.2
 
 Summary: Framework-agnostic build output detection; rs-impl wires the build script

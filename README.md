@@ -159,4 +159,4 @@ For CI, scheduled rebuilds, or any hands-off pipeline, the [**RootSpec Orchestra
 
 ---
 
-**Version v7.3.2** — See [CHANGELOG.md](CHANGELOG.md) for history. MIT [License](LICENSE). [Contributing](CONTRIBUTING.md).
+**Version v7.3.3** — See [CHANGELOG.md](CHANGELOG.md) for history. MIT [License](LICENSE). [Contributing](CONTRIBUTING.md).
