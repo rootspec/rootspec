@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.3] - 2026-04-16
+
+### Added
+
+- **Cypress runtime checks**: Orchestrator now injects `runtime-checks-hook.ts` before each validate phase. Records console errors and network 404s to `rootspec/runtime-issues.json` during tests. Static review picks these up and surfaces them as warnings — catches JS exceptions, hydration failures, and missing resources that functional tests miss.
+- **Deploy-path cross-check**: Static review reads SEED.md for a declared deploy subpath (e.g. `/demos/greenfield/`) and verifies that built HTML references assets with the correct prefix. Catches base-path misconfiguration — the exact bug that made the v7.3.2 greenfield deploy ship with broken CSS/JS.
+
+### Fixed
+
+- **Rooted asset path resolution**: Static review now resolves rooted paths (`/something`) against the build output, trying both direct resolution and deploy-base-stripped resolution. Previously all rooted paths were skipped.
+
 ## [7.3.2] - 2026-04-16
 
 ### Fixed

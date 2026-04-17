@@ -13,8 +13,11 @@ export interface StaticIssue {
     | "template_syntax"
     | "literal_icon"
     | "broken_link"
+    | "deploy_path"
     | "accessibility"
-    | "test_coverage";
+    | "test_coverage"
+    | "runtime_error"
+    | "network_404";
   file: string;
   excerpt?: string;
   message: string;
@@ -74,6 +77,9 @@ export async function runStaticReview(
     issues.push({ ...issue, id: `REV-${String(nextId++).padStart(3, "0")}` });
   };
 
+  // Detect deploy base from SEED.md (e.g. "/demos/greenfield/")
+  const deployBase = detectDeployBase(dir);
+
   // Per-page checks
   const existingFiles = buildRoot ? collectAllFiles(buildRoot) : new Set<string>();
   for (const page of pages) {
@@ -81,12 +87,21 @@ export async function runStaticReview(
     const rel = relative(dir, page);
     scanPlaceholders(html, rel, push);
     scanLiteralIcons(html, rel, push);
-    scanLinks(html, page, rel, buildRoot, existingFiles, push);
+    scanLinks(html, page, rel, buildRoot, existingFiles, deployBase, push);
     scanAccessibility(html, rel, push);
+  }
+
+  // Deploy-path cross-check: if SEED.md declares a deploy subpath,
+  // verify built HTML references assets with the correct prefix.
+  if (buildRoot && pages.length > 0 && deployBase) {
+    scanDeployPath(pages, dir, deployBase, push);
   }
 
   // Test coverage cross-check
   scanTestCoverage(dir, push);
+
+  // Runtime issues from Cypress (console errors, 404s)
+  scanRuntimeIssues(dir, push);
 
   const blockers = issues.filter((i) => i.severity === "blocker");
   const warnings = issues.filter((i) => i.severity === "warning");
@@ -247,6 +262,7 @@ function scanLinks(
   file: string,
   buildRoot: string | undefined,
   existingFiles: Set<string>,
+  deployBase: string | null,
   push: (i: Omit<StaticIssue, "id">) => void
 ): void {
   const attrRe = /\b(href|src)\s*=\s*"([^"]*)"/gi;
@@ -271,15 +287,41 @@ function scanLinks(
 
     // External URL — warn only (can't verify without network)
     if (/^https?:\/\//i.test(url)) {
-      // Already covered by BROKEN_URL_PATTERNS if obviously bad; otherwise skip
       continue;
     }
 
     // Anchor / fragment only — accept
     if (url.startsWith("#")) continue;
 
-    // Rooted absolute path — may be base-path-dependent at deploy time.
-    // Don't try to resolve; we can't tell without knowing the deploy base.
+    // Rooted absolute path — resolve against build root.
+    // Try two strategies: (1) strip leading /, (2) strip the deploy base prefix.
+    // A build with `base: '/demos/greenfield'` produces files at dist/_astro/foo.css
+    // but references them as /demos/greenfield/_astro/foo.css.
+    if (url.startsWith("/") && buildRoot) {
+      const raw = url.split(/[?#]/)[0];
+      const stripped = raw.replace(/^\/+/, "");
+      if (!stripped) continue;
+
+      // Try direct resolution (works for root-deploy builds)
+      const abs1 = resolve(buildRoot, stripped);
+      if (resolveFile(abs1, existingFiles)) continue;
+
+      // Try stripping deploy base (works for subpath-deploy builds)
+      if (deployBase && raw.startsWith(deployBase)) {
+        const withoutBase = raw.slice(deployBase.length);
+        const abs2 = resolve(buildRoot, withoutBase);
+        if (resolveFile(abs2, existingFiles)) continue;
+      }
+
+      push({
+        severity: "warning",
+        category: "broken_link",
+        file,
+        excerpt: `${attr}="${url}"`,
+        message: `Rooted ${attr} does not resolve within build output`,
+      });
+      continue;
+    }
     if (url.startsWith("/")) continue;
 
     // Genuinely relative URL — try to resolve against the build root
@@ -369,6 +411,84 @@ function scanTestCoverage(
         message: `${id} passed but produced no screenshot — test may not exercise rendered UI`,
       });
     }
+  }
+}
+
+/**
+ * Cross-check SEED.md's deploy path against asset references in built HTML.
+ * If SEED declares a subpath (e.g. `/demos/greenfield/`) but the HTML references
+ * assets at root (`/_astro/foo.css`), the framework's base config is likely missing.
+ */
+function resolveFile(abs: string, existingFiles: Set<string>): boolean {
+  return existingFiles.has(abs) || existingFiles.has(abs + ".html") || existingFiles.has(join(abs, "index.html"));
+}
+
+function detectDeployBase(projectDir: string): string | null {
+  const seedPath = join(projectDir, "SEED.md");
+  if (!existsSync(seedPath)) return null;
+  const seed = readFileSync(seedPath, "utf-8");
+  const m = seed.match(
+    /(?:deployed?\s+(?:to|at)|subpath|base\s*path)\s+[^\n]*?(\/[\w-]+(?:\/[\w-]+)+\/)/i
+  );
+  return m ? m[1] : null;
+}
+
+function scanDeployPath(
+  pages: string[],
+  projectDir: string,
+  deployBase: string,
+  push: (i: Omit<StaticIssue, "id">) => void
+): void {
+  const ASSET_PREFIXES = ["/_astro/", "/_next/", "/_app/", "/_nuxt/"];
+  for (const page of pages) {
+    const html = readFileSync(page, "utf-8");
+    const rel = relative(projectDir, page);
+    for (const prefix of ASSET_PREFIXES) {
+      if (html.includes(prefix) && !html.includes(deployBase.replace(/\/$/, "") + prefix)) {
+        push({
+          severity: "blocker",
+          category: "deploy_path",
+          file: rel,
+          excerpt: `Found "${prefix}" without "${deployBase}" prefix`,
+          message: `Asset references use root paths but SEED.md declares deploy path "${deployBase}" — framework base path config likely missing`,
+        });
+        return;
+      }
+    }
+  }
+}
+
+function scanRuntimeIssues(
+  projectDir: string,
+  push: (i: Omit<StaticIssue, "id">) => void
+): void {
+  const path = join(projectDir, "rootspec", "runtime-issues.json");
+  if (!existsSync(path)) return;
+
+  let issues: Array<{ type: string; test: string; message: string }>;
+  try {
+    issues = JSON.parse(readFileSync(path, "utf-8"));
+  } catch {
+    return;
+  }
+  if (!Array.isArray(issues) || issues.length === 0) return;
+
+  // Dedup by message
+  const seen = new Set<string>();
+  for (const issue of issues) {
+    const key = `${issue.type}:${issue.message}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    push({
+      severity: "warning",
+      category: issue.type === "network_404" ? "network_404" : "runtime_error",
+      file: `test: ${issue.test}`,
+      excerpt: issue.message.slice(0, 120),
+      message: issue.type === "network_404"
+        ? `Network request failed: ${issue.message}`
+        : `Console error during test: ${issue.message}`,
+    });
   }
 }
 

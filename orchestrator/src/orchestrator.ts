@@ -108,9 +108,10 @@ export async function orchestrate(
       return result;
     }
 
-    // Inject screenshot hook before validate — impl may have overwritten e2e.ts
+    // Inject hooks before validate — impl may have overwritten e2e.ts
     if (phase === "validate") {
       injectScreenshotHook(config.projectDir);
+      injectRuntimeChecksHook(config.projectDir);
     }
 
     // Execute phase — init is programmatic, others use Agent SDK
@@ -345,6 +346,7 @@ export async function orchestrate(
       state.totalCostUsd += implFixResult.costUsd - (prevImpl?.costUsd ?? 0);
 
       injectScreenshotHook(config.projectDir);
+      injectRuntimeChecksHook(config.projectDir);
       const revalidateResult = await executePhase({
         phase: "validate",
         config,
@@ -653,6 +655,72 @@ afterEach(function () {
     const content = readFileSync(e2ePath, "utf-8");
     if (!content.includes("screenshot-hook")) {
       appendFileSync(e2ePath, '\nimport "./screenshot-hook";\n');
+    }
+  }
+}
+
+/**
+ * Inject a runtime-checks hook that records console errors and network 404s
+ * to rootspec/runtime-issues.json during Cypress tests. The static review
+ * phase picks these up and surfaces them as review warnings.
+ */
+function injectRuntimeChecksHook(projectDir: string): void {
+  const supportDir = join(projectDir, "cypress", "support");
+  if (!existsSync(supportDir)) return;
+
+  // Initialize the output file — fresh each run
+  const rootspecDir = join(projectDir, "rootspec");
+  if (existsSync(rootspecDir)) {
+    writeFileSync(join(rootspecDir, "runtime-issues.json"), "[]");
+  }
+
+  const hookPath = join(supportDir, "runtime-checks-hook.ts");
+  writeFileSync(
+    hookPath,
+    `// Track console errors and network failures during tests.
+// Injected by the orchestrator before each validate phase.
+// Results are read by the static review phase.
+
+const runtimeErrors: string[] = [];
+const network404s: string[] = [];
+
+Cypress.on('uncaught:exception', (err) => {
+  runtimeErrors.push(err.message);
+  return false;
+});
+
+beforeEach(() => {
+  runtimeErrors.length = 0;
+  network404s.length = 0;
+  cy.intercept('**/*', (req) => {
+    req.continue((res) => {
+      if (res.statusCode >= 400) {
+        network404s.push(\`\${res.statusCode} \${req.url}\`);
+      }
+    });
+  });
+});
+
+afterEach(function () {
+  const issues = [
+    ...runtimeErrors.map(e => ({ type: 'console_error' as const, test: this.currentTest?.title ?? '', message: e })),
+    ...network404s.map(e => ({ type: 'network_404' as const, test: this.currentTest?.title ?? '', message: e })),
+  ];
+  if (issues.length > 0) {
+    cy.readFile('rootspec/runtime-issues.json', { log: false }).then((existing: unknown) => {
+      const arr = Array.isArray(existing) ? existing : [];
+      cy.writeFile('rootspec/runtime-issues.json', [...arr, ...issues], { log: false });
+    });
+  }
+});
+`
+  );
+
+  const e2ePath = join(supportDir, "e2e.ts");
+  if (existsSync(e2ePath)) {
+    const content = readFileSync(e2ePath, "utf-8");
+    if (!content.includes("runtime-checks-hook")) {
+      appendFileSync(e2ePath, '\nimport "./runtime-checks-hook";\n');
     }
   }
 }
