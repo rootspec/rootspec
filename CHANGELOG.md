@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Review phase silently skipped when `validate` not in phase list**: Orchestrator gated the review-fix loop on `state.completedPhases.includes("validate")`, so running `--phases init,spec,impl,review` (skipping validate) silently dropped review entirely — no log entry, no phase result, `review-status.json` stayed at its init shape. Review now runs whenever it's in the phase list.
+
 ## [7.3.4] - 2026-04-17
 
 ### Fixed

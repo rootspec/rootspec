@@ -238,7 +238,7 @@ export async function orchestrate(
   // Two-stage: static review (deterministic, authoritative) → optional LLM
   // review (advisory). Only static blockers can trigger a fix-cycle.
   // Review NEVER fails the build.
-  if (includeReview && state.completedPhases.includes("validate")) {
+  if (includeReview) {
     const maxFixCycles = config.gates.review?.maxFixCycles ?? 1;
     const runLlmStage = config.gates.review?.runLlmStage ?? true;
 
