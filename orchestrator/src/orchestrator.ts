@@ -680,38 +680,37 @@ function injectRuntimeChecksHook(projectDir: string): void {
     `// Track console errors and network failures during tests.
 // Injected by the orchestrator before each validate phase.
 // Results are read by the static review phase.
+// Self-initializing — works even outside the orchestrator (e.g. validate-deploy CI).
 
-const runtimeErrors: string[] = [];
-const network404s: string[] = [];
+const allIssues: Array<{ type: string; test: string; message: string }> = [];
 
 Cypress.on('uncaught:exception', (err) => {
-  runtimeErrors.push(err.message);
+  allIssues.push({ type: 'console_error', test: '', message: err.message });
   return false;
 });
 
+let currentNetwork404s: string[] = [];
+
 beforeEach(() => {
-  runtimeErrors.length = 0;
-  network404s.length = 0;
+  currentNetwork404s = [];
   cy.intercept('**/*', (req) => {
     req.continue((res) => {
       if (res.statusCode >= 400) {
-        network404s.push(\`\${res.statusCode} \${req.url}\`);
+        currentNetwork404s.push(\`\${res.statusCode} \${req.url}\`);
       }
     });
   });
 });
 
 afterEach(function () {
-  const issues = [
-    ...runtimeErrors.map(e => ({ type: 'console_error' as const, test: this.currentTest?.title ?? '', message: e })),
-    ...network404s.map(e => ({ type: 'network_404' as const, test: this.currentTest?.title ?? '', message: e })),
-  ];
-  if (issues.length > 0) {
-    cy.readFile('rootspec/runtime-issues.json', { log: false }).then((existing: unknown) => {
-      const arr = Array.isArray(existing) ? existing : [];
-      cy.writeFile('rootspec/runtime-issues.json', [...arr, ...issues], { log: false });
-    });
+  const testName = this.currentTest?.title ?? '';
+  for (const msg of currentNetwork404s) {
+    allIssues.push({ type: 'network_404', test: testName, message: msg });
   }
+});
+
+after(() => {
+  cy.writeFile('rootspec/runtime-issues.json', allIssues, { log: false });
 });
 `
   );
