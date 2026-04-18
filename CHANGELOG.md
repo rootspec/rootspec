@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Proactive deploy-base directive for impl phase**: When SEED.md declares a deploy subpath, the orchestrator now injects a directive into the impl prompt telling the agent to configure the framework's base path (`kit.paths.base`, `basePath`, `base`, etc.) and Cypress `baseUrl`. Prevents the `deploy_path` blocker from ever reaching review.
+- **Category-aware review fix hints**: `buildReviewFixPrompt` now emits targeted guidance per issue category — `deploy_path` points at framework config instead of the built HTML symptom; `placeholder_text`, `template_syntax`, `literal_icon`, `broken_link`, runtime signals each get their own hint. Previously the fix prompt just surfaced the symptom file, so the agent frequently made cosmetic edits or bailed.
+
 ## [7.3.5] - 2026-04-18
 
 ### Fixed

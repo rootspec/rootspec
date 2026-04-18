@@ -3,6 +3,7 @@ import { resolve, join } from "node:path";
 import type { Phase } from "../types.js";
 import type { OrchestratorConfig } from "../config.js";
 import type { OrchestratorState } from "../types.js";
+import { detectDeployBase } from "../quality-gates/static-review.js";
 
 const SKILL_DIRS: Record<Phase, string> = {
   init: "rs-init",
@@ -101,6 +102,26 @@ You are running inside an automated orchestrator. No human is present.
 - If you encounter ambiguity, make your best judgment and proceed.
 `;
 
+function categoryFixHint(category: string): string | null {
+  switch (category) {
+    case "deploy_path":
+      return "The listed file is the symptom (built HTML), not the root cause. Find the framework config for this project and set its base path option — svelte.config.js `kit.paths.base`, astro.config.mjs `base`, next.config.js `basePath`, vite.config.ts `base`, etc. Also update `cypress.config.ts` `baseUrl` to include the subpath, or tests will hit the wrong route.";
+    case "placeholder_text":
+      return "Replace the placeholder with real content from SEED.md / the spec, or remove the element entirely if it's unused.";
+    case "template_syntax":
+      return "Unrendered template syntax in the build output means the view isn't being processed — check the component/page responsible for this route and ensure data is wired correctly.";
+    case "literal_icon":
+      return "Replace the literal `[icon]` text with a real icon (SVG, icon-font class, or component) or remove it.";
+    case "broken_link":
+      return "Either fix the URL to point at a real resource, or remove the link.";
+    case "network_404":
+    case "runtime_error":
+      return "Runtime signal from Cypress — trace to the component/route that issued the request or threw the error.";
+    default:
+      return null;
+  }
+}
+
 function buildReviewFixPrompt(
   config: OrchestratorConfig,
   state: OrchestratorState
@@ -132,6 +153,8 @@ function buildReviewFixPrompt(
           parts.push(`**${b.id}** [${b.category}] — ${b.message}`);
           parts.push(`- File: \`${b.file}\``);
           if (b.excerpt) parts.push(`- Excerpt: \`${b.excerpt}\``);
+          const hint = categoryFixHint(b.category as string);
+          if (hint) parts.push(`- Fix hint: ${hint}`);
           parts.push("");
         }
       }
@@ -227,6 +250,10 @@ export function buildPrompt(
     parts.push("- Implement all stories unless a specific focus was provided.");
     parts.push("- Follow the skill's step sequence exactly.");
     parts.push("- If a story fails after 2 test-fix cycles, move on to the next story.");
+    const deployBase = detectDeployBase(config.projectDir);
+    if (deployBase) {
+      parts.push(`- **Deploy subpath declared:** \`${deployBase}\`. Configure the framework's base path setting to match (svelte.config.js \`kit.paths.base\`, astro.config.mjs \`base\`, next.config.js \`basePath\`, vite.config.ts \`base\`, etc. — whichever framework you chose). Update \`cypress.config.ts\` \`baseUrl\` to include the subpath so tests hit the real routes.`);
+    }
     parts.push("");
   }
 

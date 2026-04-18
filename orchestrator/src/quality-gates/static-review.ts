@@ -423,7 +423,7 @@ function resolveFile(abs: string, existingFiles: Set<string>): boolean {
   return existingFiles.has(abs) || existingFiles.has(abs + ".html") || existingFiles.has(join(abs, "index.html"));
 }
 
-function detectDeployBase(projectDir: string): string | null {
+export function detectDeployBase(projectDir: string): string | null {
   const seedPath = join(projectDir, "SEED.md");
   if (!existsSync(seedPath)) return null;
   const seed = readFileSync(seedPath, "utf-8");
