@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.6] - 2026-04-18
+
 ### Added
 
 - **Proactive deploy-base directive for impl phase**: When SEED.md declares a deploy subpath, the orchestrator now injects a directive into the impl prompt telling the agent to configure the framework's base path (`kit.paths.base`, `basePath`, `base`, etc.) and Cypress `baseUrl`. Prevents the `deploy_path` blocker from ever reaching review.
