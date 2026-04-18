@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.4] - 2026-04-17
+
 ### Fixed
 
 - **Runtime-checks hook crash outside orchestrator**: The hook used `cy.readFile` to merge issues across tests, but the file only exists when the orchestrator creates it. In validate-deploy CI (no orchestrator), every test's afterEach crashed — 22/22 failures. Replaced with in-memory accumulator + single `after()` write.
