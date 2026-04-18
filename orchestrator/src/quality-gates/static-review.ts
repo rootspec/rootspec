@@ -440,20 +440,25 @@ function scanDeployPath(
   push: (i: Omit<StaticIssue, "id">) => void
 ): void {
   const ASSET_PREFIXES = ["/_astro/", "/_next/", "/_app/", "/_nuxt/"];
+  const baseNoSlash = deployBase.replace(/\/$/, "");
   for (const page of pages) {
     const html = readFileSync(page, "utf-8");
     const rel = relative(projectDir, page);
     for (const prefix of ASSET_PREFIXES) {
-      if (html.includes(prefix) && !html.includes(deployBase.replace(/\/$/, "") + prefix)) {
-        push({
-          severity: "blocker",
-          category: "deploy_path",
-          file: rel,
-          excerpt: `Found "${prefix}" without "${deployBase}" prefix`,
-          message: `Asset references use root paths but SEED.md declares deploy path "${deployBase}" — framework base path config likely missing`,
-        });
-        return;
-      }
+      // Match rooted asset references — /_app/ preceded by a quote, =, (, or whitespace.
+      // Excludes relative paths like ./_app/ (SvelteKit emits these — browser resolves
+      // them against the page URL, so base-path is applied implicitly at serve time).
+      const rootedRegex = new RegExp(`[="'(\\s]${prefix.replace(/\//g, "\\/")}`);
+      if (!rootedRegex.test(html)) continue;
+      if (html.includes(baseNoSlash + prefix)) continue;
+      push({
+        severity: "blocker",
+        category: "deploy_path",
+        file: rel,
+        excerpt: `Found rooted "${prefix}" without "${deployBase}" prefix`,
+        message: `Asset references use root paths but SEED.md declares deploy path "${deployBase}" — framework base path config likely missing`,
+      });
+      return;
     }
   }
 }
