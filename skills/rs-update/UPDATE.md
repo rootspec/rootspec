@@ -8,6 +8,13 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.3.7
+
+Summary: Fix deploy_path false positive for frameworks emitting relative asset refs (SvelteKit)
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — orchestrator-side change only.
+
 ## 7.3.6
 
 Summary: Proactive deploy-base directive in impl prompt; category-aware review fix hints

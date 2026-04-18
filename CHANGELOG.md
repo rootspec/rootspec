@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.3.7] - 2026-04-18
+
 ### Fixed
 
 - **False-positive `deploy_path` blocker for SvelteKit**: `scanDeployPath` used `html.includes("/_app/")` to find rooted asset refs, but this also matched relative paths like `./_app/` (which SvelteKit emits — the browser resolves them against the page URL, so base-path is applied implicitly). Now only flags truly rooted refs (preceded by `"`, `'`, `=`, `(`, or whitespace). Scaffold deploy-path scan now correctly returns 0 blockers when the framework is configured correctly.
