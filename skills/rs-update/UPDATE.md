@@ -8,6 +8,20 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.3.5
+
+Summary: Review phase no longer requires validate — runs whenever it's in the phase list
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — orchestrator-side change only.
+
+## 7.3.4
+
+Summary: Runtime-checks hook self-initializes; no cy.readFile dependency
+Framework files: Replace (version bump only)
+Prerequisites: None
+Manual: None — orchestrator-side change only.
+
 ## 7.3.3
 
 Summary: Runtime checks (console errors, 404s) + deploy-path cross-check in review
