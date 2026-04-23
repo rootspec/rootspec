@@ -8,7 +8,7 @@ Prerequisite entries are tagged:
 
 ---
 
-## [Unreleased]
+## 7.4.0
 
 Summary: Interactive readiness contract — pages must set `<body data-ready="true">` when fully interactive. Shared `visit` step waits for this before proceeding. Fixes intermittent flake on hydration-gap renderers (SSR-then-hydrate, lazy islands, code-splitting).
 Framework files: Replace.
