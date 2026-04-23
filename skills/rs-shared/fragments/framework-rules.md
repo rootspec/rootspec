@@ -50,3 +50,16 @@ Changes flow downward through abstraction layers.
 
 Every feature must support at least one Design Pillar from Level 1.
 If a feature doesn't support any pillar, it doesn't belong.
+
+## Interactive Readiness
+
+Any element whose click or input is asserted by a test must be functional at the moment the test reaches it. Server-rendered inert DOM is not sufficient for tests that drive interaction.
+
+If the rendering stack has any gap between DOM existing and event handlers being attached (server render then client wiring, lazy code-splitting, progressive enhancement), the implementation must either:
+
+- **(a)** defer rendering until the element is fully interactive, or
+- **(b)** signal readiness once all client wiring is complete.
+
+**Readiness contract:** Pages signal readiness by setting `<body data-ready="true">` when the page's interactive handlers are attached. The shared `visit` step waits for this attribute before returning. A page that never sets it fails with a visible timeout at the visit step, not as silent flake downstream.
+
+The rule is universal; how a specific renderer satisfies it is implementation-specific and belongs in `CONVENTIONS/technical.md`, not here.

@@ -72,7 +72,7 @@ This creates the test file with all stories embedded as YAML string literals usi
 - `loginAs` steps → implement the task body in `cypress.config.ts`
 - `seedItem` steps → implement the task body in `cypress.config.ts`
 - Custom DSL steps not in the core set → extend `steps.ts` and `schema.ts`
-- Framework-specific `visit` behavior (e.g., hydration waits for React islands in Astro)
+- Readiness signal wiring — every page the tests visit must set `<body data-ready="true">` once its interactive handlers are attached. See `../rs-shared/fragments/framework-rules.md` → Interactive Readiness. How you satisfy this is implementation-specific (defer rendering until interactive, or set the attribute after client wiring completes) and must be recorded in `CONVENTIONS/technical.md`.
 
 Write all customizations in a single multi-file operation.
 
@@ -150,6 +150,8 @@ This is mechanical — add the type, add the implementation skeleton. Do it once
 #### Phase A: Build a batch
 
 Pick 2-4 related stories. Write all their code + test YAML in as few turns as possible using parallel Write calls. Every `data-test` attribute in the preflight's `SELECTORS_NEEDED` list must appear in your component code.
+
+Every route in `ROUTES_NEEDED` must set `<body data-ready="true">` when its interactive handlers are attached — the shared `visit` step waits for this attribute. Pick a single mechanism that fits the rendering stack (e.g., effect on mount, post-hydration callback, SSR-then-client hook, or unconditional set for static pages) and apply it uniformly. Record the chosen mechanism in `CONVENTIONS/technical.md` so every subsequent route follows it.
 
 #### Phase B: Test targeted stories
 

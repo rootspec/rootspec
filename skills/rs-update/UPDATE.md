@@ -8,6 +8,24 @@ Prerequisite entries are tagged:
 
 ---
 
+## [Unreleased]
+
+Summary: Interactive readiness contract — pages must set `<body data-ready="true">` when fully interactive. Shared `visit` step waits for this before proceeding. Fixes intermittent flake on hydration-gap renderers (SSR-then-hydrate, lazy islands, code-splitting).
+Framework files: Replace.
+Prerequisites: None new.
+Manual: CHANGED — `cypress/support/steps.ts` is user-owned and will not be overwritten by the scaffold. Existing projects must manually update the `visit` handler to wait for the readiness attribute:
+
+```ts
+if ('visit' in s) {
+  cy.visit(s.visit);
+  cy.get('body', { timeout: 10000 }).should('have.attr', 'data-ready', 'true');
+}
+```
+
+Every route referenced by a `visit:` DSL step must set `<body data-ready="true">` once its interactive handlers are attached. Choice of mechanism is implementation-specific (e.g., post-hydration effect, defer rendering until ready, mount-time attribute set). Record the chosen mechanism in `CONVENTIONS/technical.md`.
+
+Skipping this migration: tests will hang 10s at each visit, then fail with "expected body to have attribute data-ready with value true".
+
 ## 7.3.7
 
 Summary: Fix deploy_path false positive for frameworks emitting relative asset refs (SvelteKit)
