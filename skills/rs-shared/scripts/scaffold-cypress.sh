@@ -131,7 +131,10 @@ write_if_missing "cypress/support/steps.ts" "import type { Step } from './schema
 
 export function runSetupSteps(steps: Step[]) {
   for (const s of steps ?? []) {
-    if ('visit' in s) cy.visit(s.visit);
+    if ('visit' in s) {
+      cy.visit(s.visit);
+      cy.get('body', { timeout: 10000 }).should('have.attr', 'data-ready', 'true');
+    }
     else if ('click' in s) cy.get(s.click.selector).first().click();
     else if ('fill' in s) cy.get(s.fill.selector).clear().type(s.fill.value);
     else if ('loginAs' in s) cy.task('loginAs', s.loginAs);

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.4.0] - 2026-04-23
+
+### Changed
+
+- **Interactive readiness contract**: Tests now require pages to set `<body data-ready="true">` when the page's interactive handlers are attached. The shared `visit` step waits for this attribute before proceeding, with a 10s timeout. Fixes intermittent flake on hydration-gap renderers (SSR-then-hydrate, lazy islands, code-splitting) where Cypress reached elements before event handlers attached and clicks became no-ops. Rule is framework-agnostic; satisfied by either deferring rendering until interactive or signaling readiness after client wiring completes. See `framework-rules.md` → Interactive Readiness. Migration: update `cypress/support/steps.ts` (user-owned, not overwritten) and ensure every visited route sets the attribute — see UPDATE.md.
+
 ## [7.3.7] - 2026-04-18
 
 ### Fixed

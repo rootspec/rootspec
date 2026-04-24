@@ -19,6 +19,12 @@
 | `shouldContain` | `shouldContain: { selector: '[data-test=el]', text: 'expected' }` | Verify text content |
 | `shouldExist` | `shouldExist: { selector: '[data-test=el]' }` | Verify element exists |
 
+## Visit Readiness Contract
+
+After `visit`, the shared step waits for `<body data-ready="true">` before proceeding. The application must set this attribute once the page's interactive handlers are attached. Pages that never set it will fail at the visit step with a clear timeout — not as silent flake at a downstream click/fill.
+
+See `framework-rules.md` → Interactive Readiness for the rule. How each framework satisfies it belongs in `CONVENTIONS/technical.md`.
+
 ## Extending the DSL
 
 Add domain-specific steps in `cypress/support/steps.ts`:
