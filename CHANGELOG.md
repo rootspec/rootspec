@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Preview-mode E2E by default**: `bootstrap-init.sh` now writes a testMode-aware `scripts/test.sh` and copies a new `scripts/preview.sh` template; `.rootspec.json` gains `prerequisites.previewServer` and `prerequisites.testMode` (default `"preview"`). Tests run against a built artifact + preview server unless the project opts into `"dev"`. Eliminates whole categories of dev-only flake (hot-reload, lazy compile, looser URL handling, hydration timing). `dev.sh` and `preview.sh` both expose a `url` subcommand so `test.sh` can set `CYPRESS_BASE_URL` per-mode.
+- **Test-runner contract fragment**: New `skills/rs-shared/fragments/test-runner-contract.md` documents the baseUrl/visit and test-mode contracts the framework enforces (interactivity readiness already lives in `framework-rules.md` from 7.4.0).
+- **Framework-rule reconciliation in `/rs-update`**: `gap-analysis.sh` emits `RULE_VIOLATIONS=` (always — even on `GAP=none`) for projects that predate current rules: `baseUrl_has_path`, `testmode_implicit_dev`, `previewServer_missing`. New Step 5 in rs-update SKILL.md walks each violation interactively (no auto-rewrites of user code).
+- **`HARD RULE — peer-dep discipline`** in rs-impl SKILL.md: when installing a framework, install only the framework, its intentional integrations, and packages your application code directly imports. Don't independently pin tooling the framework already owns transitively (bundlers, compilers, test runners, CSS processors). Prevents upgrade-compatibility breakage at generation time.
+
+### Changed
+
+- **Generated `cypress.config.ts` baseUrl is host:port only**: `scaffold-cypress.sh` strips any path component from the auto-detected baseUrl. Deploy subpaths belong in `visit:` targets (and `cy.visit()` calls), never in baseUrl. Stops the silent `/sub/path/sub/path/` 404s that surfaced in the v7.3.x greenfield demo rebuild.
+- **Generated `cypress/support/steps.ts` `visit` step rejects baseUrl-with-path**: throws a clear error if baseUrl carries a path AND the visit target starts with it (fail-loud, not silent normalization — keeps the contract visible to maintainers). The body[data-ready="true"] wait shipped in 7.4.0 stays unchanged.
+- **`rs-validate` Step 2 reads `testMode`**: prefers invoking `validationScript` (test.sh) when present so server lifecycle stays in one place; otherwise starts preview or dev server per the configured mode.
+
 ## [7.4.0] - 2026-04-23
 
 ### Changed

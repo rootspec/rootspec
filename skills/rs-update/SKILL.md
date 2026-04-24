@@ -21,8 +21,8 @@ If these paths don't resolve, find the scripts by searching for `gap-analysis.sh
 Based on the output:
 
 - **`GAP=no_project`** — No `.rootspec.json` found. Tell the developer: "No RootSpec project found. Run `/rs-init` first." Exit.
-- **`GAP=none`** — Already on the latest version. Tell the developer: "Project is already on version X.Y.Z. Nothing to update." Exit.
-- **`GAP=patch|minor|major`** — Upgrade needed. Continue.
+- **`GAP=none`** — Already on the latest framework version. **If `RULE_VIOLATIONS` is empty**, tell the developer: "Project is on version X.Y.Z and matches current framework rules. Nothing to update." Exit. **If `RULE_VIOLATIONS` is non-empty**, the project predates one or more framework rules — skip Steps 2-4 and jump to Step 5 (Reconcile framework rules).
+- **`GAP=patch|minor|major`** — Upgrade needed. Continue. (Reconciliation in Step 5 still runs after the upgrade.)
 
 ## Step 2: Show what changed
 
@@ -108,7 +108,43 @@ If breaking changes were detected (`HAS_BREAKING=true`): pass `false` as the sec
 bash "$(dirname "$0")/../rs-shared/scripts/write-spec-status.sh" {specDirectory} false
 ```
 
-## Step 5: Report
+## Step 5: Reconcile framework rules
+
+Run when `RULE_VIOLATIONS` from gap-analysis is non-empty. Each token names a project state that predates a framework rule. For each, present the fix and ask before applying — none of these auto-rewrite user code.
+
+### `baseUrl_has_path`
+
+The project's `cypress.config.ts` has `baseUrl: 'http://host:port/some/path'`. The framework now requires baseUrl to be host:port only; deploy paths belong in `visit:` targets and `cy.visit()` calls. Concatenation of both produces 404s like `/some/path/some/path/`.
+
+Show the developer:
+1. The current baseUrl line and the path that needs stripping (e.g., `/some/path`).
+2. A grep over `cypress/` and `rootspec/05.IMPLEMENTATION/USER_STORIES/` for `visit:` and `cy.visit(` references.
+3. Categorize the visit references:
+   - **Already prefixed** (start with the path) — leave alone; they'll work once baseUrl is stripped.
+   - **Unprefixed** (start with `/` but not the path) — offer to prepend the path.
+   - **Relative** (don't start with `/`) — flag for manual review; relative paths break under both old and new contracts.
+
+Apply only what the developer confirms. After: re-run `/rs-validate` to confirm.
+
+### `testmode_implicit_dev`
+
+The project's `scripts/test.sh` starts the dev server, but `.rootspec.json` has no `prerequisites.testMode`. Old projects defaulted to dev-mode E2E implicitly; the framework now defaults to preview mode (built artifact + preview server) for fewer flakes.
+
+Offer two paths:
+- **Preserve current behavior** — add `"testMode": "dev"` to `.rootspec.json` `prerequisites`. No other changes. Project keeps running dev-mode E2E by explicit choice.
+- **Switch to preview default (recommended)** — copy `scripts/preview.sh` from the bundle (per `previewServer_missing` below), rewrite `scripts/test.sh` to the testMode-aware template (see `bootstrap-init.sh`), add `"testMode": "preview"` and `"previewServer": "./scripts/preview.sh"` to `.rootspec.json`. Verify `npm run build` works before committing.
+
+If the developer picks "switch", note that the project may need `data-ready` signals on interactive elements (see Interactivity contract in rs-impl SKILL.md) — preview mode exposes hydration timing bugs that dev mode hid.
+
+### `previewServer_missing`
+
+The project's `.rootspec.json` lacks a `previewServer` entry. If `testmode_implicit_dev` is being resolved with the "switch" path, fix this in the same step. Otherwise, add the entry pointing at `./scripts/preview.sh` (and copy the bundled template if missing) so the prerequisite is recorded — even projects that stay on dev mode benefit from having preview infra available.
+
+### Reporting
+
+For each violation, report what was reconciled (or skipped on developer's request) in Step 6's report.
+
+## Step 6: Report
 
 Summarize what was done:
 

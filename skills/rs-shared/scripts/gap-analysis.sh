@@ -30,6 +30,42 @@ if [[ -f "$SHARED_DIR/00.FRAMEWORK.md" ]]; then
 fi
 echo "BUNDLED_VERSION=$BUNDLED_VERSION"
 
+# --- Framework-rule violations (always — even when versions match) ---
+# Detect projects generated under older rules. Each token is something
+# rs-update knows how to reconcile interactively. Emitted before the GAP=none
+# early exit so a same-version project can still be brought to current rules.
+RULE_VIOLATIONS=()
+
+CY_CFG=""
+[[ -f "$ROOT/cypress.config.ts" ]] && CY_CFG="$ROOT/cypress.config.ts"
+[[ -z "$CY_CFG" && -f "$ROOT/cypress.config.js" ]] && CY_CFG="$ROOT/cypress.config.js"
+if [[ -n "$CY_CFG" ]]; then
+  if grep -E "baseUrl:[[:space:]]*['\"]https?://[^/'\"]+/[^'\"]+['\"]" "$CY_CFG" >/dev/null 2>&1; then
+    RULE_VIOLATIONS+=("baseUrl_has_path")
+  fi
+fi
+
+if [[ -f "$ROOT/scripts/test.sh" ]] && grep -q "dev.sh start" "$ROOT/scripts/test.sh" 2>/dev/null; then
+  if ! grep -q '"testMode"' "$ROOT/.rootspec.json" 2>/dev/null; then
+    RULE_VIOLATIONS+=("testmode_implicit_dev")
+  fi
+fi
+
+if [[ -f "$ROOT/.rootspec.json" ]] && ! grep -q '"previewServer"' "$ROOT/.rootspec.json" 2>/dev/null; then
+  RULE_VIOLATIONS+=("previewServer_missing")
+fi
+
+RULE_VIOLATIONS_OUT=""
+for v in "${RULE_VIOLATIONS[@]:-}"; do
+  [[ -z "$v" ]] && continue
+  if [[ -n "$RULE_VIOLATIONS_OUT" ]]; then
+    RULE_VIOLATIONS_OUT="$RULE_VIOLATIONS_OUT|$v"
+  else
+    RULE_VIOLATIONS_OUT="$v"
+  fi
+done
+echo "RULE_VIOLATIONS=$RULE_VIOLATIONS_OUT"
+
 # --- Compare versions ---
 if [[ "$PROJECT_VERSION" == "$BUNDLED_VERSION" ]]; then
   echo "GAP=none"

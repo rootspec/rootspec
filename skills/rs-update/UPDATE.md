@@ -8,6 +8,23 @@ Prerequisite entries are tagged:
 
 ---
 
+## Unreleased
+
+Summary: Three framework-level test-correctness rules (baseUrl/visit contract, peer-dep discipline, preview-mode E2E default) — interactivity contract already shipped in 7.4.0
+Framework files: Replace
+Prerequisites:
+  NEW: previewServer (./scripts/preview.sh) — preview-server template; mirrors dev.sh surface (start/stop/restart/status/logs/url)
+  NEW: testMode (.rootspec.json prerequisites.testMode = "preview" | "dev"; default "preview")
+  CHANGED: scripts/test.sh — branches on testMode; preview default builds + serves preview, dev opt-in starts dev server. Sets CYPRESS_BASE_URL per-mode so cypress.config.ts default doesn't have to match either port.
+  CHANGED: scripts/dev.sh — adds `url` subcommand for symmetry with preview.sh
+  CHANGED: cypress/support/steps.ts — visit step rejects baseUrl-with-path (throws clear error); the body[data-ready] wait shipped in 7.4.0 stays unchanged
+  CHANGED: cypress.config.ts — auto-detected baseUrl is stripped to host:port (no path component)
+Manual: After upgrading, /rs-update Step 5 reconciles violations interactively:
+  - baseUrl_has_path — strip path from cypress.config.ts baseUrl; re-prefix any unprefixed visit references in test files and spec YAML
+  - testmode_implicit_dev — choose: preserve dev mode (add `"testMode": "dev"`) or switch to preview default (rewrite test.sh, add preview.sh)
+  - previewServer_missing — add previewServer entry; copy bundled preview.sh
+Breaking: false (existing dev-mode behavior preservable via explicit `"testMode": "dev"`)
+
 ## 7.4.0
 
 Summary: Interactive readiness contract — pages must set `<body data-ready="true">` when fully interactive. Shared `visit` step waits for this before proceeding. Fixes intermittent flake on hydration-gap renderers (SSR-then-hydrate, lazy islands, code-splitting).
@@ -25,6 +42,7 @@ if ('visit' in s) {
 Every route referenced by a `visit:` DSL step must set `<body data-ready="true">` once its interactive handlers are attached. Choice of mechanism is implementation-specific (e.g., post-hydration effect, defer rendering until ready, mount-time attribute set). Record the chosen mechanism in `CONVENTIONS/technical.md`.
 
 Skipping this migration: tests will hang 10s at each visit, then fail with "expected body to have attribute data-ready with value true".
+
 
 ## 7.3.7
 

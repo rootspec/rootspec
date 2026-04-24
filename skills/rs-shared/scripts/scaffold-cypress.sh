@@ -40,6 +40,11 @@ elif [[ -f "$ROOT/nuxt.config.ts" ]]; then
   BASE_URL="http://localhost:3000"
 fi
 
+# Strip any path component — baseUrl is host:port only.
+# Deploy subpaths belong in visit() targets, not baseUrl. Concatenating both
+# produces 404s like /sub/path/sub/path/. See test-runner-contract.md.
+BASE_URL=$(echo "$BASE_URL" | sed -E 's|^(https?://[^/]+).*|\1|')
+
 # --- 1. cypress.config.ts ---
 write_if_missing "cypress.config.ts" "import { defineConfig } from 'cypress';
 import { rootspecReporter } from './cypress/support/rootspec-reporter';
@@ -131,10 +136,7 @@ write_if_missing "cypress/support/steps.ts" "import type { Step } from './schema
 
 export function runSetupSteps(steps: Step[]) {
   for (const s of steps ?? []) {
-    if ('visit' in s) {
-      cy.visit(s.visit);
-      cy.get('body', { timeout: 10000 }).should('have.attr', 'data-ready', 'true');
-    }
+    if ('visit' in s) safeVisit(s.visit);
     else if ('click' in s) cy.get(s.click.selector).first().click();
     else if ('fill' in s) cy.get(s.fill.selector).clear().type(s.fill.value);
     else if ('loginAs' in s) cy.task('loginAs', s.loginAs);
@@ -151,6 +153,29 @@ export function runAssertionSteps(steps: Step[]) {
       cy.get(s.shouldExist.selector).should('exist');
     }
   }
+}
+
+// Combines two contracts:
+// 1. baseUrl must be host:port only — if it carries a path AND the visit
+//    target starts with that path, the runner concatenates them into a 404
+//    like /sub/path/sub/path/. Throws a clear error rather than silently
+//    normalizing — keeps the contract visible to maintainers.
+// 2. After visit, wait for <body data-ready=\"true\"> (interactivity readiness
+//    contract from 7.4.0). Pages must signal once interactive handlers are
+//    attached so tests don't race the framework.
+function safeVisit(target: string) {
+  const baseUrl = (Cypress.config('baseUrl') || '').replace(/\\/+\$/, '');
+  let basePath = '';
+  try { basePath = new URL(baseUrl).pathname; } catch { basePath = ''; }
+  if (basePath && basePath !== '/' && target.startsWith(basePath)) {
+    throw new Error(
+      \`Invalid baseUrl: '\${baseUrl}' contains path '\${basePath}'. \` +
+      'baseUrl must be host:port only; deploy paths belong in visit targets. ' +
+      \`Strip '\${basePath}' from cypress.config.ts baseUrl.\`
+    );
+  }
+  cy.visit(target);
+  cy.get('body', { timeout: 10000 }).should('have.attr', 'data-ready', 'true');
 }
 "
 

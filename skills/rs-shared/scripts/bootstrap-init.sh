@@ -84,17 +84,44 @@ if [[ ! -f "$ROOT/scripts/dev.sh" ]]; then
   fi
 fi
 
-# 3.2 Validation script (test.sh)
+# 3.1b Preview server — copy bundled template (used by default test mode)
+if [[ ! -f "$ROOT/scripts/preview.sh" ]]; then
+  if [[ -f "$SHARED/scripts/preview.sh" ]]; then
+    cp "$SHARED/scripts/preview.sh" "$ROOT/scripts/preview.sh"
+    chmod +x "$ROOT/scripts/preview.sh"
+    echo "  Created scripts/preview.sh"
+  else
+    echo "  WARNING: Bundled preview.sh not found" >&2
+  fi
+fi
+
+# 3.2 Validation script (test.sh) — branches on .rootspec.json testMode.
+# Default is "preview" (built artifact + preview server). "dev" opts into
+# the dev server. baseUrl is set per-mode via CYPRESS_BASE_URL so the
+# generated cypress.config.ts default doesn't have to match either port.
 if [[ ! -f "$ROOT/scripts/test.sh" ]]; then
   cat > "$ROOT/scripts/test.sh" <<'EOSH'
 #!/usr/bin/env bash
-# Test runner — starts dev server, runs Cypress, stops server
+# Test runner — defaults to preview mode (built artifact + preview server).
+# Override via .rootspec.json prerequisites.testMode = "dev".
 set -euo pipefail
-./scripts/dev.sh start
+
+MODE=$(grep -o '"testMode"[^,}]*' .rootspec.json 2>/dev/null \
+  | sed -E 's/.*"testMode"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/')
+MODE="${MODE:-preview}"
+
+if [[ "$MODE" == "dev" ]]; then
+  ./scripts/dev.sh start
+  trap "./scripts/dev.sh stop" EXIT
+  export CYPRESS_BASE_URL="$(./scripts/dev.sh url)"
+else
+  npm run build
+  ./scripts/preview.sh start
+  trap "./scripts/preview.sh stop" EXIT
+  export CYPRESS_BASE_URL="$(./scripts/preview.sh url)"
+fi
+
 npx cypress run --config-file cypress.config.ts 2>&1
-EXIT_CODE=$?
-./scripts/dev.sh stop
-exit $EXIT_CODE
 EOSH
   chmod +x "$ROOT/scripts/test.sh"
   echo "  Created scripts/test.sh"
@@ -172,6 +199,8 @@ cat > "$ROOT/.rootspec.json" <<EOJSON
   "specDirectory": "rootspec",
   "prerequisites": {
     "devServer": "./scripts/dev.sh",
+    "previewServer": "./scripts/preview.sh",
+    "testMode": "preview",
     "preCommitHook": ".githooks/pre-commit",
     "releaseScript": "./scripts/release.sh",
     "validationScript": "./scripts/test.sh"
