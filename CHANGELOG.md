@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.5.0] - 2026-04-23
+
 ### Added
 
 - **Preview-mode E2E by default**: `bootstrap-init.sh` now writes a testMode-aware `scripts/test.sh` and copies a new `scripts/preview.sh` template; `.rootspec.json` gains `prerequisites.previewServer` and `prerequisites.testMode` (default `"preview"`). Tests run against a built artifact + preview server unless the project opts into `"dev"`. Eliminates whole categories of dev-only flake (hot-reload, lazy compile, looser URL handling, hydration timing). `dev.sh` and `preview.sh` both expose a `url` subcommand so `test.sh` can set `CYPRESS_BASE_URL` per-mode.

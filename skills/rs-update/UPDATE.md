@@ -8,7 +8,7 @@ Prerequisite entries are tagged:
 
 ---
 
-## Unreleased
+## 7.5.0
 
 Summary: Three framework-level test-correctness rules (baseUrl/visit contract, peer-dep discipline, preview-mode E2E default) — interactivity contract already shipped in 7.4.0
 Framework files: Replace
