@@ -5,7 +5,7 @@
 <h1 align="center">RootSpec</h1>
 
 <p align="center">
-  <strong>Specification Language for Software</strong><br>
+  <strong>Generate software bound by intent</strong><br>
   Philosophy guides implementation, never vice versa.
 </p>
 
@@ -24,15 +24,13 @@
 
 ## What and Why
 
-RootSpec implements **purpose-aligned declarative specification** — a methodology where foundational philosophy guides implementation, never vice versa. The methodology works with or without AI, with any tooling, any team.
+RootSpec generates software bound by intent. You declare what your product is and why it exists; everything downstream — strategies, interactions, architecture, tests — is derived in a strict hierarchy where each level can only reference the levels above. Nothing ships unless it traces back to a stated purpose.
 
-You define what your product is and why it exists, then derive everything else — strategies, interaction patterns, system architecture, testable user stories — in a strict hierarchy where each level can only reference the levels above it. The spec is **declarative**, **executable**, and serves as a **validation gate**: nothing ships unless it traces back to a user need, through a design pillar, to a mission.
+When code and specs can be generated trivially, the real value is **validation and proof**. The spec transforms output from "unverifiable claims" into "proven implementations."
 
-AI makes this methodology more urgent: when code and specs can be generated trivially, the real value is **validation and proof**. The spec transforms output from "unverifiable claims" into "proven implementations."
+Humans supply intent (why it exists, what users should feel). AI generates the implementation. The hierarchy enforces the boundary — upper levels encode judgment AI lacks; lower levels move at speed humans lack.
 
-AI has knowledge but not wisdom. It can retrieve and recombine, but it has no experience, no intuition, no skin in the game. This is why the hierarchy matters — humans supply the philosophy (why it exists, what users should feel), and AI executes the implementation. The upper levels encode the judgment that AI lacks; the lower levels leverage the speed that humans lack.
-
-RootSpec is one implementation of this methodology — a specification language, file structure, YAML DSL, and four AI-agent skills that operationalize the approach for building software.
+RootSpec is a specification language, file structure, YAML DSL, AI-agent skills, and an orchestrator that operationalize this.
 
 See [AXIOMS.md](rootspec/00.AXIOMS.md) for the foundational beliefs this framework is built on.
 
@@ -64,7 +62,7 @@ Then:
 
 ### Skills
 
-Four skills, each an agentic loop with an iteration cap. All accept an optional **focus** argument to narrow what they work on.
+Each skill is an agentic loop with an iteration cap. All accept an optional **focus** argument to narrow what they work on.
 
 | Skill | Description | Mode |
 |-------|-------------|------|
@@ -72,6 +70,8 @@ Four skills, each an agentic loop with an iteration cap. All accept an optional 
 | `/rs-spec [focus]` | Create or update specification — interview + validation loop | Interactive (skippable) |
 | `/rs-impl [focus]` | Implement from spec — test-driven, autonomous | Non-interactive |
 | `/rs-validate [focus]` | Run tests and report results | Non-interactive |
+| `/rs-update [focus]` | Upgrade project to latest framework version | Interactive |
+| `/rs-review [focus]` | Advisory visual review of rendered UI from screenshots | Non-interactive |
 
 ### Focus Examples
 
@@ -103,10 +103,7 @@ Each level can only reference higher levels, never lower. This prevents circular
 
 ### How It Works
 
-1. **Init** — Set up project directories, base files, and prerequisites
-2. **Spec** — Define what to build through interview-driven dialogue with built-in validation
-3. **Impl** — Build it test-driven from the spec, autonomously
-4. **Validate** — Run tests and prove it works
+Intent flows down: philosophy → truths → interactions → systems → implementation. Skills drive each transition; tests prove the result still binds to the original intent.
 
 ### Project Structure
 
