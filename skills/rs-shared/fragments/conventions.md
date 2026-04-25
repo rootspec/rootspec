@@ -100,6 +100,12 @@ Predefined categories and their entries. Include all categories that apply.
 - **E2E:** framework (e.g., Cypress, Playwright)
 - **Patterns:** testing conventions (e.g., collocated tests, test/ directory)
 
+### Test Viewports
+- **MOBILE_JOURNEY:** 375x667
+- **TABLET_JOURNEY:** 768x1024
+
+> Read by `generate-test-file.sh` to inject `setViewport` for stories tagged with the matching `@journey:`. Add or remove entries to control which journeys get auto-viewport. Per-story `setViewport` in the YAML always wins over this map.
+
 ---
 
 ## visual.md

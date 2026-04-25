@@ -30,6 +30,14 @@ if [[ -f "$SHARED_DIR/00.FRAMEWORK.md" ]]; then
 fi
 echo "BUNDLED_VERSION=$BUNDLED_VERSION"
 
+# --- Spec directory (parsed early so violation checks can use it) ---
+SPEC_DIR=""
+if [[ -f "$ROOT/.rootspec.json" ]]; then
+  SPEC_DIR=$(grep -o '"specDirectory"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/.rootspec.json" 2>/dev/null \
+    | head -1 | sed 's/.*"specDirectory"[[:space:]]*:[[:space:]]*"//' | sed 's/"//')
+fi
+SPEC_DIR="${SPEC_DIR:-rootspec}"
+
 # --- Framework-rule violations (always — even when versions match) ---
 # Detect projects generated under older rules. Each token is something
 # rs-update knows how to reconcile interactively. Emitted before the GAP=none
@@ -105,6 +113,18 @@ if wrapper_has_recursion "$ROOT/scripts/preview.sh" "PREVIEW_CMD" \
   fi
 fi
 
+# Viewport injection missing (pre-7.8.0). Fires when the project has at least
+# one mobile/tablet-journey story but no .cy.ts file ever invokes cy.viewport
+# — meaning the older generator emitted those tests without viewport injection.
+USER_STORIES_DIR="$ROOT/$SPEC_DIR/05.IMPLEMENTATION/USER_STORIES"
+if [[ -d "$USER_STORIES_DIR" ]] \
+   && grep -rqE "@journey:[[:space:]]*(MOBILE|TABLET)" "$USER_STORIES_DIR" 2>/dev/null \
+   && compgen -G "$ROOT/cypress/e2e/*.cy.ts" > /dev/null; then
+  if ! grep -rq "cy\.viewport(" "$ROOT/cypress/e2e" 2>/dev/null; then
+    RULE_VIOLATIONS+=("viewport_missing")
+  fi
+fi
+
 RULE_VIOLATIONS_OUT=""
 for v in "${RULE_VIOLATIONS[@]:-}"; do
   [[ -z "$v" ]] && continue
@@ -134,13 +154,7 @@ else
   echo "GAP=patch"
 fi
 
-# --- Spec directory ---
-SPEC_DIR=""
-if [[ -f "$ROOT/.rootspec.json" ]]; then
-  SPEC_DIR=$(grep -o '"specDirectory"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/.rootspec.json" 2>/dev/null \
-    | head -1 | sed 's/.*"specDirectory"[[:space:]]*:[[:space:]]*"//' | sed 's/"//')
-fi
-SPEC_DIR="${SPEC_DIR:-rootspec}"
+# --- Spec directory (already parsed at top; emit for downstream consumers) ---
 echo "SPEC_DIR=$SPEC_DIR"
 
 # --- Framework/Axioms staleness ---

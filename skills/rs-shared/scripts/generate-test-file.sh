@@ -61,6 +61,16 @@ if [[ ${#YAML_FILES[@]} -eq 0 ]]; then
   exit 1
 fi
 
+# Resolve journey -> viewport map (CONVENTIONS overrides + framework defaults).
+# Empty if read-viewport-defaults.sh is missing or finds nothing — generator
+# falls back to no injection in that case.
+SCRIPT_DIR_GEN="$(cd "$(dirname "$0")" && pwd)"
+VIEWPORT_LINES=""
+if [[ -x "$SCRIPT_DIR_GEN/read-viewport-defaults.sh" ]]; then
+  PROJECT_ROOT="$(cd "$SPEC_DIR/.." && pwd)"
+  VIEWPORT_LINES=$(bash "$SCRIPT_DIR_GEN/read-viewport-defaults.sh" "$PROJECT_ROOT" 2>/dev/null || true)
+fi
+
 # Collect existing story IDs from output file
 EXISTING_IDS=""
 if [[ -f "$OUTPUT" ]]; then
@@ -69,13 +79,32 @@ fi
 
 # Use node to parse YAML, extract stories, clean them, and output TypeScript
 FILE_LIST=$(printf '%s\n' "${YAML_FILES[@]}")
-RESULT=$(node -e "
+RESULT=$(VIEWPORT_LINES="$VIEWPORT_LINES" node -e "
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-const CORE_SETUP_STEPS = new Set(['visit', 'click', 'fill', 'loginAs', 'seedItem']);
-const CORE_ASSERT_STEPS = new Set(['shouldContain', 'shouldExist']);
+const CORE_SETUP_STEPS = new Set(['visit', 'click', 'fill', 'loginAs', 'seedItem', 'awaitReady', 'setViewport']);
+const CORE_ASSERT_STEPS = new Set(['shouldContain', 'shouldExist', 'shouldHaveNoOverflowX', 'shouldFitViewport']);
 const ALL_CORE = new Set([...CORE_SETUP_STEPS, ...CORE_ASSERT_STEPS]);
+const UNIVERSAL_SELECTORS = new Set(['body', 'html', 'main', '#root', '#app', '#__next']);
+const LAYOUT_TITLE_RE = /horizontal scroll|overflow|fit|tap target|44.{0,4}px|viewport|narrow|wide|breakpoint|responsive/i;
+
+// Parse journey->viewport map from VIEWPORT_LINES env var (one JOURNEY=WxH per line)
+const viewportMap = {};
+const vpRaw = (process.env.VIEWPORT_LINES || '').split('\n').filter(Boolean);
+for (const line of vpRaw) {
+  const m = line.match(/^([A-Z_][A-Z0-9_]*)=(\d+)x(\d+)$/);
+  if (m) viewportMap[m[1]] = { width: parseInt(m[2], 10), height: parseInt(m[3], 10) };
+}
+
+function resolveJourneyViewport(journey) {
+  if (!journey) return null;
+  if (viewportMap[journey]) return viewportMap[journey];
+  // Pattern fallback: MOBILE_* matches MOBILE_JOURNEY default, etc.
+  const prefix = journey.split('_')[0];
+  const fallbackKey = prefix + '_JOURNEY';
+  return viewportMap[fallbackKey] || null;
+}
 
 const existingIds = new Set('${EXISTING_IDS}'.split(',').filter(Boolean));
 const files = \`${FILE_LIST}\`.trim().split('\n').filter(Boolean);
@@ -86,6 +115,20 @@ const storyBlocks = [];
 for (const file of files) {
   let content;
   try { content = fs.readFileSync(file, 'utf8'); } catch { continue; }
+
+  // Pre-pass: build storyId -> journey map from comment annotations.
+  // js-yaml strips comments, so journey tags must be parsed from raw text.
+  // Walk lines: each '# @journey: NAME' sets a pending value; the next
+  // 'id: STORY_ID' line claims it.
+  const journeyById = {};
+  const rawLines = content.split('\n');
+  let pendingJourney = null;
+  for (const line of rawLines) {
+    const j = line.match(/#\s*@journey:\s*([A-Z][A-Z0-9_]*)/i);
+    if (j) { pendingJourney = j[1].toUpperCase(); continue; }
+    const idMatch = line.match(/^\s*-?\s*id:\s*([A-Za-z0-9_-]+)/);
+    if (idMatch) { journeyById[idMatch[1]] = pendingJourney; }
+  }
 
   // Parse multi-doc YAML
   let docs;
@@ -100,6 +143,8 @@ for (const file of files) {
     for (const story of stories) {
       if (!story || !story.id || !story.acceptance_criteria) continue;
       if (existingIds.has(story.id)) continue;
+      const journey = journeyById[story.id] || null;
+      const journeyViewport = resolveJourneyViewport(journey);
 
       // Check for DSL format and filter to core steps only
       let hasDslSteps = false;
@@ -126,6 +171,28 @@ for (const file of files) {
         if (!cleanAc.given) cleanAc.given = [{ visit: '/' }];
         if (!cleanAc.when) cleanAc.when = [];
         if (!cleanAc.then) cleanAc.then = [];
+
+        // Inject viewport from journey default if absent and journey resolves.
+        // Per-story override wins: if author set setViewport in given, leave it.
+        if (journeyViewport && !cleanAc.given.some(s => s && typeof s === 'object' && 'setViewport' in s)) {
+          cleanAc.given.unshift({ setViewport: { width: journeyViewport.width, height: journeyViewport.height } });
+          hasDslSteps = true;
+        }
+
+        // Vacuous-assertion warning: layout-class title with only universal-
+        // selector shouldExist assertions can't actually catch layout breakage.
+        if (LAYOUT_TITLE_RE.test(ac.title || '')) {
+          const thens = cleanAc.then;
+          if (thens.length > 0 && thens.every(s => {
+            if (typeof s !== 'object' || s === null) return false;
+            const k = Object.keys(s)[0];
+            if (k !== 'shouldExist') return false;
+            const sel = s.shouldExist && s.shouldExist.selector;
+            return typeof sel === 'string' && UNIVERSAL_SELECTORS.has(sel.trim().toLowerCase());
+          })) {
+            warnings.push(story.id + ':' + ac.id + ': assertion on universal selector may be vacuous for \"' + (ac.title || '') + '\" — consider shouldHaveNoOverflowX or shouldFitViewport');
+          }
+        }
 
         cleanedAC.push(cleanAc);
       }

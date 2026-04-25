@@ -12,6 +12,7 @@
 | `loginAs` | `loginAs: 'member'` | Authenticate as a user role |
 | `seedItem` | `seedItem: { slug: 'id', status: 'active' }` | Create test data |
 | `awaitReady` | `awaitReady: true` | Wait for app readiness (mid-flow gate after click/route change) |
+| `setViewport` | `setViewport: { width: 375, height: 667 }` | Set viewport size for the rest of the test |
 
 ## Core Assertion Steps (then)
 
@@ -19,6 +20,18 @@
 |------|--------|---------|
 | `shouldContain` | `shouldContain: { selector: '[data-test=el]', text: 'expected' }` | Verify text content |
 | `shouldExist` | `shouldExist: { selector: '[data-test=el]' }` | Verify element exists |
+| `shouldHaveNoOverflowX` | `shouldHaveNoOverflowX: { selector: 'body' }` | Verify element's `scrollWidth ≤ clientWidth` (no horizontal scrollbar) |
+| `shouldFitViewport` | `shouldFitViewport: { selector: '[data-test=hero]' }` | Verify element's bounding rect fits within the viewport horizontally |
+
+## Viewports
+
+Stories tagged with a `@journey:` matching the framework defaults (`MOBILE_*`, `TABLET_*`) get a `setViewport` step auto-injected as the first item in `given`. Authors override per-story by adding their own `setViewport` to `given:` — explicit always wins.
+
+The journey→viewport map is sourced from `rootspec/CONVENTIONS/technical.md` → "Test Viewports" (project override) and falls back to `rs-shared/viewport-defaults.json` (framework defaults: `MOBILE_JOURNEY: 375x667`, `TABLET_JOURNEY: 768x1024`). Other journeys get no injection — Cypress's default viewport applies.
+
+## Geometry Assertions
+
+`shouldExist` against universal selectors (`body`, `html`, `main`, `#root`, `#app`) cannot validate layout — those elements always exist on a rendered page. For criteria that mention horizontal scroll, overflow, fit, tap targets, viewport bounds, or responsive behavior, use `shouldHaveNoOverflowX` or `shouldFitViewport`. They actually measure the property the criterion describes; otherwise the test passes vacuously while the bug ships.
 
 ## App Readiness
 
@@ -41,8 +54,11 @@ export type Step =
   | { loginAs: string }
   | { seedItem: Record<string, unknown> }
   | { awaitReady: true }
+  | { setViewport: { width: number; height: number } }
   | { shouldContain: { selector: string; text: string } }
   | { shouldExist: { selector: string } }
+  | { shouldHaveNoOverflowX: { selector: string } }
+  | { shouldFitViewport: { selector: string } }
   // Custom steps:
   | { createProject: { name: string } }
   | { inviteUser: { email: string; role: string } }
@@ -84,8 +100,11 @@ const StepSchema = z.union([
   z.object({ loginAs: z.string() }),
   z.object({ seedItem: z.record(z.unknown()) }),
   z.object({ awaitReady: z.literal(true) }),
+  z.object({ setViewport: z.object({ width: z.number(), height: z.number() }) }),
   z.object({ shouldContain: z.object({ selector: z.string(), text: z.string() }) }),
   z.object({ shouldExist: z.object({ selector: z.string() }) }),
+  z.object({ shouldHaveNoOverflowX: z.object({ selector: z.string() }) }),
+  z.object({ shouldFitViewport: z.object({ selector: z.string() }) }),
   // Custom:
   z.object({ createProject: z.object({ name: z.string() }) }),
   z.object({ inviteUser: z.object({ email: z.string(), role: z.string() }) }),

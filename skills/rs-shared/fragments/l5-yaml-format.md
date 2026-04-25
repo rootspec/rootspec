@@ -70,12 +70,44 @@ The `given`/`when`/`then` arrays in acceptance criteria use a fixed DSL. Only us
 - `fill: { selector: '[data-test=input]', value: 'text' }` — type into an input
 - `loginAs: 'role'` — authenticate as a user role (requires Cypress task)
 - `seedItem: { slug: 'id', status: 'active' }` — create test data (requires Cypress task)
+- `awaitReady: true` — wait for app readiness mid-flow (after click/route change)
+- `setViewport: { width: 375, height: 667 }` — set viewport for this test
 
 **Assertion steps (then):**
 - `shouldContain: { selector: '[data-test=el]', text: 'expected' }` — verify text content
 - `shouldExist: { selector: '[data-test=el]' }` — verify element exists
+- `shouldHaveNoOverflowX: { selector: 'body' }` — verify no horizontal scrollbar (`scrollWidth ≤ clientWidth`)
+- `shouldFitViewport: { selector: '[data-test=hero]' }` — verify element fits within viewport horizontally
 
-**Do NOT use:** `scrollTo`, `shouldNavigateToUrl`, `shouldHaveAttribute`, `wait`, `reload`, `hover`, `dragTo`, or any other step name. These do not exist in the schema. If a behavior can't be tested with the core steps above, simplify the acceptance criterion to use `shouldExist` or `shouldContain` on the observable result.
+**Do NOT use:** `scrollTo`, `shouldNavigateToUrl`, `shouldHaveAttribute`, `wait`, `reload`, `hover`, `dragTo`, or any other step name. These do not exist in the schema. If a behavior can't be tested with the core steps above, simplify the acceptance criterion to use `shouldExist`, `shouldContain`, or a geometry assertion on the observable result.
+
+## Mobile / Responsive Stories
+
+Tag the story with `@journey: MOBILE_JOURNEY` (or `TABLET_JOURNEY`) and the test generator auto-injects `setViewport` as the first `given` step. Override per-story by setting `setViewport` yourself:
+
+```yaml
+# @journey: MOBILE_JOURNEY
+id: US-301
+title: Page is usable at 375px
+acceptance_criteria:
+  - id: AC-301-1
+    title: No horizontal scroll at 375px
+    given:
+      - visit: '/'
+    when: []
+    then:
+      - shouldHaveNoOverflowX: { selector: 'body' }
+  - id: AC-301-2
+    title: Renders at iPhone 14 Pro Max width
+    given:
+      - setViewport: { width: 430, height: 932 }   # explicit override
+      - visit: '/'
+    when: []
+    then:
+      - shouldExist: { selector: '[data-test=hero]' }
+```
+
+Override the journey defaults globally for the project by editing `rootspec/CONVENTIONS/technical.md` → "Test Viewports".
 
 ## YAML Syntax Rules
 
@@ -115,6 +147,7 @@ message: 'hasn\'t arrived'
 3. **Bad indentation** — use 2 spaces consistently, never tabs
 4. **Empty array elements** — extra `-` with no content creates null values
 5. **Misaligned dashes** — sibling array items must align at same column
+6. **Vacuous assertions on universal selectors** — `shouldExist: { selector: 'body' }` for a "no horizontal scroll" criterion is structurally valid but semantically empty: `body` is always present. Use `shouldHaveNoOverflowX` or `shouldFitViewport` for layout/scroll/overflow/viewport criteria. `/rs-spec` flags this pattern after validation.
 
 ## Test Control Modifiers
 

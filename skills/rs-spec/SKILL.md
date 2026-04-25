@@ -138,6 +138,27 @@ If the path doesn't resolve, search for `validate-spec.sh` in the skills directo
 
 If violations are found, report them and fix. **Max 3 validation-fix cycles.** If still failing after 3, report remaining violations and exit.
 
+### Vacuous-assertion advisory
+
+After validation passes, run the vacuous-assertion check:
+
+```bash
+bash "$(dirname "$0")/../rs-shared/scripts/check-vacuous-assertions.sh" rootspec
+```
+
+Each `VACUOUS=storyId:acId:reason` line names an acceptance criterion whose assertion can't actually catch the failure mode the title describes — typically `shouldExist` against `body`/`html`/`main` for a layout/scroll/overflow/viewport criterion (the universal selector always exists; the test passes vacuously while the bug ships). Reasons:
+
+- `layout_assertion_on_universal_selector` — title matches layout/responsive keywords; replace with `shouldHaveNoOverflowX` or `shouldFitViewport` against the actual element.
+- `no_assertions` — `then:` is empty; the test passes regardless of behavior.
+
+**Interactive:** for each finding, show the AC title, the current assertion, and the suggested replacement. Ask the developer to confirm per-finding before editing the YAML. Don't auto-rewrite — the right selector depends on what the criterion is actually about.
+
+**Non-interactive:** print the findings as warnings and continue. Don't block validation — vacuous assertions are advisory.
+
+If no findings, the script outputs nothing and you can skip the prompt entirely.
+
+Mobile/tablet journeys auto-receive `setViewport` in tests via the `generate-test-file.sh` injection; you don't need to add `setViewport` to YAML when creating responsive stories. Override per-story by adding `setViewport: { width, height }` to `given:` if the story needs a non-default viewport.
+
 ## Step 5b: Reconcile baseline stories (brownfield only)
 
 Skip this step if HAS_CODE=false or if no stories are tagged `@phase: baseline`.

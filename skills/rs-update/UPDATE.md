@@ -8,6 +8,22 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.8.0
+
+Summary: Viewport-aware test generation + vacuous-assertion detection. Closes the "looks tested, isn't tested" gap from 7.7.0 field testing — mobile/tablet stories tagged with `@journey:` now get `setViewport` auto-injected; geometry assertions (`shouldHaveNoOverflowX`, `shouldFitViewport`) replace the structurally-valid-but-semantically-empty `shouldExist: { selector: 'body' }` for layout criteria; `/rs-spec` flags vacuous patterns after validation.
+Framework files: Replace
+Prerequisites:
+  NEW: skills/rs-shared/viewport-defaults.json — framework defaults: MOBILE_JOURNEY 375x667, TABLET_JOURNEY 768x1024
+  NEW: skills/rs-shared/scripts/read-viewport-defaults.sh — emits JOURNEY=WxH lines; CONVENTIONS/technical.md → "Test Viewports" overrides framework defaults
+  NEW: skills/rs-shared/scripts/check-vacuous-assertions.sh — scans user stories for layout-class titles paired with universal-selector assertions; emits VACUOUS=storyId:acId:reason
+  CHANGED: skills/rs-shared/scripts/generate-test-file.sh — auto-injects setViewport from journey + warns on vacuous patterns; CORE_SETUP_STEPS gains setViewport (and awaitReady, fixing a pre-existing strip bug); CORE_ASSERT_STEPS gains shouldHaveNoOverflowX + shouldFitViewport
+  CHANGED: skills/rs-shared/scripts/scaffold-cypress.sh — schema.ts and steps.ts templates extended with the new step types
+  CHANGED: rootspec/CONVENTIONS/technical.md — Test Viewports section (under Testing) when project has any MOBILE_*/TABLET_* journey; /rs-impl writes the framework defaults on first scaffold
+Manual: After upgrading, /rs-update Step 5 reconciles viewport_missing if applicable:
+  - viewport_missing — auto-extend schema.ts and steps.ts with setViewport + geometry assertions (idempotent), auto-add Test Viewports section to CONVENTIONS/technical.md if missing. Existing cypress/e2e/*.cy.ts files were generated WITHOUT viewport injection — delete them and re-run /rs-impl to regenerate. CI mode auto-applies the file edits (idempotent) and emits WARN=cypress_e2e_needs_regen so the regen happens on the next developer-led run.
+  - /rs-spec runs check-vacuous-assertions.sh after validation. Findings are advisory (don't block); interactive mode prompts per-finding for replacement. The right replacement depends on what the criterion is actually about, so /rs-spec doesn't auto-rewrite.
+Breaking: false (additive — old generated tests keep running, new test generations get viewport injection automatically; vacuous-assertion check is advisory)
+
 ## 7.7.0
 
 Summary: Dev-server wrapper layering fix (no more `npm run dev` recursion / wrapper bypass) and `rs-update` CI mode (transactional, non-interactive, structured report). Two failures from CI runs of 7.6.1 — `dev.sh` recursing through `npm run dev`, and `rs-update` hanging on confirmation prompts then leaving projects in half-broken state — both closed.

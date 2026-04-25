@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`skills/rs-shared/viewport-defaults.json`** — framework-default journey→viewport map (`MOBILE_JOURNEY: 375x667`, `TABLET_JOURNEY: 768x1024`). Single source of truth for ship-defaults; projects override via `CONVENTIONS/technical.md` → "Test Viewports".
+- **`scripts/read-viewport-defaults.sh`** — resolves the journey→viewport map for a project. Reads CONVENTIONS overrides first, falls back to framework defaults. Emits `JOURNEY=WxH` lines for `generate-test-file.sh` to consume.
+- **`scripts/check-vacuous-assertions.sh`** — scans user stories for acceptance criteria whose title classifies as layout/scroll/overflow/viewport/responsive but whose `then` only contains `shouldExist` against universal selectors (`body`, `html`, `main`, `#root`). Emits `VACUOUS=storyId:acId:reason`. Also flags ACs with no assertions. Run by `/rs-spec` after validation; advisory, doesn't block.
+- **`setViewport` DSL step** — `setViewport: { width, height }` in `given:`/`when:` sets the Cypress viewport for the rest of the test. Stories tagged with `@journey: MOBILE_*` or `TABLET_*` get the step auto-injected by `generate-test-file.sh` (using the journey→viewport map); per-story author override always wins.
+- **Geometry assertions** `shouldHaveNoOverflowX` and `shouldFitViewport` in `then:` — actually measure layout (scrollWidth ≤ clientWidth, bounding rect within viewport) instead of asserting that universal selectors exist. The latter passes vacuously for "no horizontal scroll at 375px" criteria, hiding real mobile bugs.
+- **`viewport_missing` violation in `gap-analysis.sh`** — fires when a project has at least one `@journey: MOBILE_*` or `@journey: TABLET_*` story, generated `cypress/e2e/*.cy.ts` files exist, and none of those test files invoke `cy.viewport(`. Means the older generator emitted those tests without viewport injection. New `### viewport_missing` reconciliation in `rs-update/SKILL.md` walks the developer through extending schema.ts/steps.ts (idempotent), adding Test Viewports to CONVENTIONS, and regenerating affected test files.
+
+### Changed
+
+- **`generate-test-file.sh`** — `CORE_SETUP_STEPS` gains `setViewport` (and `awaitReady`, fixing a pre-existing strip bug — `awaitReady` shipped in 7.6.0 but the generator was silently dropping it from generated tests). `CORE_ASSERT_STEPS` gains `shouldHaveNoOverflowX` + `shouldFitViewport`. Pre-pass parses `@journey:` from raw YAML comments (js-yaml strips comments at parse time, so the journey lookup must happen on raw text before `loadAll`). For each story whose journey resolves to a viewport, prepends `setViewport` to `given` if absent. Vacuous-pattern warning emitted when an AC's title matches layout/responsive keywords and its `then` is only `shouldExist` against a universal selector.
+- **`scaffold-cypress.sh` templates** — `cypress/support/schema.ts` Step union extended with `setViewport`, `shouldHaveNoOverflowX`, `shouldFitViewport`. `cypress/support/steps.ts` `runSetupSteps` handles `setViewport` via `cy.viewport()`; `runAssertionSteps` handles the geometry assertions via `expect(scrollWidth).to.be.at.most(clientWidth)` and bounding-rect-within-viewport checks. Affects new projects only; existing projects pick up the new step types via the `viewport_missing` reconciliation when they next run `/rs-update`.
+- **`rs-impl/SKILL.md` Step 2c** — when scaffolding `CONVENTIONS/technical.md`, write a `### Test Viewports` section if any user story uses a `MOBILE_*` or `TABLET_*` journey. Skipped silently for projects without responsive journeys.
+- **`rs-spec/SKILL.md` Step 5** — after `validate-spec.sh` passes, runs `check-vacuous-assertions.sh`. In interactive mode, surfaces each finding with a suggested replacement (geometry assertion or "add a real assertion"); doesn't auto-rewrite. Non-interactive prints warnings and continues. Mobile/tablet journeys auto-receive `setViewport` in tests — no need to add it to YAML.
+- **`rs-update/SKILL.md` Mode + Step 5** — pre-flight table includes `viewport_missing` (no preflight check needed — file edits are idempotent, never deletes user files); CI policy table adds `viewport_missing` row (auto-extend schema.ts/steps.ts + add Test Viewports section + emit `WARN=cypress_e2e_needs_regen`); structured report format gains a `WARN=` field, comma-separated.
+- **`l5-test-dsl.md`, `l5-yaml-format.md`** — document `setViewport` and the geometry assertions; new "Viewports" + "Geometry Assertions" subsections; new "Mobile / Responsive Stories" example showing journey-driven default + per-story override; new vacuous-assertion entry under "Common Pitfalls".
+- **`conventions.md`** — example `### Test Viewports` subsection added under Testing in the technical.md template.
+
 ## [7.7.0] - 2026-04-25
 
 ### Added

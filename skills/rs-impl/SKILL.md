@@ -102,6 +102,16 @@ The dev server is for fast iteration (`npx cypress run` against it during the im
 
 If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec, detected framework, and existing source code. For brownfield projects (existing code, no prior conventions), audit the codebase and document observed patterns — stack, file organization, styling approach, API patterns, component structure. Use `## Heading` sections with `- **Label:** value` entries.
 
+**`technical.md` MUST include a "Test Viewports" section** if any user story is tagged with a `MOBILE_*` or `TABLET_*` journey. Detect with `grep -rE "@journey:.*(MOBILE|TABLET)" rootspec/05.IMPLEMENTATION/USER_STORIES`. If matches exist, write the framework defaults from `$SHARED_DIR/viewport-defaults.json`:
+
+```markdown
+### Test Viewports
+- **MOBILE_JOURNEY:** 375x667
+- **TABLET_JOURNEY:** 768x1024
+```
+
+These drive `generate-test-file.sh` viewport injection. Project edits override the defaults; per-story `setViewport` in YAML always wins. Skip the section entirely if the project has no responsive journeys.
+
 **`technical.md` MUST include an "App Readiness" section** answering two questions in this order:
 
 1. **Deferred-execution boundaries.** List every component, region, or module whose interactive code is loaded or executed *after* the initial document arrives. Cite file paths. Examples: components mounted with `client:load`/`client:idle`/`client:visible`/`client:only` (Astro), `'use client'` islands (RSC), `React.lazy`+`<Suspense>`, `dynamic(...)` imports (Next.js), `defineAsyncComponent` (Vue), Svelte dynamic loads. If the project has none, write "None — fully static" with one-line evidence.
