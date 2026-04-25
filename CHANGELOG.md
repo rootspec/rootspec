@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.8.0] - 2026-04-25
+
 ### Added
 
 - **`skills/rs-shared/viewport-defaults.json`** — framework-default journey→viewport map (`MOBILE_JOURNEY: 375x667`, `TABLET_JOURNEY: 768x1024`). Single source of truth for ship-defaults; projects override via `CONVENTIONS/technical.md` → "Test Viewports".
