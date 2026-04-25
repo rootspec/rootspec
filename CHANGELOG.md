@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`scripts/check-app-ready.sh` pre-flight gate** — detects shallow `cy.appReady()` implementations against projects that mount deferred-execution boundaries. Greps the project for client directives (Astro `client:load`/`idle`/`visible`/`only`/`media`), RSC `'use client'` islands, `React.lazy`/`<Suspense>`, Next.js `dynamic()`, Vue `defineAsyncComponent`. If found AND `cypress/support/app-ready.ts` resolves on `document.readyState`, body presence, `cy.wrap(true)`, or an empty body, exits non-zero with an actionable message. Runs from `scripts/test.sh` (so pre-commit + CI gate on it) and from `rs-validate` Step 1 (before the test server starts). Closes the loop where 7.6.0's contract gave the impl agent total freedom and the agent shipped `cy.document().its('readyState').should('eq', 'complete')` for an Astro+React island app — flaky greens that survived validate.
+- **Hydration-aware-readiness rule** in `framework-rules.md` → App Readiness. Framework-agnostic wording — names "deferred-execution boundary" rather than any specific stack. Matches the pre-flight's detection set.
+
+### Changed
+
+- **Scaffold no longer primes the cheap default.** `scaffold-cypress.sh` strips the three-example "Examples (uncomment and adapt one)" comment block from `cypress/support/app-ready.ts`. The first example was `Cypress.Commands.add('appReady', () => { cy.wrap(true); })` for "Static site, no async work" — agents reading "static-ish Astro site" picked that pattern even with `client:load` islands on the page. Replaced with one-line pointer to `CONVENTIONS/technical.md` → App Readiness. The throw stays.
+- **Conventions-first ordering in `rs-impl/SKILL.md`.** `CONVENTIONS/technical.md` MUST include an "App Readiness" section answering (1) which deferred-execution boundaries the project uses with file refs, (2) what signal each emits when fully active. The implementation in `cypress/support/app-ready.ts` derives from (2) — convention drives the code, not the other way around. The implementation file stays terse: no multi-line rationalization comments.
+- **`rs-impl/SKILL.md` Step 2b and Phase A** drop the "or a one-line no-op for a static site" enumeration that the agent was reading as permission to skip the actual readiness check. A no-op or document-level check is acceptable ONLY when the App Readiness conventions section answers (1) with "None — fully static".
+- **`bootstrap-init.sh`** copies `check-app-ready.sh` into the project's `scripts/` and the generated `scripts/test.sh` invokes it before the mode branch.
+- **`gap-analysis.sh`** detects existing 7.6.0 projects via new `shallow_app_ready` violation (delegates to `check-app-ready.sh`); `/rs-update` Step 5 reconciles interactively — does not auto-rewrite `app-ready.ts` since the choice depends on the app's actual hydration mechanism.
+- **`rs-validate/SKILL.md` Step 1** runs the pre-flight before starting the test server.
+
 ## [7.6.0] - 2026-04-24
 
 ### Changed

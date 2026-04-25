@@ -29,6 +29,14 @@ If these paths don't resolve, search for the scripts in the skills directory.
 
 **Check that tests exist.** If `cypress/e2e/` doesn't exist or contains no test files: "No tests found. Run `/rs-impl` first." Exit.
 
+**Run the app-readiness pre-flight.** This catches shallow `cy.appReady()` implementations against projects that mount deferred-execution boundaries (client directives, lazy/Suspense, dynamic imports). Failure here means tests would pass intermittently and miss regressions — fix before running Cypress.
+
+```bash
+bash "$(dirname "$0")/../rs-shared/scripts/check-app-ready.sh" .
+```
+
+If it exits non-zero: relay the script's stderr verbatim, tell the developer to run `/rs-impl` to fix `cypress/support/app-ready.ts`, and exit. Do not run tests.
+
 Announce: "Found X stories. Running [focus or: all tests]."
 
 ## Step 2: Run tests

@@ -146,6 +146,19 @@ Offer two paths:
 
 If full migration is chosen, advise the developer that the FIRST `npx cypress run` will fail with "cy.appReady() is not implemented" — that's the contract surfacing, not a regression.
 
+### `shallow_app_ready`
+
+The project's `cypress/support/app-ready.ts` resolves on a document-level signal (`document.readyState`, body presence, `cy.wrap(true)`, etc.) but the project mounts deferred-execution boundaries — components or modules whose interactive code runs *after* the initial document arrives (Astro `client:*`, RSC `'use client'`, React.lazy/Suspense, Next.js `dynamic()`, Vue `defineAsyncComponent`, etc.). The shallow check fires before those boundaries are interactive; tests pass intermittently and fail on the first click into an unhydrated component. Same flake the 7.6.0 contract was meant to prevent, just lower in the stack.
+
+Show the developer:
+1. The current `cypress/support/app-ready.ts` body and which shallow pattern it matches.
+2. The deferred-execution markers found in the project (file paths + matched directive/import).
+3. The required fix: rewrite `cy.appReady()` to wait on a signal those boundaries emit when fully active (a global the framework or app sets after hydration, an attribute on a known node, polled component state, an event, etc.). Document the chosen mechanism in `CONVENTIONS/technical.md` → App Readiness with: (a) the boundaries listed in step 2, (b) the signal each emits when active.
+
+Do NOT auto-rewrite `app-ready.ts` — the choice depends on the app's actual hydration mechanism. Walk the developer through the conventions section first; the implementation falls out of it.
+
+If the project also lacks `scripts/check-app-ready.sh`, copy it from the bundled `rs-shared/scripts/` so future test runs gate on the same rule. After the rewrite, run `./scripts/check-app-ready.sh .` to confirm the gate passes.
+
 ### `previewServer_missing`
 
 The project's `.rootspec.json` lacks a `previewServer` entry. If `testmode_implicit_dev` is being resolved with the "switch" path, fix this in the same step. Otherwise, add the entry pointing at `./scripts/preview.sh` (and copy the bundled template if missing) so the prerequisite is recorded — even projects that stay on dev mode benefit from having preview infra available.

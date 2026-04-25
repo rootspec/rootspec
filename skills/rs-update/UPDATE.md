@@ -8,6 +8,18 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.6.1
+
+Summary: Pre-flight gate detects shallow `cy.appReady()` against deferred-execution boundaries. Hydration-aware-readiness rule added to framework. Scaffold stops priming the cheap no-op default. Conventions-first ordering: `CONVENTIONS/technical.md` → App Readiness must list deferred-execution boundaries and their signals BEFORE `app-ready.ts` is written.
+Framework files: Replace
+Prerequisites:
+  NEW: scripts/check-app-ready.sh — pre-flight gate; run by scripts/test.sh and rs-validate before Cypress starts
+  CHANGED: scripts/test.sh — invokes ./scripts/check-app-ready.sh before mode branch; old test.sh works fine, just lacks the gate
+  CHANGED: cypress/support/app-ready.ts — scaffold no longer includes the three "Examples" comment block (incl. cy.wrap(true) static-site shortcut); existing project files untouched
+  CHANGED: rootspec/CONVENTIONS/technical.md — must include "App Readiness" section with (1) deferred-execution boundaries + file refs, (2) signal each boundary emits when active
+Manual: After upgrading, /rs-update Step 5 reconciles `shallow_app_ready` interactively if the project's app-ready.ts uses document.readyState / cy.wrap(true) / body-presence against a project that contains client directives, lazy/Suspense, dynamic imports, or 'use client' islands. The agent must rewrite app-ready.ts to wait on a real readiness signal from those boundaries, and add/expand the App Readiness section in technical.md to match.
+Breaking: false (existing correct projects unaffected; existing wrong projects start failing the pre-flight, which is the intent — they were producing flaky greens before)
+
 ## 7.6.0
 
 Summary: App-readiness contract replaces body-level data-ready prescription. The framework no longer dictates HOW an app signals readiness — the project defines it in `cypress/support/app-ready.ts`.

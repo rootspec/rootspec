@@ -64,4 +64,10 @@ E2E tests must wait for **app readiness** — not DOM readiness, not body readin
 - The shared `visit` step calls `cy.appReady()` automatically after every visit; tests can also use `awaitReady` mid-flow after a click or route change that triggers async work.
 - Until the project defines `cy.appReady()`, the scaffolded stub throws a clear error — silent no-ops re-create the flake the contract is meant to prevent.
 
-How a specific app satisfies the contract belongs in `CONVENTIONS/technical.md`, not here. A static site implements `cy.appReady()` as a one-line no-op; a hydration-heavy site polls its own state.
+**Hydration-aware readiness (mandatory).** If the rendered output contains any *deferred-execution boundary* — a component, region, or module whose interactive code is loaded or executed *after* the initial document arrives — `cy.appReady()` MUST wait for a signal those boundaries emit when fully active. Document-level signals (`document.readyState`, `DOMContentLoaded`, body presence) and unconditional resolution (`cy.wrap(true)`) are insufficient: they fire *before* deferred boundaries become interactive, and tests that visit-then-click pass intermittently and fail loud on the first miss. A no-op or document-only check is acceptable ONLY when the rendered output has zero post-document execution.
+
+This is enforced by `scripts/check-app-ready.sh`, which runs as a pre-flight in `scripts/test.sh`. If the project contains deferred-execution markers (client directives, lazy/Suspense, dynamic imports, RSC `'use client'` islands, etc.) AND `cypress/support/app-ready.ts` resolves on a shallow signal, the gate hard-fails before Cypress starts.
+
+**Conventions-first ordering.** Before writing `cypress/support/app-ready.ts`, fill in `CONVENTIONS/technical.md` → App Readiness with: (1) the deferred-execution boundaries the project uses, with file references; (2) for each, the signal it emits when fully active. The implementation flows from (2). The implementation file itself stays terse — no multi-line rationalization comments; reasoning lives in the conventions doc where it can be reviewed against this rule.
+
+How a specific app satisfies the contract belongs in `CONVENTIONS/technical.md`, not here.

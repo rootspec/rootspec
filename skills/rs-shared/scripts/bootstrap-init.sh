@@ -95,6 +95,13 @@ if [[ ! -f "$ROOT/scripts/preview.sh" ]]; then
   fi
 fi
 
+# 3.1c App-readiness pre-flight — copy bundled check (test.sh invokes it).
+# Always overwrite so projects pick up framework-level rule updates.
+if [[ -f "$SHARED/scripts/check-app-ready.sh" ]]; then
+  cp "$SHARED/scripts/check-app-ready.sh" "$ROOT/scripts/check-app-ready.sh"
+  chmod +x "$ROOT/scripts/check-app-ready.sh"
+fi
+
 # 3.2 Validation script (test.sh) — branches on .rootspec.json testMode.
 # Default is "preview" (built artifact + preview server). "dev" opts into
 # the dev server. baseUrl is set per-mode via CYPRESS_BASE_URL so the
@@ -105,6 +112,12 @@ if [[ ! -f "$ROOT/scripts/test.sh" ]]; then
 # Test runner — defaults to preview mode (built artifact + preview server).
 # Override via .rootspec.json prerequisites.testMode = "dev".
 set -euo pipefail
+
+# Pre-flight: detect shallow cy.appReady() against deferred-execution boundaries.
+# Hard-fails before tests start so flake doesn't masquerade as a green run.
+if [[ -x ./scripts/check-app-ready.sh ]]; then
+  ./scripts/check-app-ready.sh .
+fi
 
 MODE=$(grep -o '"testMode"[^,}]*' .rootspec.json 2>/dev/null \
   | sed -E 's/.*"testMode"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/')

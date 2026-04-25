@@ -62,6 +62,15 @@ if [[ -f "$ROOT/cypress/support/steps.ts" ]] \
   RULE_VIOLATIONS+=("legacy_body_ready")
 fi
 
+# Shallow cy.appReady() against deferred-execution boundaries (pre-7.6.1 rule).
+# Delegates to check-app-ready.sh — same logic as the test.sh pre-flight.
+if [[ -x "$SHARED_DIR/scripts/check-app-ready.sh" ]] \
+   && [[ -f "$ROOT/cypress/support/app-ready.ts" ]]; then
+  if ! "$SHARED_DIR/scripts/check-app-ready.sh" "$ROOT" >/dev/null 2>&1; then
+    RULE_VIOLATIONS+=("shallow_app_ready")
+  fi
+fi
+
 RULE_VIOLATIONS_OUT=""
 for v in "${RULE_VIOLATIONS[@]:-}"; do
   [[ -z "$v" ]] && continue

@@ -74,7 +74,7 @@ This creates the test file with all stories embedded as YAML string literals usi
 - `loginAs` steps → implement the task body in `cypress.config.ts`
 - `seedItem` steps → implement the task body in `cypress.config.ts`
 - Custom DSL steps not in the core set → extend `steps.ts` and `schema.ts`
-- App readiness — implement `cypress/support/app-ready.ts` so `cy.appReady()` resolves only when the app is actually interactive. The shared `visit` step calls it automatically after every visit. The scaffolded stub throws until you customize it; your call whether "ready" is a global, an attribute, polled state, or a one-line no-op for a static site. Record the chosen mechanism in `CONVENTIONS/technical.md`. See `../rs-shared/fragments/framework-rules.md` → App Readiness.
+- App readiness — see step 2c below. `cypress/support/app-ready.ts` MUST be derived from the App Readiness section of `CONVENTIONS/technical.md`, not the other way around. Don't customize the throwing stub until that section is written.
 
 Write all customizations in a single multi-file operation.
 
@@ -90,6 +90,15 @@ sleep 3
 The dev server is for fast iteration (`npx cypress run` against it during the implement loop). The project's canonical test runner is `./scripts/test.sh`, which respects `.rootspec.json` `prerequisites.testMode` (default `"preview"`: build + preview server). The pre-commit hook calls test.sh, so the gate is preview-mode regardless of how you iterate. Don't change `testMode` to `"dev"` to make tests pass — fix the impl so it passes against a built artifact.
 
 If `rootspec/CONVENTIONS/` doesn't exist, create both `technical.md` and `visual.md` using parallel Write calls in this same turn. Derive from the spec, detected framework, and existing source code. For brownfield projects (existing code, no prior conventions), audit the codebase and document observed patterns — stack, file organization, styling approach, API patterns, component structure. Use `## Heading` sections with `- **Label:** value` entries.
+
+**`technical.md` MUST include an "App Readiness" section** answering two questions in this order:
+
+1. **Deferred-execution boundaries.** List every component, region, or module whose interactive code is loaded or executed *after* the initial document arrives. Cite file paths. Examples: components mounted with `client:load`/`client:idle`/`client:visible`/`client:only` (Astro), `'use client'` islands (RSC), `React.lazy`+`<Suspense>`, `dynamic(...)` imports (Next.js), `defineAsyncComponent` (Vue), Svelte dynamic loads. If the project has none, write "None — fully static" with one-line evidence.
+2. **Readiness signal.** For each boundary, what observable signal does it emit when fully active? (a global, an attribute on a known node, an event, polled component state, etc.) The Cypress implementation in `cypress/support/app-ready.ts` flows from this — the convention drives the code, not the other way around.
+
+Then write `cypress/support/app-ready.ts` to assert the signal from (2). Keep the file terse: `Cypress.Commands.add` body + `declare global` + `export {}`. **Do not put rationalization comments in the implementation file** — reasoning belongs in `technical.md` where it can be reviewed against the framework rule. A one-line pointer back to the conventions doc is fine; multi-paragraph justification is not.
+
+If the rendered output contains any deferred-execution boundary, `cy.appReady()` MUST observe those boundaries — `document.readyState`, body presence, and `cy.wrap(true)` are insufficient and will hard-fail the `scripts/check-app-ready.sh` pre-flight before Cypress starts. A no-op or document-level check is acceptable ONLY when the App Readiness section answers (1) with "None — fully static".
 
 ### 2d. Wire the `build` script
 
@@ -155,7 +164,7 @@ This is mechanical — add the type, add the implementation skeleton. Do it once
 
 Pick 2-4 related stories. Write all their code + test YAML in as few turns as possible using parallel Write calls. Every `data-test` attribute in the preflight's `SELECTORS_NEEDED` list must appear in your component code.
 
-App readiness must resolve before any test interacts with a page. `cy.appReady()` is called automatically after every `visit` (and explicitly via the `awaitReady` DSL step for mid-flow gating). Implement `cypress/support/app-ready.ts` to define when your app is ready — pick one mechanism that fits the rendering stack (a global the framework sets after hydration, an attribute on a known node, polling component state, or a one-line no-op for a fully static site) and apply it uniformly. Record the chosen mechanism in `CONVENTIONS/technical.md`. Routes need not set any specific attribute; how readiness is signaled is the project's call.
+App readiness must resolve before any test interacts with a page. `cy.appReady()` is called automatically after every `visit` (and explicitly via the `awaitReady` DSL step for mid-flow gating). The implementation in `cypress/support/app-ready.ts` flows from the App Readiness section of `CONVENTIONS/technical.md` (see step 2c) — boundaries get listed in conventions first, the Cypress check asserts the signals those boundaries emit. If the page contains any deferred-execution boundary, the check MUST observe those boundaries; `document.readyState`, body presence, and `cy.wrap(true)` are pre-flight failures. Routes need not set any specific attribute; how readiness is signaled is the project's call within the rule.
 
 #### Phase B: Test targeted stories
 
