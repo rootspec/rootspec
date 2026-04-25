@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.6.0] - 2026-04-24
+
 ### Changed
 
 - **App-readiness contract** replaces the body-level `data-ready` prescription from 7.4.0/7.5.0. The framework no longer dictates HOW an app signals readiness — what "ready" means is project-defined in a new project-owned file `cypress/support/app-ready.ts`. The framework provides the primitive `cy.appReady()` and a DSL step `awaitReady`; the project provides the implementation. The shared `safeVisit` step calls `cy.appReady()` automatically after every visit. Body-level readiness conflated "page shell in DOM" with "app interactive" — distinct moments for any framework with async islands or lazy hydration. The new contract delegates the definition to where it belongs, the application.
