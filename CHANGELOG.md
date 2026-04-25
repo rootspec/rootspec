@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.7.0] - 2026-04-25
+
 ### Added
 
 - **`scripts/detect-stack.sh`** — single source of truth for framework detection. Emits `STACK`/`DEV_CMD`/`PREVIEW_CMD`/`PORT` for the project. Detection order: captured-original from `.rootspec.json` `prerequisites.detected` (the project's pre-bootstrap package.json scripts), then framework config-file presence (`astro.config.*`, `vite.config.*`, `next.config.*`, `nuxt.config.*`, `svelte.config.*`, `remix.config.*`, `eleventy.config.*`), then devDependency inspection. Brownfield-friendly: a Vite project running on `--host 0.0.0.0 --port 5174` keeps those flags rather than getting substituted with the framework default. `scaffold-cypress.sh` consumes it for `baseUrl`; `/rs-impl` consumes it to populate the wrappers; `/rs-update` consumes it to reconcile `dev_cmd_recursive`.
