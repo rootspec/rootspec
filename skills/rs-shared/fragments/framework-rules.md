@@ -51,15 +51,17 @@ Changes flow downward through abstraction layers.
 Every feature must support at least one Design Pillar from Level 1.
 If a feature doesn't support any pillar, it doesn't belong.
 
-## Interactive Readiness
+## App Readiness
 
-Any element whose click or input is asserted by a test must be functional at the moment the test reaches it. Server-rendered inert DOM is not sufficient for tests that drive interaction.
+E2E tests must wait for **app readiness** — not DOM readiness, not body readiness — before driving interactions. Server-rendered inert DOM is not sufficient. The page shell being in the DOM and the application being interactive are different moments for any framework with asynchronous islands, lazy hydration, or code-splitting.
 
-If the rendering stack has any gap between DOM existing and event handlers being attached (server render then client wiring, lazy code-splitting, progressive enhancement), the implementation must either:
+**The framework makes no claim about HOW an app signals readiness.** The application owns the definition. What "ready" means depends on the stack: all islands hydrated, a store rehydrated, fonts loaded, an event fired, a global set, etc.
 
-- **(a)** defer rendering until the element is fully interactive, or
-- **(b)** signal readiness once all client wiring is complete.
+**Contract:**
 
-**Readiness contract:** Pages signal readiness by setting `<body data-ready="true">` when the page's interactive handlers are attached. The shared `visit` step waits for this attribute before returning. A page that never sets it fails with a visible timeout at the visit step, not as silent flake downstream.
+- The framework provides a Cypress primitive `cy.appReady()` and a DSL step `awaitReady`.
+- The project provides the implementation in `cypress/support/app-ready.ts`.
+- The shared `visit` step calls `cy.appReady()` automatically after every visit; tests can also use `awaitReady` mid-flow after a click or route change that triggers async work.
+- Until the project defines `cy.appReady()`, the scaffolded stub throws a clear error — silent no-ops re-create the flake the contract is meant to prevent.
 
-The rule is universal; how a specific renderer satisfies it is implementation-specific and belongs in `CONVENTIONS/technical.md`, not here.
+How a specific app satisfies the contract belongs in `CONVENTIONS/technical.md`, not here. A static site implements `cy.appReady()` as a one-line no-op; a hydration-heavy site polls its own state.

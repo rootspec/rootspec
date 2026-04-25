@@ -55,6 +55,13 @@ if [[ -f "$ROOT/.rootspec.json" ]] && ! grep -q '"previewServer"' "$ROOT/.rootsp
   RULE_VIOLATIONS+=("previewServer_missing")
 fi
 
+# Legacy body-level data-ready wait in steps.ts (pre-7.6.0 contract)
+if [[ -f "$ROOT/cypress/support/steps.ts" ]] \
+   && grep -q "have.attr.*data-ready" "$ROOT/cypress/support/steps.ts" 2>/dev/null \
+   && ! grep -q "cy\.appReady" "$ROOT/cypress/support/steps.ts" 2>/dev/null; then
+  RULE_VIOLATIONS+=("legacy_body_ready")
+fi
+
 RULE_VIOLATIONS_OUT=""
 for v in "${RULE_VIOLATIONS[@]:-}"; do
   [[ -z "$v" ]] && continue

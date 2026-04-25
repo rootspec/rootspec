@@ -11,6 +11,7 @@
 | `fill` | `fill: { selector: '[data-test=input]', value: 'text' }` | Fill an input |
 | `loginAs` | `loginAs: 'member'` | Authenticate as a user role |
 | `seedItem` | `seedItem: { slug: 'id', status: 'active' }` | Create test data |
+| `awaitReady` | `awaitReady: true` | Wait for app readiness (mid-flow gate after click/route change) |
 
 ## Core Assertion Steps (then)
 
@@ -19,11 +20,13 @@
 | `shouldContain` | `shouldContain: { selector: '[data-test=el]', text: 'expected' }` | Verify text content |
 | `shouldExist` | `shouldExist: { selector: '[data-test=el]' }` | Verify element exists |
 
-## Visit Readiness Contract
+## App Readiness
 
-After `visit`, the shared step waits for `<body data-ready="true">` before proceeding. The application must set this attribute once the page's interactive handlers are attached. Pages that never set it will fail at the visit step with a clear timeout — not as silent flake at a downstream click/fill.
+After `visit`, the shared step calls `cy.appReady()` automatically. The Cypress command lives in `cypress/support/app-ready.ts` and is project-owned — the application defines what "ready" means (a global, an attribute, a polled state, etc.). The scaffolded stub throws until customized; replace it with the readiness check your app actually needs (one line for static sites).
 
-See `framework-rules.md` → Interactive Readiness for the rule. How each framework satisfies it belongs in `CONVENTIONS/technical.md`.
+For mid-flow gating (after a click or route change that triggers async work), use the `awaitReady` step.
+
+See `framework-rules.md` → App Readiness for the rule. How each app satisfies it belongs in `CONVENTIONS/technical.md`.
 
 ## Extending the DSL
 
@@ -37,6 +40,7 @@ export type Step =
   | { fill: { selector: string; value: string } }
   | { loginAs: string }
   | { seedItem: Record<string, unknown> }
+  | { awaitReady: true }
   | { shouldContain: { selector: string; text: string } }
   | { shouldExist: { selector: string } }
   // Custom steps:
@@ -79,6 +83,7 @@ const StepSchema = z.union([
   z.object({ fill: z.object({ selector: z.string(), value: z.string() }) }),
   z.object({ loginAs: z.string() }),
   z.object({ seedItem: z.record(z.unknown()) }),
+  z.object({ awaitReady: z.literal(true) }),
   z.object({ shouldContain: z.object({ selector: z.string(), text: z.string() }) }),
   z.object({ shouldExist: z.object({ selector: z.string() }) }),
   // Custom:
@@ -111,4 +116,5 @@ When a test fails, follow this decision tree:
 | `cypress/support/e2e.ts` | Global setup: `beforeEach` with DB reset |
 | `cypress/support/steps.ts` | DSL step implementations |
 | `cypress/support/schema.ts` | DSL validation schema (Zod) |
+| `cypress/support/app-ready.ts` | Project-defined `cy.appReady()` — what "ready" means for this app |
 | `cypress/e2e/*.cy.ts` | Test suite files that load YAML and run tests |

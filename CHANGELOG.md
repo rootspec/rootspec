@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **App-readiness contract** replaces the body-level `data-ready` prescription from 7.4.0/7.5.0. The framework no longer dictates HOW an app signals readiness — what "ready" means is project-defined in a new project-owned file `cypress/support/app-ready.ts`. The framework provides the primitive `cy.appReady()` and a DSL step `awaitReady`; the project provides the implementation. The shared `safeVisit` step calls `cy.appReady()` automatically after every visit. Body-level readiness conflated "page shell in DOM" with "app interactive" — distinct moments for any framework with async islands or lazy hydration. The new contract delegates the definition to where it belongs, the application.
+- **Scaffolded `cypress/support/app-ready.ts` stub throws by default** with instructions to customize. Silent no-ops re-create the exact flake the contract is meant to prevent — first test run forces an explicit decision (one-line no-op for static sites; real readiness check for hydration-heavy sites).
+- **`framework-rules.md`** `Interactive Readiness` section renamed to `App Readiness` and rewritten to describe the project-defined contract.
+- **`l5-test-dsl.md`** documents the new `awaitReady` step in the Core Setup Steps table and lists `cypress/support/app-ready.ts` in the Cypress Infrastructure table.
+- **`scaffold-cypress.sh`** now writes `cypress/support/app-ready.ts`, appends `import './app-ready';` to `cypress/support/e2e.ts`, drops the body-level wait from `safeVisit` in favor of `cy.appReady()`, and adds `awaitReady: z.literal(true)` to the schema union.
+- **`gap-analysis.sh`** detects pre-7.6.0 projects via `legacy_body_ready` (steps.ts has the body wait but no `cy.appReady()`); `/rs-update` Step 5 reconciles interactively (stub-only or full migration). Migration is opt-in — untouched projects keep the body wait in their user-owned `steps.ts`.
+- **`rs-impl/SKILL.md`** Step 2b and Phase A guidance now points at implementing `cypress/support/app-ready.ts` instead of wiring `<body data-ready=…>`.
+
 ## [7.5.0] - 2026-04-23
 
 ### Added

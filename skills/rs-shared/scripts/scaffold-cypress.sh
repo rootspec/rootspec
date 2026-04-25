@@ -101,6 +101,11 @@ EOTS
   if ! grep -q "screenshot-hook" "$fullpath" 2>/dev/null; then
     printf '\nimport "./screenshot-hook";\n' >> "$fullpath"
   fi
+
+  # Always ensure app-ready import is present (registers cy.appReady())
+  if ! grep -q "app-ready" "$fullpath" 2>/dev/null; then
+    printf '\nimport "./app-ready";\n' >> "$fullpath"
+  fi
 }
 
 # Write the screenshot hook as a separate file — immune to e2e.ts being
@@ -141,6 +146,7 @@ export function runSetupSteps(steps: Step[]) {
     else if ('fill' in s) cy.get(s.fill.selector).clear().type(s.fill.value);
     else if ('loginAs' in s) cy.task('loginAs', s.loginAs);
     else if ('seedItem' in s) cy.task('seedItem', s.seedItem);
+    else if ('awaitReady' in s) cy.appReady();
   }
 }
 
@@ -160,9 +166,9 @@ export function runAssertionSteps(steps: Step[]) {
 //    target starts with that path, the runner concatenates them into a 404
 //    like /sub/path/sub/path/. Throws a clear error rather than silently
 //    normalizing — keeps the contract visible to maintainers.
-// 2. After visit, wait for <body data-ready=\"true\"> (interactivity readiness
-//    contract from 7.4.0). Pages must signal once interactive handlers are
-//    attached so tests don't race the framework.
+// 2. After visit, wait for app readiness via cy.appReady(). What 'ready' means
+//    is project-defined in cypress/support/app-ready.ts. The framework makes
+//    no claim about HOW the app signals readiness — only that it must.
 function safeVisit(target: string) {
   const baseUrl = (Cypress.config('baseUrl') || '').replace(/\\/+\$/, '');
   let basePath = '';
@@ -175,8 +181,52 @@ function safeVisit(target: string) {
     );
   }
   cy.visit(target);
-  cy.get('body', { timeout: 10000 }).should('have.attr', 'data-ready', 'true');
+  cy.appReady();
 }
+"
+
+# --- 3b. cypress/support/app-ready.ts ---
+# Project-owned. Single source of truth for the app-readiness contract.
+# Default body throws — forces an explicit decision the first time tests run,
+# rather than silently passing when the app isn't actually ready.
+write_if_missing "cypress/support/app-ready.ts" "// cypress/support/app-ready.ts
+//
+// Define when your app is ready to be driven by tests. This file is the single
+// source of truth for the readiness contract. Document the chosen mechanism in
+// rootspec/CONVENTIONS/technical.md.
+//
+// Examples (uncomment and adapt one):
+//
+//   // Static site, no async work — ready immediately:
+//   Cypress.Commands.add('appReady', () => { cy.wrap(true); });
+//
+//   // App sets a global when ready:
+//   Cypress.Commands.add('appReady', () => {
+//     cy.window({ timeout: 10000 }).its('appReady').should('be.true');
+//   });
+//
+//   // Wait for every island/component that opted in:
+//   Cypress.Commands.add('appReady', () => {
+//     cy.get('[data-ready=\"true\"]', { timeout: 10000 }).should('exist');
+//   });
+
+Cypress.Commands.add('appReady', () => {
+  throw new Error(
+    'cy.appReady() is not implemented. Edit cypress/support/app-ready.ts ' +
+    'to define when your app is ready for tests. See ' +
+    'rootspec/CONVENTIONS/technical.md for project-specific guidance.'
+  );
+});
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      appReady(): Chainable<void>;
+    }
+  }
+}
+
+export {};
 "
 
 # --- 4. cypress/support/schema.ts ---
@@ -188,6 +238,7 @@ const StepSchema = z.union([
   z.object({ fill: z.object({ selector: z.string(), value: z.string() }) }),
   z.object({ loginAs: z.string() }),
   z.object({ seedItem: z.record(z.unknown()) }),
+  z.object({ awaitReady: z.literal(true) }),
   z.object({ shouldContain: z.object({ selector: z.string(), text: z.string() }) }),
   z.object({ shouldExist: z.object({ selector: z.string() }) }),
 ]);

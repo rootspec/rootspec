@@ -8,6 +8,21 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.6.0
+
+Summary: App-readiness contract replaces body-level data-ready prescription. The framework no longer dictates HOW an app signals readiness — the project defines it in `cypress/support/app-ready.ts`.
+Framework files: Replace
+Prerequisites:
+  NEW: cypress/support/app-ready.ts — project-owned `cy.appReady()` implementation; scaffolded stub throws until customized
+  CHANGED: cypress/support/steps.ts — `safeVisit` now calls `cy.appReady()` after `cy.visit()` instead of waiting for `<body data-ready="true">`. New DSL step `awaitReady` for mid-flow gating.
+  CHANGED: cypress/support/e2e.ts — add `import './app-ready';` so the Cypress command registers
+  CHANGED: cypress/support/schema.ts — add `awaitReady: z.literal(true)` to StepSchema
+Manual: After upgrading, /rs-update Step 5 reconciles `legacy_body_ready` interactively:
+  - Stub-only — scaffold app-ready.ts + e2e.ts import; leave steps.ts alone (existing body wait keeps working)
+  - Full migration — also rewrite `safeVisit` to call `cy.appReady()` and add the `awaitReady` step
+  After full migration, the project must implement `cy.appReady()` — one-line no-op for static sites, real check for hydration-heavy sites. Document the chosen mechanism in `CONVENTIONS/technical.md`.
+Breaking: false (untouched projects keep the body wait in their user-owned steps.ts; migration is opt-in)
+
 ## 7.5.0
 
 Summary: Three framework-level test-correctness rules (baseUrl/visit contract, peer-dep discipline, preview-mode E2E default) — interactivity contract already shipped in 7.4.0

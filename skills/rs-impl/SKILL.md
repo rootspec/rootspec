@@ -74,7 +74,7 @@ This creates the test file with all stories embedded as YAML string literals usi
 - `loginAs` steps → implement the task body in `cypress.config.ts`
 - `seedItem` steps → implement the task body in `cypress.config.ts`
 - Custom DSL steps not in the core set → extend `steps.ts` and `schema.ts`
-- Readiness signal wiring — every page the tests visit must set `<body data-ready="true">` once its interactive handlers are attached. See `../rs-shared/fragments/framework-rules.md` → Interactive Readiness. How you satisfy this is implementation-specific (defer rendering until interactive, or set the attribute after client wiring completes) and must be recorded in `CONVENTIONS/technical.md`.
+- App readiness — implement `cypress/support/app-ready.ts` so `cy.appReady()` resolves only when the app is actually interactive. The shared `visit` step calls it automatically after every visit. The scaffolded stub throws until you customize it; your call whether "ready" is a global, an attribute, polled state, or a one-line no-op for a static site. Record the chosen mechanism in `CONVENTIONS/technical.md`. See `../rs-shared/fragments/framework-rules.md` → App Readiness.
 
 Write all customizations in a single multi-file operation.
 
@@ -155,7 +155,7 @@ This is mechanical — add the type, add the implementation skeleton. Do it once
 
 Pick 2-4 related stories. Write all their code + test YAML in as few turns as possible using parallel Write calls. Every `data-test` attribute in the preflight's `SELECTORS_NEEDED` list must appear in your component code.
 
-Every route in `ROUTES_NEEDED` must set `<body data-ready="true">` when its interactive handlers are attached — the shared `visit` step waits for this attribute. Pick a single mechanism that fits the rendering stack (e.g., effect on mount, post-hydration callback, SSR-then-client hook, or unconditional set for static pages) and apply it uniformly. Record the chosen mechanism in `CONVENTIONS/technical.md` so every subsequent route follows it.
+App readiness must resolve before any test interacts with a page. `cy.appReady()` is called automatically after every `visit` (and explicitly via the `awaitReady` DSL step for mid-flow gating). Implement `cypress/support/app-ready.ts` to define when your app is ready — pick one mechanism that fits the rendering stack (a global the framework sets after hydration, an attribute on a known node, polling component state, or a one-line no-op for a fully static site) and apply it uniformly. Record the chosen mechanism in `CONVENTIONS/technical.md`. Routes need not set any specific attribute; how readiness is signaled is the project's call.
 
 #### Phase B: Test targeted stories
 

@@ -2,9 +2,10 @@
 
 Two implicit test-runner decisions that, if mismatched, silently produce 404s
 or run against the wrong server. Made explicit here so generation enforces
-both ends. Interactivity readiness (the third test-runner contract) lives in
-`framework-rules.md` → Interactive Readiness, and is enforced by the
-`safeVisit` helper waiting for `<body data-ready="true">` after every visit.
+both ends. App readiness (the third test-runner contract) lives in
+`framework-rules.md` → App Readiness, and is enforced by the `safeVisit`
+helper calling `cy.appReady()` after every visit. The project owns the
+`cy.appReady()` implementation; the framework owns the call site.
 
 ## baseUrl ↔ visit target
 

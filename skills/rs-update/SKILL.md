@@ -134,7 +134,17 @@ Offer two paths:
 - **Preserve current behavior** — add `"testMode": "dev"` to `.rootspec.json` `prerequisites`. No other changes. Project keeps running dev-mode E2E by explicit choice.
 - **Switch to preview default (recommended)** — copy `scripts/preview.sh` from the bundle (per `previewServer_missing` below), rewrite `scripts/test.sh` to the testMode-aware template (see `bootstrap-init.sh`), add `"testMode": "preview"` and `"previewServer": "./scripts/preview.sh"` to `.rootspec.json`. Verify `npm run build` works before committing.
 
-If the developer picks "switch", note that the project may need `data-ready` signals on interactive elements (see Interactivity contract in rs-impl SKILL.md) — preview mode exposes hydration timing bugs that dev mode hid.
+If the developer picks "switch", note that the project may need an app-readiness implementation (see App Readiness in framework-rules.md) — preview mode exposes hydration timing bugs that dev mode hid.
+
+### `legacy_body_ready`
+
+The project's `cypress/support/steps.ts` waits for `<body data-ready="true">` after every visit (the pre-7.6.0 contract). The framework now expects `cy.appReady()` — project-defined readiness in `cypress/support/app-ready.ts`. Body-level readiness can't observe per-island hydration; on stacks with async islands, tests pass body-ready and then click into inert DOM.
+
+Offer two paths:
+- **Stub-only (minimal change)** — scaffold `cypress/support/app-ready.ts` with the throwing default and add `import './app-ready';` to `cypress/support/e2e.ts`. Leave `steps.ts` alone for now. The developer can adopt `cy.appReady()` later, story by story. Existing tests continue to use the body wait.
+- **Full migration (recommended)** — same as stub-only, plus rewrite `safeVisit` in `steps.ts`: replace the `cy.get('body').should('have.attr', 'data-ready', 'true')` line with `cy.appReady()`. Add the `awaitReady` step to `runSetupSteps` and the schema. The developer must then implement `cy.appReady()` (a one-line no-op for static sites, or a real check for hydration-heavy sites). Existing pages that set `body[data-ready]` are untouched — they can keep doing so or stop, the framework no longer cares.
+
+If full migration is chosen, advise the developer that the FIRST `npx cypress run` will fail with "cy.appReady() is not implemented" — that's the contract surfacing, not a regression.
 
 ### `previewServer_missing`
 
