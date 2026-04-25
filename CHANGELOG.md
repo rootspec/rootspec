@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.6.1] - 2026-04-25
+
 ### Added
 
 - **`scripts/check-app-ready.sh` pre-flight gate** — detects shallow `cy.appReady()` implementations against projects that mount deferred-execution boundaries. Greps the project for client directives (Astro `client:load`/`idle`/`visible`/`only`/`media`), RSC `'use client'` islands, `React.lazy`/`<Suspense>`, Next.js `dynamic()`, Vue `defineAsyncComponent`. If found AND `cypress/support/app-ready.ts` resolves on `document.readyState`, body presence, `cy.wrap(true)`, or an empty body, exits non-zero with an actionable message. Runs from `scripts/test.sh` (so pre-commit + CI gate on it) and from `rs-validate` Step 1 (before the test server starts). Closes the loop where 7.6.0's contract gave the impl agent total freedom and the agent shipped `cy.document().its('readyState').should('eq', 'complete')` for an Astro+React island app — flaky greens that survived validate.
