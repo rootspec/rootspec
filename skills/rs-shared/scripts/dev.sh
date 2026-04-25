@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 # dev.sh — Dev server with process management
 # Usage: ./scripts/dev.sh [start|stop|restart|status|logs]
-# Copied into projects by /rs-init. Edit DEV_CMD and PORT to match your project.
+# Copied into projects by /rs-init. Populated by /rs-impl from detected stack.
+#
+# Layering contract (see rootspec/00.FRAMEWORK.md → Dev Server Wrapper):
+#   package.json "dev"/"start"/"preview" scripts MUST go through this wrapper.
+#   This wrapper MUST call the framework binary directly (e.g.
+#   `npx astro dev --port 4321`, `npx vite dev --port 5173`). It MUST NOT call
+#   `npm run dev` (which calls this wrapper → infinite recursion) or itself.
+#   The self-check in do_start() enforces this.
 
 set -euo pipefail
 
-# --- Configuration (edit these) ---
-DEV_CMD="npm run dev"
+# --- Configuration ---
+# DEV_CMD is left empty intentionally. /rs-impl writes the framework command
+# here based on the detected stack and records the choice in
+# rootspec/CONVENTIONS/technical.md → Dev Server. Until then, do_start fails loud.
+DEV_CMD=""
 PORT="${PORT:-3000}"
 
 # --- Internal ---
@@ -76,8 +86,36 @@ port_owner() {
   lsof -i :"$port" -sTCP:LISTEN -t 2>/dev/null | head -1
 }
 
+# --- Self-check: refuse to recurse ---
+# Wrapper bypass / recursion is the most common dev.sh footgun. Hard-fail
+# rather than spawn the wrong process or loop forever.
+check_dev_cmd() {
+  if [[ -z "$DEV_CMD" ]]; then
+    echo "ERROR: DEV_CMD is empty in scripts/dev.sh." >&2
+    echo "" >&2
+    echo "  /rs-impl populates DEV_CMD with the framework binary based on" >&2
+    echo "  the detected stack (e.g. 'npx astro dev --port 4321'). Run" >&2
+    echo "  /rs-impl, or set DEV_CMD manually and document the choice in" >&2
+    echo "  rootspec/CONVENTIONS/technical.md → Dev Server." >&2
+    exit 1
+  fi
+  case "$DEV_CMD" in
+    *"npm run dev"*|*"yarn dev"*|*"pnpm dev"*|*"bun run dev"*|*"./scripts/dev.sh"*)
+      echo "ERROR: DEV_CMD='${DEV_CMD}' would recurse through this wrapper." >&2
+      echo "" >&2
+      echo "  package.json 'dev' scripts call ./scripts/dev.sh. This wrapper" >&2
+      echo "  must call the framework binary directly (e.g. 'npx astro dev'," >&2
+      echo "  'npx vite dev', 'npx next dev -p 3000'), not 'npm run dev' or" >&2
+      echo "  itself. Edit scripts/dev.sh." >&2
+      exit 1
+      ;;
+  esac
+}
+
 # --- Commands ---
 do_start() {
+  check_dev_cmd
+
   local resolved_port
   resolved_port=$(detect_port)
 

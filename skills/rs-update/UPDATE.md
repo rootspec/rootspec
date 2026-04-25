@@ -8,6 +8,21 @@ Prerequisite entries are tagged:
 
 ---
 
+## 7.7.0
+
+Summary: Dev-server wrapper layering fix (no more `npm run dev` recursion / wrapper bypass) and `rs-update` CI mode (transactional, non-interactive, structured report). Two failures from CI runs of 7.6.1 — `dev.sh` recursing through `npm run dev`, and `rs-update` hanging on confirmation prompts then leaving projects in half-broken state — both closed.
+Framework files: Replace
+Prerequisites:
+  NEW: scripts/detect-stack.sh — emits STACK/DEV_CMD/PREVIEW_CMD/PORT for the project's framework; sourced by /rs-impl, scaffold-cypress.sh, and /rs-update dev_cmd_recursive reconciliation
+  CHANGED: scripts/dev.sh — DEV_CMD ships empty with a hard-fail recursion guard. /rs-impl populates from detected stack. Existing projects with DEV_CMD="npm run dev" routing through the wrapper trigger dev_cmd_recursive (see Manual)
+  CHANGED: scripts/preview.sh — same treatment as dev.sh (PREVIEW_CMD empty + recursion guard)
+  CHANGED: .rootspec.json — bootstrap-init.sh now writes prerequisites.detected.devCmd / .previewCmd capturing the project's pre-bootstrap package.json scripts so detect-stack.sh can preserve custom flags (port, host, env wiring) when /rs-impl populates the wrappers
+  CHANGED: rootspec/CONVENTIONS/technical.md — must include "Dev Server" section with detected stack + literal command (DEV_CMD/PREVIEW_CMD); /rs-impl writes this on first run
+Manual: After upgrading, /rs-update Step 5 reconciles new violations:
+  - dev_cmd_recursive — detect-stack.sh resolves the framework binary; rs-update overwrites scripts/dev.sh and scripts/preview.sh with the new templates (empty DEV_CMD/PREVIEW_CMD + recursion guard) and substitutes the detected command. CI mode auto-applies if detection succeeds; aborts if the stack is unknown.
+  CI mode is opt-in via `/rs-update ci` or `ROOTSPEC_CI=1` (also auto-detected via `CI=true`). Transactional: all pre-flights pass or no files written. Structured key=value report at end (RESULT/APPLIED/SKIPPED/ABORTED_ON/EXIT) for CI scripts to parse. legacy_body_ready in CI mode is always full migration but pre-flight aborts if cy.appReady() is the throwing stub or shallow against deferred-execution boundaries — refusing to ship known-broken state was the whole point.
+Breaking: false (existing dev.sh/preview.sh user copies stay on the old templates and keep working — they only migrate via dev_cmd_recursive reconciliation when the developer runs /rs-update; CI mode is opt-in)
+
 ## 7.6.1
 
 Summary: Pre-flight gate detects shallow `cy.appReady()` against deferred-execution boundaries. Hydration-aware-readiness rule added to framework. Scaffold stops priming the cheap no-op default. Conventions-first ordering: `CONVENTIONS/technical.md` → App Readiness must list deferred-execution boundaries and their signals BEFORE `app-ready.ts` is written.

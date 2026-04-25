@@ -51,6 +51,17 @@ Changes flow downward through abstraction layers.
 Every feature must support at least one Design Pillar from Level 1.
 If a feature doesn't support any pillar, it doesn't belong.
 
+## Dev Server Wrapper
+
+The framework ships two process-management wrappers — `scripts/dev.sh` (dev server) and `scripts/preview.sh` (built-artifact preview server). Both enforce port handling, single-instance guarantees, log capture, and clean shutdown via `trap` from `scripts/test.sh`. Bypassing them defeats those guarantees.
+
+**Two rules:**
+
+1. **`package.json` `dev`/`preview`/`start` scripts MUST go through the wrappers.** They invoke `./scripts/dev.sh start` / `./scripts/preview.sh start`, never the framework binary directly. Anyone who types `npm run dev` must hit the wrapper, not bypass it.
+2. **The wrappers MUST call the framework binary directly.** `DEV_CMD` and `PREVIEW_CMD` hold the literal binary invocation (`npx astro dev --port 4321`, `npx vite dev --port 5173`, `npx next dev -p 3000`, etc.). They MUST NOT contain `npm run dev` / `yarn dev` / `pnpm dev` / `bun run dev` / `./scripts/dev.sh` (and equivalents for preview) — those route back through this wrapper and recurse infinitely. The self-check in each wrapper's `do_start()` rejects all of these and exits 1 with a clear error.
+
+`/rs-impl` populates `DEV_CMD`/`PREVIEW_CMD` from `detect-stack.sh` (which prefers the captured-original from `package.json` before bootstrap, then framework config-file presence, then devDependency inspection) and records the choice in `CONVENTIONS/technical.md` → Dev Server. Until populated, the wrappers ship empty and hard-fail on first invocation — by design, so half-configured projects surface immediately.
+
 ## App Readiness
 
 E2E tests must wait for **app readiness** — not DOM readiness, not body readiness — before driving interactions. Server-rendered inert DOM is not sufficient. The page shell being in the DOM and the application being interactive are different moments for any framework with asynchronous islands, lazy hydration, or code-splitting.

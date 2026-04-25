@@ -7,6 +7,27 @@ You are upgrading a RootSpec project to the latest framework version. Start by t
 
 "I'll check your project against the latest framework version and upgrade what's needed — framework files, prerequisites, and config."
 
+## Mode
+
+This skill runs in one of two modes:
+
+- **Interactive (default)** — present plan, wait for confirmation, walk through each violation reconciliation with the developer. Suitable for human-in-the-loop runs.
+- **CI** — auto-apply the plan without prompts; per-violation policy is the "recommended" path; the entire run is **transactional** (all pre-flights pass or no files are modified). Suitable for `claude -p` invocations in CI pipelines, scheduled rebuilds, or any unattended context.
+
+Detect CI mode by either signal:
+
+```bash
+if [[ "${CI_FOCUS:-}" == "ci" || -n "${ROOTSPEC_CI:-}" || "${CI:-}" == "true" ]]; then
+  CI_MODE="true"
+else
+  CI_MODE="false"
+fi
+```
+
+(`CI_FOCUS` here means the literal string `ci` was passed as the focus arg to this skill — `/rs-update ci`.) Most CI runners set `CI=true` automatically; users who want CI mode locally can export `ROOTSPEC_CI=1`.
+
+When `CI_MODE=true`, follow the **CI behavior** notes throughout this document and skip all confirmation prompts. When false, follow the interactive flow as written.
+
 ## Step 1: Detect the gap
 
 Run the scanning and gap analysis scripts:
@@ -67,7 +88,43 @@ Will NOT touch:
 ⚠ Breaking changes detected — see details above.
 ```
 
-Wait for the developer to confirm. They can exclude items (e.g., "skip dev.sh").
+**Interactive:** wait for the developer to confirm. They can exclude items (e.g., "skip dev.sh").
+
+**CI:** skip the confirmation. Run the **transactional pre-flight** (below) before applying anything. If pre-flight fails, abort the whole run with the structured report; otherwise apply the full plan.
+
+### Transactional pre-flight (CI only)
+
+Before writing any files, validate every planned action. If any check fails, emit the abort report (Step 6 CI format) and exit 1 — no partial application.
+
+For each entry in `RULE_VIOLATIONS`, run its pre-flight check:
+
+| Violation | Pre-flight check | Failure → |
+|-----------|------------------|-----------|
+| `baseUrl_has_path` | Categorize all `visit:` references; relative paths (don't start with `/`) require human disambiguation | Abort |
+| `testmode_implicit_dev` | None — auto-pick "preserve current behavior" | Pass |
+| `previewServer_missing` | None — additive | Pass |
+| `legacy_body_ready` | `cypress/support/app-ready.ts` exists AND does not contain `'cy.appReady() is not implemented'` AND `check-app-ready.sh` passes against it | Abort |
+| `shallow_app_ready` | None — auto-rewrite forbidden by framework rule | Abort |
+| `dev_cmd_recursive` | `detect-stack.sh` returns non-empty `DEV_CMD` (and `PREVIEW_CMD` if preview also recursive) | Abort if undetected |
+
+Abort messages must include the violation token, what was checked, why it failed, and what the developer needs to do before re-running. Concrete error templates:
+
+- `legacy_body_ready` pre-flight failure:
+  > Cannot apply legacy_body_ready migration: cy.appReady() is not implemented
+  > (or is shallow). Implement cypress/support/app-ready.ts per
+  > CONVENTIONS/technical.md → App Readiness, then re-run /rs-update ci.
+  >
+  > Wiring safeVisit to a throwing cy.appReady() is a known-broken state we
+  > refuse to ship.
+
+- `shallow_app_ready` pre-flight failure: relay the error from `check-app-ready.sh` verbatim, plus a note that CI mode does not auto-rewrite — implement per `CONVENTIONS/technical.md` → App Readiness and re-run.
+
+- `dev_cmd_recursive` pre-flight failure (undetected stack):
+  > Cannot reconcile dev_cmd_recursive: detect-stack.sh found no framework
+  > (no astro/vite/next/nuxt/etc. config or devDependency). Set DEV_CMD and
+  > PREVIEW_CMD in scripts/dev.sh / scripts/preview.sh manually, then re-run.
+
+If any pre-flight fails: write nothing, emit the abort report, exit 1.
 
 ## Step 4: Execute the upgrade
 
@@ -110,7 +167,20 @@ bash "$(dirname "$0")/../rs-shared/scripts/write-spec-status.sh" {specDirectory}
 
 ## Step 5: Reconcile framework rules
 
-Run when `RULE_VIOLATIONS` from gap-analysis is non-empty. Each token names a project state that predates a framework rule. For each, present the fix and ask before applying — none of these auto-rewrite user code.
+Run when `RULE_VIOLATIONS` from gap-analysis is non-empty. Each token names a project state that predates a framework rule.
+
+**Interactive:** for each violation, present the fix and ask before applying — none of these auto-rewrite user code. **CI:** apply the recommended path automatically per the policy table below; pre-flight already validated each in Step 3.
+
+### CI policy summary
+
+| Violation | CI behavior |
+|-----------|-------------|
+| `baseUrl_has_path` | Auto-strip path from `baseUrl`; auto-prefix unprefixed visit references (relative references aborted in pre-flight). |
+| `testmode_implicit_dev` | Auto-pick **"preserve current behavior"** — add `"testMode": "dev"`. Conservative — switching to preview can change behavior unexpectedly. Human flips later if desired. |
+| `previewServer_missing` | Auto-add `"previewServer": "./scripts/preview.sh"`, copy bundled template if missing. |
+| `legacy_body_ready` | **Always full migration.** Pre-flight already verified `cy.appReady()` is implemented. |
+| `shallow_app_ready` | **Never auto-rewrite** — pre-flight already aborted the run. (This row exists only as a reminder; CI never reaches Apply phase if this violation is present.) |
+| `dev_cmd_recursive` | Auto-populate `DEV_CMD`/`PREVIEW_CMD` from `detect-stack.sh` and overwrite the wrappers with the bundled templates (so the recursion guard ships). Pre-flight already confirmed detection succeeded. |
 
 ### `baseUrl_has_path`
 
@@ -124,7 +194,8 @@ Show the developer:
    - **Unprefixed** (start with `/` but not the path) — offer to prepend the path.
    - **Relative** (don't start with `/`) — flag for manual review; relative paths break under both old and new contracts.
 
-Apply only what the developer confirms. After: re-run `/rs-validate` to confirm.
+**Interactive:** apply only what the developer confirms. After: re-run `/rs-validate` to confirm.
+**CI:** auto-strip the path; auto-prefix unprefixed visit references with the path; relative references already aborted in pre-flight.
 
 ### `testmode_implicit_dev`
 
@@ -136,6 +207,8 @@ Offer two paths:
 
 If the developer picks "switch", note that the project may need an app-readiness implementation (see App Readiness in framework-rules.md) — preview mode exposes hydration timing bugs that dev mode hid.
 
+**CI:** auto-pick "preserve current behavior" (add `"testMode": "dev"`). Switching to preview can change runtime behavior; CI's job is to upgrade safely, not to flip behavioral defaults. Human can switch later.
+
 ### `legacy_body_ready`
 
 The project's `cypress/support/steps.ts` waits for `<body data-ready="true">` after every visit (the pre-7.6.0 contract). The framework now expects `cy.appReady()` — project-defined readiness in `cypress/support/app-ready.ts`. Body-level readiness can't observe per-island hydration; on stacks with async islands, tests pass body-ready and then click into inert DOM.
@@ -145,6 +218,8 @@ Offer two paths:
 - **Full migration (recommended)** — same as stub-only, plus rewrite `safeVisit` in `steps.ts`: replace the `cy.get('body').should('have.attr', 'data-ready', 'true')` line with `cy.appReady()`. Add the `awaitReady` step to `runSetupSteps` and the schema. The developer must then implement `cy.appReady()` (a one-line no-op for static sites, or a real check for hydration-heavy sites). Existing pages that set `body[data-ready]` are untouched — they can keep doing so or stop, the framework no longer cares.
 
 If full migration is chosen, advise the developer that the FIRST `npx cypress run` will fail with "cy.appReady() is not implemented" — that's the contract surfacing, not a regression.
+
+**CI:** always full migration. Pre-flight already verified `cy.appReady()` is implemented (not the throwing stub, not shallow against deferred-execution boundaries). Wiring `safeVisit` to a throwing stub is a known-broken state and is rejected at pre-flight, not silently shipped.
 
 ### `shallow_app_ready`
 
@@ -159,6 +234,34 @@ Do NOT auto-rewrite `app-ready.ts` — the choice depends on the app's actual hy
 
 If the project also lacks `scripts/check-app-ready.sh`, copy it from the bundled `rs-shared/scripts/` so future test runs gate on the same rule. After the rewrite, run `./scripts/check-app-ready.sh .` to confirm the gate passes.
 
+**CI:** never auto-rewrite. Pre-flight aborts the whole run with the `check-app-ready.sh` error verbatim. Implement per `CONVENTIONS/technical.md` → App Readiness, then re-run.
+
+### `dev_cmd_recursive`
+
+The project's `scripts/dev.sh` and/or `scripts/preview.sh` has `DEV_CMD`/`PREVIEW_CMD` set to a recursion pattern (`npm run dev`, `./scripts/dev.sh`, equivalents) AND `package.json` routes its `dev`/`preview` script through the wrapper. As soon as anyone types `npm run dev`, this loops forever. The bypass that has been masking this in some projects (package.json calling the framework binary directly, skipping the wrapper) defeats the wrapper's port handling and single-instance guarantees.
+
+Run `detect-stack.sh` to determine the framework binary command:
+
+```bash
+eval "$(bash "$(dirname "$0")/../rs-shared/scripts/detect-stack.sh" .)"
+echo "Detected: $STACK"
+echo "DEV_CMD=$DEV_CMD"
+echo "PREVIEW_CMD=$PREVIEW_CMD"
+```
+
+`detect-stack.sh` prefers the captured-original from `.rootspec.json` `prerequisites.detected` (the project's pre-bootstrap `package.json` scripts), then falls back to framework config-file presence, then `package.json` devDependency inspection.
+
+**Interactive:** show the developer the detected `DEV_CMD`/`PREVIEW_CMD` values and ask for confirmation. They may want to edit (e.g., add `--host 0.0.0.0`, change port). Apply only what they confirm. If `STACK=unknown`, walk them through identifying the framework binary manually.
+
+**CI:** auto-apply if `DEV_CMD` is non-empty (pre-flight already validated). Abort the run if `STACK=unknown` (pre-flight failure).
+
+Apply phase:
+1. Overwrite `scripts/dev.sh` with the bundled template from `../rs-shared/scripts/dev.sh` (this ships the new recursion guard).
+2. Overwrite `scripts/preview.sh` with the bundled template from `../rs-shared/scripts/preview.sh`.
+3. Substitute the empty `DEV_CMD=""` line in the wrapper with `DEV_CMD="<detected command>"`. Same for `PREVIEW_CMD=""`.
+4. Verify package.json `dev`/`preview` scripts route through the wrappers (they should already if this violation fired). If not, rewrite them.
+5. Update `CONVENTIONS/technical.md` → Dev Server section with the chosen commands.
+
 ### `previewServer_missing`
 
 The project's `.rootspec.json` lacks a `previewServer` entry. If `testmode_implicit_dev` is being resolved with the "switch" path, fix this in the same step. Otherwise, add the entry pointing at `./scripts/preview.sh` (and copy the bundled template if missing) so the prerequisite is recorded — even projects that stay on dev mode benefit from having preview infra available.
@@ -168,6 +271,8 @@ The project's `.rootspec.json` lacks a `previewServer` entry. If `testmode_impli
 For each violation, report what was reconciled (or skipped on developer's request) in Step 6's report.
 
 ## Step 6: Report
+
+### Interactive
 
 Summarize what was done:
 
@@ -190,9 +295,41 @@ Next steps:
   - [Any manual instructions from UPDATE.md]
 ```
 
+### CI
+
+Emit a structured key=value report so CI scripts can grep:
+
+```
+RESULT=success
+APPLIED=baseUrl_has_path,previewServer_missing,legacy_body_ready
+SKIPPED=
+ABORTED_ON=
+EXIT=0
+```
+
+On abort:
+
+```
+RESULT=aborted
+APPLIED=
+SKIPPED=
+ABORTED_ON=shallow_app_ready
+EXIT=1
+```
+
+Field semantics:
+- `RESULT` — `success` (all violations resolved or none present) or `aborted` (one or more pre-flights failed; nothing applied — transactional contract).
+- `APPLIED` — comma-separated tokens for violations that were reconciled this run.
+- `SKIPPED` — tokens not applied because the developer (in interactive mode) declined; always empty in CI.
+- `ABORTED_ON` — comma-separated tokens whose pre-flight failed. Empty on success.
+- `EXIT` — `0` success, `1` abort. The skill exits with this code.
+
+Print the report to stdout on a clean newline so CI can pipe it to a parser.
+
 ## Focus
 
 If the developer passes an argument:
+- `"ci"` → activate **CI mode** (see Mode section): no confirmations, recommended path per violation, transactional pre-flight, structured key=value report. Equivalent to setting `ROOTSPEC_CI=1`.
 - A version number (e.g., `"6.2.2"`) → show what changed in that specific version only
 - `"check"` → run gap analysis only, don't execute any changes (dry run)
 - `"prerequisites"` → only handle prerequisite updates (skip framework files)

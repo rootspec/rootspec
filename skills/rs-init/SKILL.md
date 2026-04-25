@@ -55,9 +55,9 @@ Read `../rs-shared/fragments/prerequisites.md` for the full reference on what ea
 
 Report what was detected. For brownfield projects, adapt the bootstrap defaults:
 
-- **Dev server** — edit the `DEV_CMD` variable in `scripts/dev.sh` to match the project's actual dev command (e.g., `npm run dev`, `npx vite`).
+- **Dev server** — `scripts/dev.sh` and `scripts/preview.sh` ship with empty `DEV_CMD`/`PREVIEW_CMD` and a recursion guard. They will hard-fail until populated. **Do not set them here** — `/rs-impl` runs `detect-stack.sh` and writes the framework binary in based on the detected stack (or the captured-original from the project's pre-bootstrap `package.json`, preserved in `.rootspec.json` `prerequisites.detected`). Mention this in the handoff: "Run `/rs-impl` to populate dev/preview wrappers and create conventions."
 - **Existing prerequisites** — if the project already had a dev server, test runner, etc., update `.rootspec.json` to point to them instead of the bootstrap defaults.
-- **Package.json scripts** — add `dev:start`, `dev:stop`, `dev:restart` entries if not already present.
+- **Package.json scripts** — add `dev:start`, `dev:stop`, `dev:restart` entries if not already present. The `dev`, `preview`, and `start` scripts MUST go through `./scripts/dev.sh` / `./scripts/preview.sh`. `bootstrap-init.sh` writes them this way for greenfield; for brownfield, rewrite any existing `dev`/`preview`/`start` script to route through the wrapper. (The pre-rewrite values are captured into `.rootspec.json` `prerequisites.detected` so `/rs-impl` can reuse them.)
 
 ### Cypress plugin setup
 

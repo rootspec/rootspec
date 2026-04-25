@@ -1,16 +1,26 @@
 #!/usr/bin/env bash
 # preview.sh — Preview server (built artifact) with process management
 # Usage: ./scripts/preview.sh [start|stop|restart|status|logs|url]
-# Copied into projects by /rs-init. Edit PREVIEW_CMD and PORT to match your project.
+# Copied into projects by /rs-init. Populated by /rs-impl from detected stack.
 #
 # Preview servers serve the production build. Used by scripts/test.sh in the
 # default 'preview' testMode. For dev-mode testing, set
 # .rootspec.json prerequisites.testMode = "dev" and use scripts/dev.sh instead.
+#
+# Layering contract (see rootspec/00.FRAMEWORK.md → Dev Server Wrapper):
+#   package.json "preview"/"start" scripts MUST go through this wrapper.
+#   This wrapper MUST call the framework binary directly (e.g.
+#   `npx astro preview --port 4321`, `npx vite preview --port 4173`). It MUST
+#   NOT call `npm run preview` (which calls this wrapper → infinite recursion)
+#   or itself. The self-check in do_start() enforces this.
 
 set -euo pipefail
 
-# --- Configuration (edit these) ---
-PREVIEW_CMD="npm run preview"
+# --- Configuration ---
+# PREVIEW_CMD is left empty intentionally. /rs-impl writes the framework
+# command here based on the detected stack and records the choice in
+# rootspec/CONVENTIONS/technical.md → Dev Server. Until then, do_start fails loud.
+PREVIEW_CMD=""
 PORT="${PORT:-4173}"
 
 # --- Internal ---
@@ -67,8 +77,34 @@ read_pid() {
 port_in_use() { lsof -i :"$1" -sTCP:LISTEN >/dev/null 2>&1; }
 port_owner() { lsof -i :"$1" -sTCP:LISTEN -t 2>/dev/null | head -1; }
 
+# --- Self-check: refuse to recurse ---
+check_preview_cmd() {
+  if [[ -z "$PREVIEW_CMD" ]]; then
+    echo "ERROR: PREVIEW_CMD is empty in scripts/preview.sh." >&2
+    echo "" >&2
+    echo "  /rs-impl populates PREVIEW_CMD with the framework binary based on" >&2
+    echo "  the detected stack (e.g. 'npx astro preview --port 4321'). Run" >&2
+    echo "  /rs-impl, or set PREVIEW_CMD manually and document the choice in" >&2
+    echo "  rootspec/CONVENTIONS/technical.md → Dev Server." >&2
+    exit 1
+  fi
+  case "$PREVIEW_CMD" in
+    *"npm run preview"*|*"yarn preview"*|*"pnpm preview"*|*"bun run preview"*|*"./scripts/preview.sh"*)
+      echo "ERROR: PREVIEW_CMD='${PREVIEW_CMD}' would recurse through this wrapper." >&2
+      echo "" >&2
+      echo "  package.json 'preview' scripts call ./scripts/preview.sh. This" >&2
+      echo "  wrapper must call the framework binary directly (e.g." >&2
+      echo "  'npx astro preview', 'npx vite preview', 'npx next start -p 3000')," >&2
+      echo "  not 'npm run preview' or itself. Edit scripts/preview.sh." >&2
+      exit 1
+      ;;
+  esac
+}
+
 # --- Commands ---
 do_start() {
+  check_preview_cmd
+
   local resolved_port
   resolved_port=$(detect_port)
 

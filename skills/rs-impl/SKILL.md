@@ -78,12 +78,23 @@ This creates the test file with all stories embedded as YAML string literals usi
 
 Write all customizations in a single multi-file operation.
 
-### 2c. Conventions + dev server (combine into 1 turn)
+### 2c. Populate dev/preview wrappers, conventions, and dev server (combine into 1 turn)
 
-Start the dev server AND create conventions if needed in the same turn:
+The wrappers `scripts/dev.sh` and `scripts/preview.sh` ship empty (with a hard-fail recursion guard). Populate `DEV_CMD`/`PREVIEW_CMD` from the detected stack BEFORE attempting to start the server. Read once, write once, then start.
 
 ```bash
-./scripts/dev.sh start 2>/dev/null || nohup npm run dev > /dev/null 2>&1 &
+eval "$(bash "$SHARED_DIR/scripts/detect-stack.sh" .)"
+# DEV_CMD and PREVIEW_CMD are now set (e.g. DEV_CMD='npx astro dev --port 4321').
+# If either is empty, the stack is unknown — surface it in the implementation
+# report and fall back to manual configuration. Do not start the server.
+```
+
+Then in the same turn, write `DEV_CMD="..."` and `PREVIEW_CMD="..."` into the wrappers (Edit the existing empty assignment lines in `scripts/dev.sh` and `scripts/preview.sh`), and add the choice to `CONVENTIONS/technical.md` → "Dev Server" with two lines: detected stack + the literal command. Future `/rs-impl` runs read this section as authority — only re-run detection if the section is missing.
+
+After populating, start the dev server:
+
+```bash
+./scripts/dev.sh start
 sleep 3
 ```
 

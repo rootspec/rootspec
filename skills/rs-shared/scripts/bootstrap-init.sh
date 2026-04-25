@@ -29,6 +29,19 @@ fi
 
 echo "Bootstrapping RootSpec v${VERSION} in ${ROOT}"
 
+# --- Capture original package.json dev/preview scripts BEFORE any rewrite ---
+# detect-stack.sh prefers these over framework defaults so brownfield projects
+# keep their custom flags (custom port, host, env wiring, etc.) when /rs-impl
+# populates DEV_CMD/PREVIEW_CMD into the wrappers.
+ORIG_DEV=""
+ORIG_PREVIEW=""
+if [[ -f "$ROOT/package.json" ]]; then
+  ORIG_DEV=$(grep -oE '"dev"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/package.json" 2>/dev/null \
+    | head -1 | sed 's/.*"dev"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//')
+  ORIG_PREVIEW=$(grep -oE '"preview"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/package.json" 2>/dev/null \
+    | head -1 | sed 's/.*"preview"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//')
+fi
+
 # --- Step 2: Spec directory and base files ---
 
 mkdir -p "$ROOT/rootspec"
@@ -206,6 +219,14 @@ fi
 
 # --- Step 4: Write .rootspec.json ---
 
+# Include captured-original dev/preview commands when present so detect-stack.sh
+# can prefer them over framework defaults (preserves brownfield custom flags).
+DETECTED_BLOCK=""
+if [[ -n "$ORIG_DEV" || -n "$ORIG_PREVIEW" ]]; then
+  DETECTED_BLOCK=$(printf ',\n    "detected": {\n      "devCmd": "%s",\n      "previewCmd": "%s"\n    }' \
+    "${ORIG_DEV//\"/\\\"}" "${ORIG_PREVIEW//\"/\\\"}")
+fi
+
 cat > "$ROOT/.rootspec.json" <<EOJSON
 {
   "version": "${VERSION}",
@@ -216,7 +237,7 @@ cat > "$ROOT/.rootspec.json" <<EOJSON
     "testMode": "preview",
     "preCommitHook": ".githooks/pre-commit",
     "releaseScript": "./scripts/release.sh",
-    "validationScript": "./scripts/test.sh"
+    "validationScript": "./scripts/test.sh"${DETECTED_BLOCK}
   }
 }
 EOJSON

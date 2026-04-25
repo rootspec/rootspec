@@ -29,16 +29,13 @@ write_if_missing() {
 }
 
 # --- Detect baseUrl from project config ---
-BASE_URL="http://localhost:3000"
-if [[ -f "$ROOT/astro.config.mjs" ]] || [[ -f "$ROOT/astro.config.ts" ]]; then
-  BASE_URL="http://localhost:4321"
-elif [[ -f "$ROOT/vite.config.ts" ]] || [[ -f "$ROOT/vite.config.js" ]]; then
-  BASE_URL="http://localhost:5173"
-elif [[ -f "$ROOT/next.config.js" ]] || [[ -f "$ROOT/next.config.ts" ]] || [[ -f "$ROOT/next.config.mjs" ]]; then
-  BASE_URL="http://localhost:3000"
-elif [[ -f "$ROOT/nuxt.config.ts" ]]; then
-  BASE_URL="http://localhost:3000"
+# Source PORT from the shared stack detector (single source of truth).
+DETECT_SCRIPT="$(dirname "$0")/detect-stack.sh"
+DETECTED_PORT=""
+if [[ -x "$DETECT_SCRIPT" ]]; then
+  DETECTED_PORT=$("$DETECT_SCRIPT" "$ROOT" 2>/dev/null | grep '^PORT=' | head -1 | sed 's/^PORT=//')
 fi
+BASE_URL="http://localhost:${DETECTED_PORT:-3000}"
 
 # Strip any path component — baseUrl is host:port only.
 # Deploy subpaths belong in visit() targets, not baseUrl. Concatenating both

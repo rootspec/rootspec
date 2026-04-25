@@ -71,6 +71,40 @@ if [[ -x "$SHARED_DIR/scripts/check-app-ready.sh" ]] \
   fi
 fi
 
+# Recursive DEV_CMD / PREVIEW_CMD in scripts/dev.sh / scripts/preview.sh
+# (pre-7.7.0 templates shipped DEV_CMD="npm run dev" / PREVIEW_CMD="npm run preview").
+# Only fires when package.json routes through the wrapper — otherwise the
+# bypass works and the recursion is dormant.
+package_routes_through_wrapper() {
+  local script_name="$1"   # "dev" or "preview"
+  local wrapper="$2"       # "./scripts/dev.sh" or "./scripts/preview.sh"
+  [[ -f "$ROOT/package.json" ]] || return 1
+  grep -oE "\"$script_name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" "$ROOT/package.json" 2>/dev/null \
+    | grep -q "$wrapper"
+}
+
+wrapper_has_recursion() {
+  local wrapper_file="$1"  # "$ROOT/scripts/dev.sh" or "$ROOT/scripts/preview.sh"
+  local var_name="$2"      # "DEV_CMD" or "PREVIEW_CMD"
+  [[ -f "$wrapper_file" ]] || return 1
+  grep -oE "^${var_name}=\"[^\"]*\"" "$wrapper_file" 2>/dev/null \
+    | head -1 \
+    | grep -qE "(npm run (dev|preview)|yarn (dev|preview)|pnpm (dev|preview)|bun run (dev|preview)|\./scripts/(dev|preview)\.sh)"
+}
+
+if wrapper_has_recursion "$ROOT/scripts/dev.sh" "DEV_CMD" \
+   && package_routes_through_wrapper "dev" "./scripts/dev.sh"; then
+  RULE_VIOLATIONS+=("dev_cmd_recursive")
+fi
+
+if wrapper_has_recursion "$ROOT/scripts/preview.sh" "PREVIEW_CMD" \
+   && package_routes_through_wrapper "preview" "./scripts/preview.sh"; then
+  # Same violation token — reconciliation handles dev + preview together.
+  if [[ ! " ${RULE_VIOLATIONS[*]:-} " =~ " dev_cmd_recursive " ]]; then
+    RULE_VIOLATIONS+=("dev_cmd_recursive")
+  fi
+fi
+
 RULE_VIOLATIONS_OUT=""
 for v in "${RULE_VIOLATIONS[@]:-}"; do
   [[ -z "$v" ]] && continue
